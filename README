@@ -1,0 +1,10 @@
+aplwrap is a GTK+-based wrapper for GNU APL.
+
+Needs:
+
+unifont-7.0.01.ttf
+unifont_csur-7.0.01.ttf
+unifont_upper-7.0.01.ttf
+unifont_upper_csur-7.0.01.ttf
+
+from http://unifoundry.com/unifont.html
