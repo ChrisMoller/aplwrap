@@ -1,0 +1,29 @@
+
+
+To install aplwrap, it's necessary to have a copy of the GNU APL source code 
+installed at least for the duration of the installation of aplwrap. (In order 
+to ensure that aplwrap and GNU APL agree on the Unicode-Quad-AV mapping, aplwrap
+references appropriate file from GNU APL.)  The GNU APL source can be discarded
+after aplwrap is installed.  The configure.ac file in the aplwrap sources must 
+be edited to point to the top of the GNU APL sources.  The default is:
+
+	APL_SOURCES=-I/mnt/disk5/home/moller/tinkering/aplplot/apl-1.3
+
+which is unlikely to do anyone any good.
+
+
+aplwrap requires GTK+ version 3.0.12 or newer, including the development
+package (like gtk3-devel) if your distribution separates that from the GTK+
+library package.
+
+Once the above is in place:
+
+	./autogen.sh
+	make
+	sudo make install
+
+Optionally, if you like, you can alias "aplwrap" to something shorter--
+I alias it to "aw."
+
+Any complaints or suggestions:  moller@mollerware.com
+
