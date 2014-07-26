@@ -3,9 +3,17 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 
 
-# this has to point into the GNU apl source tree
-APL_SOURCES=-I/mnt/disk5/home/moller/tinkering/aplplot/apl-1.3
+# apl source directory
+AC_ARG_WITH(apl-source-dir,
+	AC_HELP_STRING(
+		[--with-apl-source-dir],
+		[APL source directory]),
+	[APL_SOURCES=$withval],
+	[echo "";
+echo "apl-source-dir must be specified and point to the GNU APL source tree.";
+echo ""; exit])
 AC_SUBST(APL_SOURCES)
+
 
 
 AC_PROG_CC
