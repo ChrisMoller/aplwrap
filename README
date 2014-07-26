@@ -1,10 +1,35 @@
 aplwrap is a GTK+-based wrapper for GNU APL.
 
-Needs:
+Usage:
+  aplwrap [OPTION...]
 
-unifont-7.0.01.ttf
-unifont_csur-7.0.01.ttf
-unifont_upper-7.0.01.ttf
-unifont_upper_csur-7.0.01.ttf
+Help Options:
+  -h, --help               Show help options
+  --help-all               Show all help options
+  --help-gtk               Show GTK+ Options
 
-from http://unifoundry.com/unifont.html
+Application Options:
+  -s, --ftsize             Integer font size in points.
+  -x, --xeq                Set an absolute or on-path executable APL 
+				other than the default, "apl".  (This
+				is primarily intended to allow the use
+				of uninstalled copies of APL --
+					aplwrap -x ./apl
+				-- for development purposes.  It's 
+				unlikely to work with anything other
+				than GNU APL.)
+  --display=DISPLAY        X display to use
+
+
+In use, aplwrap simply provides a textual interface to GNU APL.  The
+only things that aren't obvious are that pressing "Enter" on any non-empty
+line sends the contents of that line to apl--you don't have to copy-n-paste
+to re-execute a line--and that under the "Help" button is another button
+that brings up a keymap image.
+
+Contact me if I've screwed anything up or if there's a feature you want added.
+
+Have fun,
+Chris Moller
+moller@mollerware.com
+
