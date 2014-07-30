@@ -28,14 +28,14 @@
 #define char_df1(_n, _u, _t, _f, _p)
 typedef enum {
    Invalid_CHT = -1,
-#include <src/Avec.def>
+#include <Avec.def>
    MAX_AV,
 } CHT_Index;
 
 #define char_def(n, u, t, f, p) UNI_ ## n = u,
 #define char_df1(n, u, t, f, p) UNI_ ## n = u,
 typedef enum {
-#include <src/Avec.def>
+#include <Avec.def>
   Unicode_0       = 0,            ///< End fo unicode string
   Invalid_Unicode = 0x55AA55AA,   ///< An invalid Unicode.
 } Unicode;
@@ -59,7 +59,7 @@ typedef struct Character_definition
    { AV_ ## n, UNI_ ## n, # n, __LINE__,         0,         0, 0x ## p },
 #define char_df1(_n, _u, _t, _f, _p)
 characters_s characters[] = {
-#include <src/Avec.def>
+#include <Avec.def>
 };
 #define char_index(c)    characters[c].av_val
 #define char_unicode(c)  characters[c].unicode

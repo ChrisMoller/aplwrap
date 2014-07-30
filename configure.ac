@@ -1,23 +1,11 @@
 AC_INIT([aplwrap], [1.0], [moller@mollerware.com])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
-
-
-# apl source directory
-AC_ARG_WITH(apl-source-dir,
-	AC_HELP_STRING(
-		[--with-apl-source-dir],
-		[APL source directory]),
-	[APL_SOURCES=$withval],
-	[echo "";
-echo "apl-source-dir must be specified and point to the GNU APL source tree.";
-echo ""; exit])
-AC_SUBST(APL_SOURCES)
-
-
-
 AC_PROG_CC
 AM_PROG_CC_C_O
+
+APL_SOURCES=`apl --show_src_dir`
+AC_SUBST(APL_SOURCES)
 
 GETTEXT_PACKAGE=gtk30
 AC_SUBST(GETTEXT_PACKAGE)

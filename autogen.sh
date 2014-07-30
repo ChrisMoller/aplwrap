@@ -9,4 +9,3 @@ else
         autoreconf --force --install --verbose || exit $?
 fi
 
-#./configure

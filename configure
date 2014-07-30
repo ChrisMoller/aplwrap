@@ -597,6 +597,7 @@ MAINT
 MAINTAINER_MODE_FALSE
 MAINTAINER_MODE_TRUE
 GETTEXT_PACKAGE
+APL_SOURCES
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -614,7 +615,6 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-APL_SOURCES
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -684,7 +684,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
-with_apl_source_dir
 enable_dependency_tracking
 enable_maintainer_mode
 '
@@ -1324,11 +1323,6 @@ Optional Features:
   --disable-maintainer-mode
                           disable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
-
-Optional Packages:
-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-apl-source-dir   APL source directory
 
 Some influential environment variables:
   CC          C compiler command
@@ -2377,28 +2371,6 @@ _am_tools='gnutar  pax cpio none'
 am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
 
 
-
-
-
-
-
-
-
-## this has to point into the GNU apl source tree
-#APL_SOURCES=-I/mnt/disk5/home/moller/tinkering/aplplot/apl-1.3
-#AC_SUBST(APL_SOURCES)
-
-
-# apl source directory
-
-# Check whether --with-apl-source-dir was given.
-if test "${with_apl_source_dir+set}" = set; then :
-  withval=$with_apl_source_dir; APL_SOURCES=$withval
-else
-  echo "";
-echo "apl-source-dir must be specified and point to the GNU APL source tree.";
-echo ""; exit
-fi
 
 
 
@@ -3509,6 +3481,9 @@ if test "$am_t" != yes; then
    CC="$am_aux_dir/compile $CC"
 fi
 
+
+
+APL_SOURCES=`apl --show_src_dir`
 
 
 GETTEXT_PACKAGE=gtk30
