@@ -92,8 +92,9 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_aplwrap_OBJECTS = aplwrap-aplwrap.$(OBJEXT)
 aplwrap_OBJECTS = $(am_aplwrap_OBJECTS)
-aplwrap_LDADD = $(LDADD)
-aplwrap_LINK = $(CCLD) $(aplwrap_CFLAGS) $(CFLAGS) $(aplwrap_LDFLAGS) \
+am__DEPENDENCIES_1 =
+aplwrap_DEPENDENCIES = $(am__DEPENDENCIES_1)
+aplwrap_LINK = $(CCLD) $(aplwrap_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -248,7 +249,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
-aplwrap_LDFLAGS = $(GTK_LIBS)
+aplwrap_LDADD = $(GTK_LIBS)
 all: all-am
 
 .SUFFIXES:
