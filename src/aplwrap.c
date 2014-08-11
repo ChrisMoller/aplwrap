@@ -238,8 +238,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
       gtk_text_buffer_insert_at_cursor (buffer, text, sz-1);
     }
 
-    ssize_t __attribute__ ((unused)) wrc;	// fake-out for a picky
-    wrc = write (apl_in, text, sz);		// compiler
+    ssize_t __attribute__ ((unused)) wrc;
+    wrc = write (apl_in, text, sz);
     wrc = write (apl_in, &nl, 1);
     g_free (text);
     return FALSE;
