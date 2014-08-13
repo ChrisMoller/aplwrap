@@ -29,7 +29,8 @@ GPid apl_pid = -1;
 #define XEQ_FALLBACK	"apl"
 
 #define FT_SIZE_FALLBACK	12
-gint ft_size = FT_SIZE_FALLBACK;
+static gint ft_size = FT_SIZE_FALLBACK;
+static gboolean monospace = FALSE;
 
 void
 gapl2_quit (GtkWidget *widget,
@@ -316,6 +317,10 @@ main (int   argc,
       &ft_size,
       "Integer font size in points.",
       NULL },
+    { "mono", 'm', 0, G_OPTION_ARG_NONE,
+      &monospace,
+      "Use monospace font.",
+      NULL },
     { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
       &new_fn,
       "Set an absolute or on-path executable APL other than the default.",
@@ -393,7 +398,8 @@ main (int   argc,
 
   build_menubar (vbox);
 
-  desc = pango_font_description_from_string ("UnifontMedium");
+  desc =
+    pango_font_description_from_string (monospace ? "SimPL" : "UnifontMedium");
   pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
