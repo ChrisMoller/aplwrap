@@ -16,6 +16,7 @@ int kill(pid_t pid, int sig);	// compiler issue
 
 GtkTextBuffer *buffer = NULL;
 GtkWidget *window;
+GtkWidget *scroll;
 GtkWidget *view;
 PangoFontDescription *desc = NULL;
 
@@ -290,11 +291,10 @@ apl_read (gint fd,
   }
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.1,
-				TRUE,
 				0.0,
+				TRUE,
+				0.2,
 				1.0);
-
   return TRUE;
 }
 
@@ -394,6 +394,7 @@ main (int   argc,
   }
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size (GTK_WINDOW (window), 680, 440);
     
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (gapl2_quit), NULL);
@@ -408,7 +409,7 @@ main (int   argc,
     pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
   pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
-  GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+  scroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_set_size_request (scroll, 680, 440);
   view = gtk_text_view_new ();
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
@@ -416,7 +417,7 @@ main (int   argc,
 		    G_CALLBACK (key_press_event), NULL);
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
