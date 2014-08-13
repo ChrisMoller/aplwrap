@@ -31,6 +31,13 @@ GPid apl_pid = -1;
 
 #define FT_SIZE_FALLBACK	12
 static gint ft_size = FT_SIZE_FALLBACK;
+
+#define WIDTH_FALLBACK	680
+static gint width = WIDTH_FALLBACK;
+
+#define HEIGHT_FALLBACK	440
+static gint height = HEIGHT_FALLBACK;
+
 static gboolean vwidth = FALSE;
 
 void
@@ -321,11 +328,19 @@ main (int   argc,
   GOptionEntry entries[] = {
     { "ftsize", 's', 0, G_OPTION_ARG_INT,
       &ft_size,
-      "Integer font size in points.",
+      "Font size in points (integer).",
+      NULL },
+    { "width", 'w', 0, G_OPTION_ARG_INT,
+      &width,
+      "Width in pixels (integer).",
+      NULL },
+    { "height", 'h', 0, G_OPTION_ARG_INT,
+      &height,
+      "Height in pixels (integer).",
       NULL },
     { "vwidth", 'v', 0, G_OPTION_ARG_NONE,
       &vwidth,
-      "Use variable width font.",
+      "Use variable width font (boolean switch).",
       NULL },
     { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
       &new_fn,
@@ -394,7 +409,7 @@ main (int   argc,
   }
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 680, 440);
+  gtk_window_set_default_size (GTK_WINDOW (window), width, height);
     
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (gapl2_quit), NULL);

@@ -4,12 +4,14 @@ Usage:
   aplwrap [OPTION...]
 
 Help Options:
-  -h, --help               Show help options
+  --help               Show help options
   --help-all               Show all help options
   --help-gtk               Show GTK+ Options
 
 Application Options:
-  -s, --ftsize             Integer font size in points.
+  -s, --ftsize             Font size in points (integer).
+  -w, --width              Width in pixels (integer).
+  -h, --height             Height in pixels (integer).
   -v, --vwidth             Use variable width font.
   -x, --xeq                Set an absolute or on-path executable APL 
 				other than the default, "apl".  (This
