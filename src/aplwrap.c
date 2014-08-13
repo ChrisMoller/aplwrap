@@ -288,6 +288,12 @@ apl_read (gint fd,
 	  
     gtk_text_buffer_insert_at_cursor (buffer, bfr, (int)sz);
   }
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.1,
+				TRUE,
+				0.0,
+				1.0);
 
   return TRUE;
 }
