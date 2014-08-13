@@ -30,7 +30,7 @@ GPid apl_pid = -1;
 
 #define FT_SIZE_FALLBACK	12
 static gint ft_size = FT_SIZE_FALLBACK;
-static gboolean monospace = FALSE;
+static gboolean vwidth = FALSE;
 
 void
 gapl2_quit (GtkWidget *widget,
@@ -323,9 +323,9 @@ main (int   argc,
       &ft_size,
       "Integer font size in points.",
       NULL },
-    { "mono", 'm', 0, G_OPTION_ARG_NONE,
-      &monospace,
-      "Use monospace font.",
+    { "vwidth", 'v', 0, G_OPTION_ARG_NONE,
+      &vwidth,
+      "Use variable width font.",
       NULL },
     { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
       &new_fn,
@@ -405,7 +405,7 @@ main (int   argc,
   build_menubar (vbox);
 
   desc =
-    pango_font_description_from_string (monospace ? "SimPL" : "UnifontMedium");
+    pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
   pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);

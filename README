@@ -10,7 +10,7 @@ Help Options:
 
 Application Options:
   -s, --ftsize             Integer font size in points.
-  -m, --mono               Use monospace font.
+  -v, --vwidth             Use variable width font.
   -x, --xeq                Set an absolute or on-path executable APL 
 				other than the default, "apl".  (This
 				is primarily intended to allow the use
