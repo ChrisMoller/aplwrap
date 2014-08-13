@@ -360,12 +360,34 @@ main (int   argc,
     g_clear_error (&error);
   }
 
+#if 0
   gchar *apl_argv[] = {"apl",
 		       "--noColor",
 		       "--rawCIN",
 		       "-w", "500",
 			"--silent",		// fixme make option
 		       NULL};
+#else
+  gchar **apl_argv = g_alloca ((7 + argc) * sizeof (gchar *));
+  bzero (apl_argv, (7 + argc) * sizeof (gchar *));
+  {
+    gint ix = 0;
+    apl_argv[ix++] = "apl";
+    apl_argv[ix++] = "--noColor";
+    apl_argv[ix++] = "--rawCIN";
+    apl_argv[ix++] = "-w";
+    apl_argv[ix++] = "500";
+    apl_argv[ix++] = "--silent";
+
+    if (argc > 1) {
+      for (int i = 1; i < argc; i++) {
+	if (0 != g_strcmp0 (argv[i], "--")) apl_argv[ix++] = argv[i];
+      }
+    }
+    apl_argv[ix++] = NULL;
+  }
+
+#endif
 
   if (new_fn) apl_argv[0] = new_fn;
 
