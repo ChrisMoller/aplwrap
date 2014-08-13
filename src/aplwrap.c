@@ -410,7 +410,6 @@ main (int   argc,
   pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   scroll = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_set_size_request (scroll, 680, 440);
   view = gtk_text_view_new ();
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
   g_signal_connect (view, "key-press-event",
