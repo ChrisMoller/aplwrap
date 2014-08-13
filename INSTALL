@@ -15,7 +15,7 @@ library package.
 
 Once the above is in place:
 
-	./configure --with-apl-source-dir=<GNU APL source directory>
+	./configure
 	make
 	sudo make install
 
