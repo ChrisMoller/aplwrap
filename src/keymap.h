@@ -45,8 +45,8 @@ keymap_s keymap[] = {
   {AV_UP_ARROW,	      AV_YEN},		   	   //	y		29	
   {AV_DOWN_ARROW,     0},		   	   //	u		30	
   {AV_IOTA,	      AV_INDEX_UNDERBAR},	   //	i		31	
-  {AV_CIRCLE,	      0},	   		   //	o		32	
-  {AV_STAR_OPERATOR,  0},			   //	p		33	
+  {AV_CIRCLE,	      AV_CIRCLE_DIARESIS},	   //	o		32	
+  {AV_STAR_OPERATOR,  AV_STAR_DIAERESIS},	   //	p		33	
   {AV_LEFT_ARROW,     AV_QUOTE_Quad},	   	   //	[		34	
   {AV_RIGHT_ARROW,    0},			   //	]		35	
   {0,		      0},	   		   //			36	
@@ -74,7 +74,7 @@ keymap_s keymap[] = {
   {AV_ASCII_BAR,      0},		  	   //	m		58	
   {AV_COMMENT,        AV_COMMA_BAR}, 	  	   //	, (comma},	59	
   {AV_BACKSLASH_BAR,  AV_DELTA_UNDERBAR},	   //	. (dot},	60	
-  {AV_FORMAT,	      0},	       		   // 	/		61	
+  {AV_FORMAT,	      AV_Quad_COLON},		   // 	/		61	
   {0,		      0},		           //			62	
   {0,		      0},		           //			63
 };

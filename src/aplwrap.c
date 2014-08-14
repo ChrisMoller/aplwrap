@@ -216,9 +216,15 @@ build_menubar (GtkWidget *vbox)
 static gboolean
 key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-  if (event->type != GDK_KEY_PRESS) return FALSE;
- 
   GdkEventKey *key_event = (GdkEventKey *)event;
+
+#if 0
+  g_print ("state = %u, val = %u\n",
+	   key_event->state,
+	   key_event->keyval);
+#endif
+	   
+  if (event->type != GDK_KEY_PRESS) return FALSE;
   
   if (key_event->state == 0 && key_event->keyval == GDK_KEY_Return) {
     GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
