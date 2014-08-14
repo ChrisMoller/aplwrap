@@ -25,14 +25,12 @@
  *******/
 
 #define char_def( n, _u, _t, _f, _p) AV_ ## n,
-#ifdef DO_ODD_CHARS
 #define char_df1(_n, _u, _t, _f, _p) AV_ ## _n,
-#else
-#define char_df1(_n, _u, _t, _f, _p)
-#endif
+#define char_fake(_n, _u, _t, _f, _p) AV_ ## _n,
 typedef enum {
    Invalid_CHT = -1,
 #include <Avec.def>
+   char_fake(CENT         , 0x00a2 , END          , NO_SPACE ,  --) 
    MAX_AV,
 } CHT_Index;
 
@@ -61,9 +59,17 @@ typedef struct Character_definition
 //   { AV_ ## n, UNI_ ## n, # n, __LINE__, TOK_ ## t, FLG_ ## f, 0x ## p },
 #define char_def(n, _u, t, f, p) \
    { AV_ ## n, UNI_ ## n, # n, __LINE__,         0,         0, 0x ## p },
-#define char_df1(_n, _u, _t, _f, _p)
+
+#define char_df1(_n, _u, _t, _f, _p) \
+   { AV_ ## _n, UNI_ ## _n, # _n, __LINE__,         0,         0, -1 },
+
+#undef char_fake
+#define char_fake(_n, _u, _t, _f, _p) \
+   { AV_ ## _n, _u, # _n, __LINE__,         0,         0, -1 },
+
 characters_s characters[] = {
 #include <Avec.def>
+   char_fake(CENT         , 0x00a2 , END          , NO_SPACE ,  --) 
 };
 #define char_index(c)    characters[c].av_val
 #define char_unicode(c)  characters[c].unicode
