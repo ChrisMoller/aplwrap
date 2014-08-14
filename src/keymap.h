@@ -45,8 +45,13 @@ keymap_s keymap[] = {
   {AV_UP_ARROW,	      AV_YEN},		   	   //	y		29	
   {AV_DOWN_ARROW,     0},		   	   //	u		30	
   {AV_IOTA,	      AV_INDEX_UNDERBAR},	   //	i		31	
+#ifdef DO_ODD_CHARS
   {AV_CIRCLE,	      AV_CIRCLE_DIARESIS},	   //	o		32	
-  {AV_STAR_OPERATOR,  AV_STAR_DIAERESIS},	   //	p		33	
+  {AV_STAR_OPERATOR,  AV_STAR_DIAERESIS},	   //	p		33
+#else
+  {AV_CIRCLE,	      0},			   //	o		32	
+  {AV_STAR_OPERATOR,  0},			   //	p		33
+#endif
   {AV_LEFT_ARROW,     AV_QUOTE_Quad},	   	   //	[		34	
   {AV_RIGHT_ARROW,    0},			   //	]		35	
   {0,		      0},	   		   //			36	
@@ -73,8 +78,12 @@ keymap_s keymap[] = {
   {AV_DOWN_TACK,      0},		   	   //	n		57	
   {AV_ASCII_BAR,      0},		  	   //	m		58	
   {AV_COMMENT,        AV_COMMA_BAR}, 	  	   //	, (comma},	59	
-  {AV_BACKSLASH_BAR,  AV_DELTA_UNDERBAR},	   //	. (dot},	60	
-  {AV_FORMAT,	      AV_Quad_COLON},		   // 	/		61	
+  {AV_BACKSLASH_BAR,  AV_DELTA_UNDERBAR},	   //	. (dot},	60
+#ifdef DO_ODD_CHARS
+  {AV_FORMAT,	      AV_Quad_COLON},		   // 	/		61
+#else
+  {AV_FORMAT,	      0},		   	   // 	/		61
+#endif
   {0,		      0},		           //			62	
   {0,		      0},		           //			63
 };

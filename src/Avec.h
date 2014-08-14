@@ -25,7 +25,11 @@
  *******/
 
 #define char_def( n, _u, _t, _f, _p) AV_ ## n,
+#ifdef DO_ODD_CHARS
 #define char_df1(_n, _u, _t, _f, _p) AV_ ## _n,
+#else
+#define char_df1(_n, _u, _t, _f, _p)
+#endif
 typedef enum {
    Invalid_CHT = -1,
 #include <Avec.def>
