@@ -48,7 +48,7 @@ keymap_s keymap[] = {
   {AV_CIRCLE,	      AV_CIRCLE_DIARESIS},	   //	o		32
   {AV_STAR_OPERATOR,  AV_STAR_DIAERESIS},	   //	p		33
   {AV_LEFT_ARROW,     AV_QUOTE_Quad},	   	   //	[		34	
-  {AV_RIGHT_ARROW,    0},			   //	]		35	
+  {AV_RIGHT_ARROW,    AV_ZILDE},		   //	]		35	
   {0,		      0},	   		   //			36	
   {0,		      0},		   	   //			37	
   {AV_ALPHA,	      AV_ALPHA_UNDERBAR},	   //	a		38	
