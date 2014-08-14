@@ -40,6 +40,10 @@ static gint height = HEIGHT_FALLBACK;
 
 static gboolean vwidth = FALSE;
 
+#ifdef USE_ERR_TAG
+static GtkTextTag * err_tag;
+#endif
+
 void
 gapl2_quit (GtkWidget *widget,
 	     gpointer   data)
@@ -283,24 +287,174 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
   return FALSE;				// pass the event on
 }
 
+#define BUFFER_SIZE     1024
 
-static gboolean
-apl_read (gint fd,
-	  GIOCondition condition,
-	  gpointer user_data)
+#ifdef USE_GET_TEXT
+static gchar *
+get_text (gint fd, gint *accum_length_p)
 {
-  #define BUFFER_SIZE     256
-  char *bfr = alloca (BUFFER_SIZE);
+  gchar  *bfr = alloca (BUFFER_SIZE);
+  gchar  *accum = NULL;
+  gchar  *accum_ptr = NULL;
+  ssize_t accum_max = 0;
+  ssize_t accum_avail = 0;
+  
   *bfr = 0;
 
   ssize_t sz;
   while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
-    const gchar *end = NULL;
-    while (!g_utf8_validate (bfr, sz, &end)) {
-      if (end) *(gchar *)end = ' ';
+    if (sz > accum_avail) {
+      accum_avail += sz + BUFFER_SIZE;
+      accum_max   += sz + BUFFER_SIZE;
+      accum = g_try_realloc (accum, (gsize)accum_max);
+      if (accum_ptr == NULL) accum_ptr = accum;
     }
-	  
-    gtk_text_buffer_insert_at_cursor (buffer, bfr, (int)sz);
+    memcpy (accum_ptr, bfr, sz);
+    accum_ptr   += sz;
+    accum_avail -= sz;
+  }
+  
+  if (accum_length_p) *accum_length_p = (int)(accum_ptr - accum);
+
+  const gchar *end = NULL;
+  while (!g_utf8_validate (accum, *accum_length_p, &end)) {
+    if (end) *(gchar *)end = ' ';
+  }
+  return accum;
+}
+#endif
+
+static gboolean
+apl_read_out (gint fd,
+	      GIOCondition condition,
+	      gpointer user_data)
+{
+#ifdef USE_GET_TEXT
+  gint text_length;
+  gchar *text = get_text (fd, &text_length);
+#else
+  gchar  *bfr = alloca (BUFFER_SIZE);
+  static gchar  *text = NULL;
+  static gchar  *text_ptr = NULL;
+  static ssize_t text_max = 0;
+  static ssize_t text_avail = 0;
+  
+  *bfr = 0;
+
+  ssize_t sz;
+  while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
+    if (sz > text_avail) {
+      text_avail += sz + BUFFER_SIZE;
+      text_max   += sz + BUFFER_SIZE;
+      text = g_try_realloc (text, (gsize)text_max);
+      if (!text) {
+	gtk_text_buffer_insert_at_cursor (buffer,
+					  "Insufficient memory", -1);
+	text_ptr = NULL;
+	text_max = 0;
+	text_avail = 0;
+	break;
+      }
+      if (text_ptr == NULL) text_ptr = text;
+    }
+    memcpy (text_ptr, bfr, sz);
+    text_ptr   += sz;
+    text_avail -= sz;
+  }
+  
+  gint text_length = (int)(text_ptr - text);
+
+  const gchar *end = NULL;
+  while (!g_utf8_validate (text, text_length, &end)) {
+    if (end) *(gchar *)end = ' ';
+  }
+#endif
+
+
+  if (text) {
+    gtk_text_buffer_insert_at_cursor (buffer, text, text_length);
+    g_free (text);
+    text = NULL;
+    text_ptr = NULL;
+    text_max = 0;
+    text_avail = 0;
+  }
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.0,
+				TRUE,
+				0.2,
+				1.0);
+  return TRUE;
+}
+
+static gboolean
+apl_read_err (gint fd,
+	      GIOCondition condition,
+	      gpointer user_data)
+{
+#ifdef USE_GET_TEXT
+  gint text_length;
+  gchar *text = get_text (fd, &text_length);
+#else
+  gchar  *bfr = alloca (BUFFER_SIZE);
+  static gchar  *text = NULL;
+  static gchar  *text_ptr = NULL;
+  static ssize_t text_max = 0;
+  static ssize_t text_avail = 0;
+  
+  *bfr = 0;
+
+  ssize_t sz;
+  while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
+    if (sz > text_avail) {
+      text_avail += sz + BUFFER_SIZE;
+      text_max   += sz + BUFFER_SIZE;
+      text = g_try_realloc (text, (gsize)text_max);
+      if (!text) {
+	gtk_text_buffer_insert_at_cursor (buffer,
+					  "Insufficient memory", -1);
+	text_ptr = NULL;
+	text_max = 0;
+	text_avail = 0;
+	break;
+      }
+      if (text_ptr == NULL) text_ptr = text;
+    }
+    memcpy (text_ptr, bfr, sz);
+    text_ptr   += sz;
+    text_avail -= sz;
+  }
+  
+  gint text_length = (int)(text_ptr - text);
+
+  const gchar *end = NULL;
+  while (!g_utf8_validate (text, text_length, &end)) {
+    if (end) *(gchar *)end = ' ';
+  }
+#endif
+
+
+  if (text) {
+#ifdef USE_ERR_TAG
+    GtkTextIter insert_iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+    gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+
+    gtk_text_buffer_insert_with_tags (buffer,
+				      &insert_iter,
+				      text,
+				      text_length,
+				      err_tag,
+				      NULL);
+#else
+    gtk_text_buffer_insert_at_cursor (buffer, text, text_length);
+#endif
+    g_free (text);
+    text = NULL;
+    text_ptr = NULL;
+    text_max = 0;
+    text_avail = 0;
   }
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
@@ -366,14 +520,6 @@ main (int   argc,
     g_clear_error (&error);
   }
 
-#if 0
-  gchar *apl_argv[] = {"apl",
-		       "--noColor",
-		       "--rawCIN",
-		       "-w", "500",
-			"--silent",		// fixme make option
-		       NULL};
-#else
   gchar **apl_argv = g_alloca ((7 + argc) * sizeof (gchar *));
   bzero (apl_argv, (7 + argc) * sizeof (gchar *));
   {
@@ -392,8 +538,6 @@ main (int   argc,
     }
     apl_argv[ix++] = NULL;
   }
-
-#endif
 
   if (new_fn) apl_argv[0] = new_fn;
 
@@ -422,13 +566,13 @@ main (int   argc,
     g_unix_set_fd_nonblocking (apl_out, TRUE, NULL);
     g_unix_fd_add (apl_out,		// gint fd,
 		   G_IO_IN | G_IO_PRI,	// GIOCondition condition,
-		   apl_read,		// GUnixFDSourceFunc function,
+		   apl_read_out,	// GUnixFDSourceFunc function,
 		   NULL);		// gpointer user_data
 
     g_unix_set_fd_nonblocking (apl_err, TRUE, NULL);
     g_unix_fd_add (apl_err,		// gint fd,
 		   G_IO_IN | G_IO_PRI,	// GIOCondition condition,
-		   apl_read,		// GUnixFDSourceFunc function,
+		   apl_read_err,	// GUnixFDSourceFunc function,
 		   NULL);		// gpointer user_data
   }
   else {
@@ -462,6 +606,12 @@ main (int   argc,
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+#ifdef USE_ERR_TAG
+  err_tag =
+    gtk_text_buffer_create_tag (buffer, "err_tag",
+				"background", "pink",
+				NULL);
+#endif
 
   gtk_widget_show_all (window);
   gtk_main ();
