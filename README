@@ -13,6 +13,7 @@ Application Options:
   -w, --width              Width in pixels (integer).
   -h, --height             Height in pixels (integer).
   -v, --vwidth             Use variable width font.
+  -n, --nocolour           Turn off coloured error text. (boolean switch).
   -x, --xeq                Set an absolute or on-path executable APL 
 				other than the default, "apl".  (This
 				is primarily intended to allow the use
@@ -25,10 +26,16 @@ Application Options:
 
 
 In use, aplwrap simply provides a textual interface to GNU APL.  The
-only things that aren't obvious are that pressing "Enter" on any non-empty
-line sends the contents of that line to apl--you don't have to copy-n-paste
-to re-execute a line--and that under the "Help" button is another button
-that brings up a keymap image.
+only things that aren't obvious are:
+
+  1. Pressing "Enter" on any non-empty line sends the contents of that
+     line to apl--you don't have to copy-n-paste to re-execute a line.
+
+  2. Under the "Help" button is another button that brings up a keymap image.
+
+  3. Since ctrl-c is bound to the GTK+ copy operation, APL can be interrupted
+     by pressing ctrl-break.
+     
 
 Contact me if I've screwed anything up or if there's a feature you want added.
 

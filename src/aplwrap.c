@@ -38,11 +38,10 @@ static gint width = WIDTH_FALLBACK;
 #define HEIGHT_FALLBACK	440
 static gint height = HEIGHT_FALLBACK;
 
-static gboolean vwidth = FALSE;
+static gboolean vwidth   = FALSE;
+static gboolean nocolour = FALSE;
 
-#ifdef USE_ERR_TAG
 static GtkTextTag * err_tag;
-#endif
 
 void
 gapl2_quit (GtkWidget *widget,
@@ -220,15 +219,24 @@ build_menubar (GtkWidget *vbox)
 static gboolean
 key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
+  if (event->type != GDK_KEY_PRESS) return FALSE;
+
+  ssize_t __attribute__ ((unused)) wrc;
   GdkEventKey *key_event = (GdkEventKey *)event;
 
 #if 0
-  g_print ("state = %u, val = %u\n",
+  // ctrl-break: state == 4, val = 0xff6b = GDK_KEY_Break
+  //      pause: state == 0, val = 0xff13 = GDK_KEY_Pause
+  g_print ("state = 0x%08x, val = 0x%08x\n",
 	   key_event->state,
 	   key_event->keyval);
 #endif
+
+  if (key_event->state == GDK_CONTROL_MASK &&
+      key_event->keyval == GDK_KEY_Break) {
+    if (apl_pid != -1) kill ((pid_t)apl_pid, SIGINT);
+  }
 	   
-  if (event->type != GDK_KEY_PRESS) return FALSE;
   
   if (key_event->state == 0 && key_event->keyval == GDK_KEY_Return) {
     GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
@@ -257,7 +265,6 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
       gtk_text_buffer_insert_at_cursor (buffer, text, sz-1);
     }
 
-    ssize_t __attribute__ ((unused)) wrc;
     wrc = write (apl_in, text, sz);
     wrc = write (apl_in, &nl, 1);
     g_free (text);
@@ -289,102 +296,38 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
 #define BUFFER_SIZE     1024
 
-#ifdef USE_GET_TEXT
-static gchar *
-get_text (gint fd, gint *accum_length_p)
-{
-  gchar  *bfr = alloca (BUFFER_SIZE);
-  gchar  *accum = NULL;
-  gchar  *accum_ptr = NULL;
-  ssize_t accum_max = 0;
-  ssize_t accum_avail = 0;
-  
-  *bfr = 0;
-
-  ssize_t sz;
-  while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
-    if (sz > accum_avail) {
-      accum_avail += sz + BUFFER_SIZE;
-      accum_max   += sz + BUFFER_SIZE;
-      accum = g_try_realloc (accum, (gsize)accum_max);
-      if (accum_ptr == NULL) accum_ptr = accum;
-    }
-    memcpy (accum_ptr, bfr, sz);
-    accum_ptr   += sz;
-    accum_avail -= sz;
-  }
-  
-  if (accum_length_p) *accum_length_p = (int)(accum_ptr - accum);
-
-  const gchar *end = NULL;
-  while (!g_utf8_validate (accum, *accum_length_p, &end)) {
-    if (end) *(gchar *)end = ' ';
-  }
-  return accum;
-}
-#endif
-
 static gboolean
 apl_read_out (gint fd,
 	      GIOCondition condition,
 	      gpointer user_data)
 {
-#ifdef USE_GET_TEXT
-  gint text_length;
-  gchar *text = get_text (fd, &text_length);
-#else
-  gchar  *bfr = alloca (BUFFER_SIZE);
-  static gchar  *text = NULL;
-  static gchar  *text_ptr = NULL;
-  static ssize_t text_max = 0;
-  static ssize_t text_avail = 0;
-  
-  *bfr = 0;
+  static gchar  *text     = NULL;
+  static ssize_t text_idx = 0;
 
-  ssize_t sz;
-  while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
-    if (sz > text_avail) {
-      text_avail += sz + BUFFER_SIZE;
-      text_max   += sz + BUFFER_SIZE;
-      text = g_try_realloc (text, (gsize)text_max);
-      if (!text) {
-	gtk_text_buffer_insert_at_cursor (buffer,
-					  "Insufficient memory", -1);
-	text_ptr = NULL;
-	text_max = 0;
-	text_avail = 0;
-	break;
-      }
-      if (text_ptr == NULL) text_ptr = text;
+  gboolean run = TRUE;
+  while(run) {
+    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
+    if (text) {
+      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      text_idx += sz;
+      if (sz < BUFFER_SIZE || text[text_idx - 1] == '\0') run = FALSE;
     }
-    memcpy (text_ptr, bfr, sz);
-    text_ptr   += sz;
-    text_avail -= sz;
+    else run = FALSE;
   }
   
-  gint text_length = (int)(text_ptr - text);
-
-  const gchar *end = NULL;
-  while (!g_utf8_validate (text, text_length, &end)) {
-    if (end) *(gchar *)end = ' ';
-  }
-#endif
-
-
   if (text) {
-    gtk_text_buffer_insert_at_cursor (buffer, text, text_length);
+    gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
     g_free (text);
-    text = NULL;
-    text_ptr = NULL;
-    text_max = 0;
-    text_avail = 0;
   }
+
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
 				0.0,
 				TRUE,
 				0.2,
 				1.0);
+  text = NULL;
+  text_idx = 0;
   return TRUE;
 }
 
@@ -393,68 +336,38 @@ apl_read_err (gint fd,
 	      GIOCondition condition,
 	      gpointer user_data)
 {
-#ifdef USE_GET_TEXT
-  gint text_length;
-  gchar *text = get_text (fd, &text_length);
-#else
-  gchar  *bfr = alloca (BUFFER_SIZE);
-  static gchar  *text = NULL;
-  static gchar  *text_ptr = NULL;
-  static ssize_t text_max = 0;
-  static ssize_t text_avail = 0;
-  
-  *bfr = 0;
+  static gchar  *text     = NULL;
+  static ssize_t text_idx = 0;
 
-  ssize_t sz;
-  while (0 < (sz = read (fd, bfr, BUFFER_SIZE))) {
-    if (sz > text_avail) {
-      text_avail += sz + BUFFER_SIZE;
-      text_max   += sz + BUFFER_SIZE;
-      text = g_try_realloc (text, (gsize)text_max);
-      if (!text) {
-	gtk_text_buffer_insert_at_cursor (buffer,
-					  "Insufficient memory", -1);
-	text_ptr = NULL;
-	text_max = 0;
-	text_avail = 0;
-	break;
-      }
-      if (text_ptr == NULL) text_ptr = text;
+  gboolean run = TRUE;
+  while(run) {
+    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
+    if (text) {
+      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      text_idx += sz;
+      if (sz < BUFFER_SIZE || text[text_idx - 1] == '\0') run = FALSE;
     }
-    memcpy (text_ptr, bfr, sz);
-    text_ptr   += sz;
-    text_avail -= sz;
+    else run = FALSE;
   }
-  
-  gint text_length = (int)(text_ptr - text);
-
-  const gchar *end = NULL;
-  while (!g_utf8_validate (text, text_length, &end)) {
-    if (end) *(gchar *)end = ' ';
-  }
-#endif
-
 
   if (text) {
-#ifdef USE_ERR_TAG
-    GtkTextIter insert_iter;
-    GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
-    gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+    if (nocolour)
+      gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
+    else {
+      GtkTextIter insert_iter;
+      GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
 
-    gtk_text_buffer_insert_with_tags (buffer,
-				      &insert_iter,
-				      text,
-				      text_length,
-				      err_tag,
-				      NULL);
-#else
-    gtk_text_buffer_insert_at_cursor (buffer, text, text_length);
-#endif
+      gtk_text_buffer_insert_with_tags (buffer,
+					&insert_iter,
+					text,
+					text_idx,
+					err_tag,
+					NULL);
+    }
     g_free (text);
     text = NULL;
-    text_ptr = NULL;
-    text_max = 0;
-    text_avail = 0;
+    text_idx = 0;
   }
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
@@ -462,6 +375,8 @@ apl_read_err (gint fd,
 				TRUE,
 				0.2,
 				1.0);
+  text = NULL;
+  text_idx = 0;
   return TRUE;
 }
 
@@ -501,6 +416,10 @@ main (int   argc,
     { "vwidth", 'v', 0, G_OPTION_ARG_NONE,
       &vwidth,
       "Use variable width font (boolean switch).",
+      NULL },
+    { "nocolour", 'n', 0, G_OPTION_ARG_NONE,
+      &nocolour,
+      "Turn off coloured error text. (boolean switch).",
       NULL },
     { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
       &new_fn,
@@ -606,12 +525,10 @@ main (int   argc,
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-#ifdef USE_ERR_TAG
   err_tag =
     gtk_text_buffer_create_tag (buffer, "err_tag",
-				"background", "pink",
+				"foreground", "red",
 				NULL);
-#endif
 
   gtk_widget_show_all (window);
   gtk_main ();
