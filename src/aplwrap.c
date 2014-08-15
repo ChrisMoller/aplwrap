@@ -235,10 +235,12 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
   if (key_event->state == GDK_CONTROL_MASK &&
       key_event->keyval == GDK_KEY_Break) {
     if (apl_pid != -1) kill ((pid_t)apl_pid, SIGINT);
+    return FALSE;
   }
-	   
-  
-  if (key_event->state == 0 && key_event->keyval == GDK_KEY_Return) {
+
+  if ((key_event->state == 0 && key_event->keyval == GDK_KEY_Return) ||
+      (key_event->state & GDK_MOD2_MASK
+       && key_event->keyval == GDK_KEY_KP_Enter)) {
     GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
     GtkTextIter end_iter;
     GtkTextIter start_iter;
@@ -271,24 +273,26 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
   }
 
-  if (!(key_event->state & GDK_MOD1_MASK)) return FALSE;
+  if (!(key_event->state & (GDK_MOD1_MASK | GDK_MOD2_MASK))) return FALSE;
 
   guint16 kc = key_event->hardware_keycode;
-  CHT_Index ix = (key_event->state & GDK_SHIFT_MASK)
-    ? key_shift_alt (kc) :  key_alt (kc);
-  if (ix) {
-    gshort uic = char_unicode (ix);
-    gsize br, bw;
-    gchar *res = g_convert ((const gchar *)(&uic),
-			    sizeof(gshort),
-			    "utf-8",
-			    "unicode",
-			    &br,
-			    &bw,
-			    NULL);
-    gtk_text_buffer_insert_at_cursor (buffer, res, bw);
-    g_free (res);
-    return TRUE;
+  if (kc < sizeof(keymap) / sizeof(keymap_s)) {
+    CHT_Index ix = (key_event->state & GDK_SHIFT_MASK)
+      ? key_shift_alt (kc) :  key_alt (kc);
+    if (ix) {
+      gshort uic = char_unicode (ix);
+      gsize br, bw;
+      gchar *res = g_convert ((const gchar *)(&uic),
+			      sizeof(gshort),
+			      "utf-8",
+			      "unicode",
+			      &br,
+			      &bw,
+			      NULL);
+      gtk_text_buffer_insert_at_cursor (buffer, res, bw);
+      g_free (res);
+      return TRUE;
+    }
   }
 
   return FALSE;				// pass the event on

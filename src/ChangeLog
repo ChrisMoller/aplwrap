@@ -1,0 +1,5 @@
+2014-08-15  Chris Moller  <moller@mollerware.com>
+
+	* aplwrap.c: Might as well start keeping track of the changes,
+	just like a real project does...
+
