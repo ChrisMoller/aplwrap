@@ -119,12 +119,12 @@ static void
 show_about (GtkWidget *widget,
             gpointer   data)
 {
-  gchar *authors[] = {"C. H. L. Moller", NULL};
-  gchar *comments = _("Gapl2 is at GTK+-based front-end for GNU APL.");
+  gchar *authors[] = {"C. H. L. Moller", "David Lamkins", NULL};
+  gchar *comments = _("aplwrap is at GTK+-based front-end for GNU APL.");
 
   gtk_show_about_dialog (NULL,
-                         "program-name", "Gapl2",
-                         "title", _("Gapl2"),
+                         "program-name", "aplwrap",
+                         "title", _("aplwrap"),
                          "version", "1.0",
                          "license-type", GTK_LICENSE_GPL_3_0,
                          "copyright", "Copyright 2014",
@@ -161,8 +161,8 @@ build_menubar (GtkWidget *vbox)
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Open"));
-  //  g_signal_connect(G_OBJECT (item), "activate",
-  //                 G_CALLBACK (open_file), NULL);
+  g_signal_connect(G_OBJECT (item), "activate",
+		   G_CALLBACK (open_file), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Save"));
@@ -298,6 +298,26 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
   return FALSE;				// pass the event on
 }
 
+int valid_end(char *start, ssize_t size) {
+  char *look = start + size - 1;
+  ssize_t tail = 1;
+  if (size == 0) return TRUE;
+  if ((*look&0xff) < 0x80) return TRUE;
+  while (look >= start && tail <= 6) {
+    if ((*look&0xc0) != 0x80) break;
+    --look; ++tail;
+  }
+  switch (tail) {
+  case 2: if ((*look&0xe0) == 0xc0) return TRUE; break;
+  case 3: if ((*look&0xf0) == 0xe0) return TRUE; break;
+  case 4: if ((*look&0xf8) == 0xf0) return TRUE; break;
+  case 5: if ((*look&0xfc) == 0xf8) return TRUE; break;
+  case 6: if ((*look&0xfe) == 0xfc) return TRUE; break;
+  default: ;
+  }
+  return FALSE;
+}
+
 #define BUFFER_SIZE     1024
 
 static gboolean
@@ -312,9 +332,12 @@ apl_read_out (gint fd,
   while(run) {
     text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
     if (text) {
+      errno = 0;
       ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
+      if (sz == -1) run = FALSE;
       text_idx += sz;
-      if (sz < BUFFER_SIZE || text[text_idx - 1] == '\0') run = FALSE;
+      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
     }
     else run = FALSE;
   }
@@ -347,9 +370,12 @@ apl_read_err (gint fd,
   while(run) {
     text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
     if (text) {
+      errno = 0;
       ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
+      if (sz == -1) run = FALSE;
       text_idx += sz;
-      if (sz < BUFFER_SIZE || text[text_idx - 1] == '\0') run = FALSE;
+      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
     }
     else run = FALSE;
   }
@@ -403,6 +429,7 @@ main (int   argc,
   GtkWidget *vbox;
   gboolean rc;
   gchar *new_fn = NULL;
+  gchar *opt_lx = NULL;
 
   GOptionEntry entries[] = {
     { "ftsize", 's', 0, G_OPTION_ARG_INT,
@@ -429,6 +456,10 @@ main (int   argc,
       &new_fn,
       "Set an absolute or on-path executable APL other than the default.",
       NULL },
+    { "LX", 0, 0, G_OPTION_ARG_STRING,
+      &opt_lx,
+      "Invoke APL ⎕LX on startup. (string: APL command or expression)",
+      NULL },
     { NULL }
   };
 
@@ -443,8 +474,8 @@ main (int   argc,
     g_clear_error (&error);
   }
 
-  gchar **apl_argv = g_alloca ((7 + argc) * sizeof (gchar *));
-  bzero (apl_argv, (7 + argc) * sizeof (gchar *));
+  gchar **apl_argv = g_alloca ((9 + argc) * sizeof (gchar *));
+  bzero (apl_argv, (9 + argc) * sizeof (gchar *));
   {
     gint ix = 0;
     apl_argv[ix++] = "apl";
@@ -453,10 +484,18 @@ main (int   argc,
     apl_argv[ix++] = "-w";
     apl_argv[ix++] = "500";
     apl_argv[ix++] = "--silent";
+    if (opt_lx) {
+      apl_argv[ix++] = "--LX";
+      apl_argv[ix++] = opt_lx;
+    }
 
     if (argc > 1) {
-      for (int i = 1; i < argc; i++) {
-	if (0 != g_strcmp0 (argv[i], "--")) apl_argv[ix++] = argv[i];
+      int i;
+      for (i = 1; i < argc; i++) {
+	if (0 == g_strcmp0 (argv[i], "--")) break;
+      }
+      for (; i < argc; ++i) {
+        apl_argv[ix++] = argv[i];
       }
     }
     apl_argv[ix++] = NULL;
