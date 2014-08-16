@@ -238,9 +238,11 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return FALSE;
   }
 
-  if ((key_event->state == 0 && key_event->keyval == GDK_KEY_Return) ||
-      (key_event->state & GDK_MOD2_MASK
-       && key_event->keyval == GDK_KEY_KP_Enter)) {
+  /* Filter out NumLock status from event state */
+  /* and Honor numeric keypad enter key */
+  if (( key_event->state & ~ GDK_MOD2_MASK ) == 0 &&
+      (key_event->keyval == GDK_KEY_Return ||
+       key_event->keyval == GDK_KEY_KP_Enter)) {
     GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
     GtkTextIter end_iter;
     GtkTextIter start_iter;
@@ -274,7 +276,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return TRUE;
   }
 
-  if (!(key_event->state & (GDK_MOD1_MASK | GDK_MOD2_MASK))) return FALSE;
+  // if alt is inactive return false to treat the char as a normal char
+  if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
 
   guint16 kc = key_event->hardware_keycode;
   if (kc < sizeof(keymap) / sizeof(keymap_s)) {
@@ -299,7 +302,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
   return FALSE;				// pass the event on
 }
 
-int valid_end(char *start, ssize_t size) {
+static int
+valid_end(char *start, ssize_t size) {
   char *look = start + size - 1;
   ssize_t tail = 1;
   if (size == 0) return TRUE;
