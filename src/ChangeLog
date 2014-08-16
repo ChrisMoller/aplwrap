@@ -1,5 +1,6 @@
 2014-08-16  Chris Moller  <moller@mollerware.com>
 
+	* aplwrap.c (main): Fixed option parsing.
 	* aplwrap.c (apl_read_out and apl_read_out): Fixes to the read loops.
 	* aplwrap.c (key_press_event): Fixes for spurious newlines.
 	

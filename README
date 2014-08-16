@@ -22,6 +22,8 @@ Application Options:
 				-- for development purposes.  It's 
 				unlikely to work with anything other
 				than GNU APL.)
+  --LX                     Invoke APL ?LX on startup. (string: APL command or
+  			   	expression)
   --display=DISPLAY        X display to use
 
 
