@@ -269,8 +269,9 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
     wrc = write (apl_in, text, sz);
     wrc = write (apl_in, &nl, 1);
+    gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
     g_free (text);
-    return FALSE;
+    return TRUE;
   }
 
   if (!(key_event->state & (GDK_MOD1_MASK | GDK_MOD2_MASK))) return FALSE;
