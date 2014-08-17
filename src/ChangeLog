@@ -1,8 +1,10 @@
 2014-08-16  Chris Moller  <moller@mollerware.com>
 
 	* aplwrap.c (main): Fixed option parsing.
-	* aplwrap.c (apl_read_out and apl_read_out): Fixes to the read loops.
-	* aplwrap.c (key_press_event): Fixes for spurious newlines.
+	(key_press_event): Make the keypad Enter key synonymous with the
+	main Ennter key.
+	(apl_read_out and apl_read_out): Fixes to the read loops.
+	(key_press_event): Fixes for spurious newlines.
 	
 
 2014-08-15  Chris Moller  <moller@mollerware.com>

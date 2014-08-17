@@ -33,9 +33,11 @@ only things that aren't obvious are:
   1. Pressing "Enter" on any non-empty line sends the contents of that
      line to apl--you don't have to copy-n-paste to re-execute a line.
 
-  2. Under the "Help" button is another button that brings up a keymap image.
+  2. The keypad Enter key is synonymous with the main Enter key.
 
-  3. Since ctrl-c is bound to the GTK+ copy operation, APL can be interrupted
+  3. Under the "Help" button is another button that brings up a keymap image.
+
+  4. Since ctrl-c is bound to the GTK+ copy operation, APL can be interrupted
      by pressing ctrl-break.
      
 
