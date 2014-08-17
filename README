@@ -38,7 +38,11 @@ only things that aren't obvious are:
   3. Under the "Help" button is another button that brings up a keymap image.
 
   4. Since ctrl-c is bound to the GTK+ copy operation, APL can be interrupted
-     by pressing ctrl-break.
+     by pressing either ctrl-Break or ctrl-Windows-key.
+
+  5. Since ctrl-Backquote is used by various desktops like GNOME and KDE,
+     the diamond character can't be mapped to it's usual place at that
+     position.  Aplwrap relocates te character to alt-shift-D.
      
 
 Contact me if I've screwed anything up or if there's a feature you want added.

@@ -233,7 +233,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 #endif
 
   if (key_event->state == GDK_CONTROL_MASK &&
-      key_event->keyval == GDK_KEY_Break) {
+      (key_event->keyval == GDK_KEY_Super_L ||
+       key_event->keyval == GDK_KEY_Break)) {
     if (apl_pid != -1) kill ((pid_t)apl_pid, SIGINT);
     return FALSE;
   }

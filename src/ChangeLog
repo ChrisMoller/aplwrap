@@ -1,3 +1,8 @@
+2014-08-17  Chris Moller  <moller@mollerware.com>
+
+	* aplwrap.c (key_press_event): Make ctrl-Windows equivalent to
+	ctrl-Break in interrupting APL.
+
 2014-08-16  Chris Moller  <moller@mollerware.com>
 
 	* aplwrap.c (main): Fixed option parsing.
