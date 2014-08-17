@@ -5,7 +5,7 @@
 	main Ennter key.
 	(apl_read_out and apl_read_out): Fixes to the read loops.
 	(key_press_event): Fixes for spurious newlines.
-	
+	(main): More input fixes by David Lamkins.
 
 2014-08-15  Chris Moller  <moller@mollerware.com>
 

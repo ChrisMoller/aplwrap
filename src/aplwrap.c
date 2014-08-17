@@ -119,8 +119,8 @@ static void
 show_about (GtkWidget *widget,
             gpointer   data)
 {
-  gchar *authors[] = {"C. H. L. Moller", "David Lamkins", NULL};
-  gchar *comments = _("aplwrap is at GTK+-based front-end for GNU APL.");
+  gchar *authors[] = {"C. H. L. Moller", "David B. Lamkins", NULL};
+  gchar *comments = _("aplwrap is a GTK+-based front-end for GNU APL.");
 
   gtk_show_about_dialog (NULL,
                          "program-name", "aplwrap",
@@ -303,7 +303,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 static int
-valid_end(char *start, ssize_t size) {
+valid_end(char *start, ssize_t size)
+{
   char *look = start + size - 1;
   ssize_t tail = 1;
   if (size == 0) return TRUE;
@@ -324,6 +325,8 @@ valid_end(char *start, ssize_t size) {
 }
 
 #define BUFFER_SIZE     1024
+
+static gchar *last_out = NULL;  // explained in apl_read_err()
 
 static gboolean
 apl_read_out (gint fd,
@@ -348,6 +351,11 @@ apl_read_out (gint fd,
   }
   
   if (text) {
+    last_out = g_try_malloc(text_idx+1);
+    if (last_out) {
+      memcpy(last_out, text, text_idx);
+      last_out[text_idx] = '\0';
+    }
     gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
     g_free (text);
   }
@@ -386,19 +394,42 @@ apl_read_err (gint fd,
   }
 
   if (text) {
-    if (nocolour)
-      gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
-    else {
-      GtkTextIter insert_iter;
-      GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
-      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+    int suppress = FALSE;
 
-      gtk_text_buffer_insert_with_tags (buffer,
-					&insert_iter,
-					text,
-					text_idx,
-					err_tag,
-					NULL);
+    /* GNU APL's stderr is prefixed with a '\r'; GTK treats that as a
+       newline. Assume that we're already at the beginning of the line
+       and remove the '\r'. */
+    if (text[0] == '\r')
+      memmove(text, text+1, --text_idx);
+
+    /* GNU APL pushes quote-quad's prompt onto stdin just before
+       reading from quote-quad. Then aplwrap sees that prompt and
+       echoes it to stdout. After that, GNU APL writes the intended
+       prompt to stderr, duplicating the prompt that aplwrap alread
+       echoed to stdout. We work around that odd interaction by
+       suppressing stderr's output in the case that its text matches
+       the last text written to stdout. */
+    if (last_out) {
+      suppress = !strncmp(last_out, text, text_idx);
+      g_free(last_out);
+      last_out = NULL;
+    }
+
+    if (!suppress) {
+      if (nocolour)
+        gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
+      else {
+        GtkTextIter insert_iter;
+        GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+        gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+
+        gtk_text_buffer_insert_with_tags (buffer,
+                                          &insert_iter,
+                                          text,
+                                          text_idx,
+                                          err_tag,
+                                          NULL);
+      }
     }
     g_free (text);
     text = NULL;
