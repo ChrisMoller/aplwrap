@@ -216,6 +216,8 @@ build_menubar (GtkWidget *vbox)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
 }
 
+static ssize_t prompt_len = 0;
+
 static gboolean
 key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
@@ -270,10 +272,11 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
       gtk_text_buffer_insert_at_cursor (buffer, text, sz-1);
     }
 
-    wrc = write (apl_in, text, sz);
+    wrc = write (apl_in, text+prompt_len, sz-prompt_len);
     wrc = write (apl_in, &nl, 1);
     gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
     g_free (text);
+    prompt_len = 0;
     return TRUE;
   }
 
@@ -411,7 +414,14 @@ apl_read_err (gint fd,
        suppressing stderr's output in the case that its text matches
        the last text written to stdout. */
     if (last_out) {
-      suppress = !strncmp(last_out, text, text_idx);
+      ssize_t lolen = strlen(last_out);
+      suppress = lolen >= text_idx &&
+        !strncmp(last_out+lolen-text_idx, text, text_idx);
+      /* We also need to finesse the data returned to APL in response
+         to a quote-quad input; we must send only the input following
+         the prompt. See key_press_event() for the other half of this
+         interaction. */
+      prompt_len = suppress ? text_idx : 0;
       g_free(last_out);
       last_out = NULL;
     }
