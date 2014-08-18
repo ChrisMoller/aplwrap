@@ -42,6 +42,7 @@ static gboolean vwidth   = FALSE;
 static gboolean nocolour = FALSE;
 
 static GtkTextTag * err_tag;
+static GtkTextTag * out_tag;
 
 void
 gapl2_quit (GtkWidget *widget,
@@ -328,6 +329,28 @@ valid_end(char *start, ssize_t size)
   return FALSE;
 }
 
+static void
+tagged_insert (char *text, ssize_t text_idx, GtkTextTag *tag)
+{
+  GtkTextIter insert_iter;
+  GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+
+  gtk_text_buffer_insert_with_tags (buffer,
+                                    &insert_iter,
+                                    text,
+                                    text_idx,
+                                    tag,
+                                    NULL);
+
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.0,
+				TRUE,
+				0.2,
+				1.0);
+}
+
 #define BUFFER_SIZE     1024
 
 static gchar *last_out = NULL;  // explained in apl_read_err()
@@ -360,16 +383,10 @@ apl_read_out (gint fd,
       memcpy(last_out, text, text_idx);
       last_out[text_idx] = '\0';
     }
-    gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
+    tagged_insert(text, text_idx, out_tag);
     g_free (text);
   }
 
-  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
-				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.0,
-				TRUE,
-				0.2,
-				1.0);
   text = NULL;
   text_idx = 0;
   return TRUE;
@@ -427,31 +444,13 @@ apl_read_err (gint fd,
     }
 
     if (!suppress) {
-      if (nocolour)
-        gtk_text_buffer_insert_at_cursor (buffer, text, text_idx);
-      else {
-        GtkTextIter insert_iter;
-        GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
-        gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
-
-        gtk_text_buffer_insert_with_tags (buffer,
-                                          &insert_iter,
-                                          text,
-                                          text_idx,
-                                          err_tag,
-                                          NULL);
-      }
+      tagged_insert(text, text_idx, nocolour ? out_tag : err_tag);
     }
     g_free (text);
     text = NULL;
     text_idx = 0;
   }
-  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
-				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.0,
-				TRUE,
-				0.2,
-				1.0);
+
   text = NULL;
   text_idx = 0;
   return TRUE;
@@ -618,6 +617,11 @@ main (int   argc,
   err_tag =
     gtk_text_buffer_create_tag (buffer, "err_tag",
 				"foreground", "red",
+                                "editable", FALSE,
+				NULL);
+  out_tag =
+    gtk_text_buffer_create_tag (buffer, "out_tag",
+                                "editable", FALSE,
 				NULL);
 
   gtk_widget_show_all (window);
