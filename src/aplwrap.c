@@ -44,6 +44,91 @@ static gboolean nocolour = FALSE;
 static GtkTextTag * err_tag;
 static GtkTextTag * out_tag;
 
+typedef struct _history {
+  gchar *command;
+  struct _history *prev;
+  struct _history *next;
+} history;
+
+typedef enum {
+  prev, next
+} direction;
+
+static struct {
+  history *current;
+  direction last_direction;
+} history_cursor = { NULL, prev };
+
+static history *command_history         = NULL;
+
+static void
+history_insert (gchar *command, ssize_t length)
+{
+  history *history = g_try_malloc(sizeof(history));
+  if (history) {
+    history->command = g_strndup(command, length);
+    if (history->command) {
+      if (command_history) {
+        history->prev = command_history;
+        history->next = NULL;
+        command_history->next = history;
+        command_history = history;
+      }
+      else {
+        history->prev = NULL;
+        history->next = NULL;
+        command_history = history;
+      }
+    }
+    else
+      g_free(history);
+  }
+}
+
+static gchar*
+history_prev ()
+{
+  if (history_cursor.current) {
+    if (history_cursor.last_direction == next &&
+        history_cursor.current->next &&
+        history_cursor.current->prev)
+      history_cursor.current = history_cursor.current->prev;
+    history_cursor.last_direction = prev;
+    gchar *cmd = history_cursor.current->command;
+    if (history_cursor.current->prev)
+      history_cursor.current = history_cursor.current->prev;
+    return cmd;
+  }
+  else
+    return "";
+}
+
+static gchar*
+history_next ()
+{
+  if (history_cursor.current) {
+    if (history_cursor.last_direction == prev &&
+        history_cursor.current->prev &&
+        history_cursor.current->next)
+      history_cursor.current = history_cursor.current->next;
+    history_cursor.last_direction = next;
+    if (history_cursor.current->next)
+      history_cursor.current = history_cursor.current->next;
+    else
+      return "";
+    return history_cursor.current->command;
+  }
+  else
+    return "";
+}
+
+static void
+history_start ()
+{
+  history_cursor.current = command_history;
+  history_cursor.last_direction = prev;
+}
+
 void
 gapl2_quit (GtkWidget *widget,
 	     gpointer   data)
@@ -217,6 +302,35 @@ build_menubar (GtkWidget *vbox)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
 }
 
+static void
+handle_history_replacement (gchar *text)
+{
+  GtkTextIter start_iter, end_iter;
+
+  // mark
+  gtk_text_buffer_get_end_iter (buffer, &start_iter);
+  gtk_text_iter_set_line_offset (&start_iter, 6);
+  end_iter = start_iter;
+  gtk_text_iter_forward_to_line_end (&end_iter);
+
+  // delete
+  gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
+
+  // insert
+  gtk_text_buffer_get_end_iter (buffer, &end_iter);
+  gtk_text_buffer_place_cursor (buffer, &end_iter);
+  gtk_text_buffer_insert_at_cursor (buffer, text, strlen(text));
+
+  // reveal
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.0,
+				TRUE,
+				0.2,
+				1.0);
+}
+
+static int at_prompt = FALSE;
 static ssize_t prompt_len = 0;
 
 static gboolean
@@ -273,6 +387,8 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
       gtk_text_buffer_insert_at_cursor (buffer, text, sz-1);
     }
 
+    if (at_prompt)
+      history_insert(text+6, sz-6);
     wrc = write (apl_in, text+prompt_len, sz-prompt_len);
     wrc = write (apl_in, &nl, 1);
     gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
@@ -283,6 +399,16 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
   // if alt is inactive return false to treat the char as a normal char
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
+
+  if (key_event->keyval == GDK_KEY_Up) {
+    handle_history_replacement(history_prev());
+    return TRUE;
+  }
+
+  if (key_event->keyval == GDK_KEY_Down) {
+    handle_history_replacement(history_next());
+    return TRUE;
+  }
 
   guint16 kc = key_event->hardware_keycode;
   if (kc < sizeof(keymap) / sizeof(keymap_s)) {
@@ -378,6 +504,7 @@ apl_read_out (gint fd,
   }
   
   if (text) {
+    at_prompt = FALSE;
     last_out = g_try_malloc(text_idx+1);
     if (last_out) {
       memcpy(last_out, text, text_idx);
@@ -444,6 +571,9 @@ apl_read_err (gint fd,
     }
 
     if (!suppress) {
+      at_prompt = !strncmp("      ", text, text_idx);
+      if (at_prompt)
+        history_start();
       tagged_insert(text, text_idx, nocolour ? out_tag : err_tag);
     }
     g_free (text);
@@ -464,6 +594,25 @@ apl_exit (GPid pid,
   g_spawn_close_pid (pid);
   apl_pid = -1;
   gapl2_quit (NULL, NULL);
+}
+
+static gchar**
+make_env () {
+  extern char **environ;
+  ssize_t envc = 0;
+  gchar **env = environ;
+
+  while (*env++) ++envc;
+  env = g_try_malloc(2 + envc * sizeof(gchar*));
+  env[envc+1] = NULL;
+  env[envc+0] = "APLWRAP=t";
+  while (envc--) {
+    if (!strncmp(environ[envc], "TERM=", 5))
+      env[envc] = "TERM=dumb";
+    else
+      env[envc] = environ[envc];
+  }
+  return env;
 }
 
 int
@@ -551,7 +700,7 @@ main (int   argc,
 
   rc = g_spawn_async_with_pipes (NULL, 		// gchar *working_directory,
 				 apl_argv,	// gchar **argv,
-				 NULL,		// gchar **envp,
+				 make_env(),	// gchar **envp,
 				 G_SPAWN_DO_NOT_REAP_CHILD |
 				 G_SPAWN_SEARCH_PATH,	// GSpawnFlags flags,
 				 NULL,	// GSpawnChildSetupFunc child_setup,
