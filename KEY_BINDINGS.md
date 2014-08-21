@@ -24,8 +24,10 @@ Editing
 
 Backspace                   delete character to left
 Delete                      delete character to right
-Ctrl-Backspace              delete to end of line
-Ctrl-Delete                 delete to beginning of line
+Ctrl-Backspace              delete word to left
+Ctrl-Delete                 delete word to right
+Shift-Ctrl-Backspace        delete to end of line
+Shift-Ctrl-Delete           delete to beginning of line
 Ctrl-Return, Ctrl-Enter     insert a line break
 
 Clipboard
