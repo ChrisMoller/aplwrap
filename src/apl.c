@@ -1,6 +1,6 @@
-#ifdef HAVE_CONFIG_H
+#define _POSIX_SOURCE
+
 #include "../config.h"
-#endif
 
 #include <gtk/gtk.h>
 #include <glib-unix.h>
@@ -11,14 +11,14 @@
 #include "aplio.h"
 #include "options.h"
 
+#include <sys/types.h>
 #include <signal.h>
-int kill(pid_t pid, int sig);	// compiler issue
 
-GPid apl_pid = -1;
+static GPid apl_pid = -1;
 
 void
 gapl2_quit (GtkWidget *widget,
-	     gpointer   data)
+	     gpointer  data)
 {
   if (apl_pid != -1) {
     kill ((pid_t)apl_pid, SIGKILL);
@@ -29,8 +29,8 @@ gapl2_quit (GtkWidget *widget,
 }
 
 static void
-apl_exit (GPid pid,
-	  gint status,
+apl_exit (GPid     pid,
+	  gint     status,
 	  gpointer user_data)
 {
   g_spawn_close_pid (pid);
@@ -38,8 +38,14 @@ apl_exit (GPid pid,
   gapl2_quit (NULL, NULL);
 }
 
+void apl_interrupt ()
+{
+  if (apl_pid != -1) kill ((pid_t)apl_pid, SIGINT);
+}
+
 static gchar**
-make_env () {
+make_env ()
+{
   extern char **environ;
   ssize_t envc = 0;
   gchar **env = environ;
@@ -57,7 +63,8 @@ make_env () {
   return env;
 }
 
-int apl_spawn (int argc, char *argv[])
+int apl_spawn (int   argc,
+               char *argv[])
 {
   GError *error = NULL;
   gboolean rc;
@@ -133,3 +140,4 @@ int apl_spawn (int argc, char *argv[])
 
   return 0;
 }
+

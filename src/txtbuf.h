@@ -3,16 +3,23 @@
 
 extern GtkTextBuffer *buffer;
 
-extern GtkTextTag * err_tag;
-extern GtkTextTag * out_tag;
+typedef enum {
+  TAG_INP,
+  TAG_ERR,
+  TAG_OUT,
+  TAG_LCK,
+  _tag_t_count
+} tag_t;
 
 void handle_history_replacement (gchar *text);
 
-void handle_copy_down (gchar *text);
+int handle_copy_down ();
 
-gchar *get_input_text (gint *sz, int *from_selection);
+gchar *get_input_text (gint *sz);
 
-void tagged_insert (char *text, ssize_t text_idx, GtkTextTag *tag);
+void tagged_insert (char   *text,
+                    ssize_t text_idx,
+                    tag_t   tag);
 
 void define_tags ();
 

@@ -29,6 +29,7 @@ Ctrl-Delete                 delete word to right
 Shift-Ctrl-Backspace        delete to end of line
 Shift-Ctrl-Delete           delete to beginning of line
 Ctrl-Return, Ctrl-Enter     insert a line break
+Insert                      toggle insert/overwrite
 
 Clipboard
 ---------
@@ -54,3 +55,14 @@ APL Characters
 
 See Help > Keymap for a display of the APL keyboard layout.
 
+Copy-Down
+---------
+
+When selected (e.g. by mouse or keyboard) text doesn't span a line
+boundary, pressing Return or Enter copies the text to the end of the
+current APL input area and ensures that the area ends with a blank.
+The buffer does not scroll to the input area.
+
+When the cursor is on a previous APL input, pressing Return or Enter
+copies the entire input to the current APL input area. The buffer
+scrolls to the input area.

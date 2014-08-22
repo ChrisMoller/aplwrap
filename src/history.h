@@ -4,7 +4,8 @@
 #include <glib-unix.h>
 #include <unistd.h>
 
-void history_insert (gchar *command, ssize_t length);
+void history_insert (gchar  *command,
+                     ssize_t length);
 
 gchar* history_prev ();
 

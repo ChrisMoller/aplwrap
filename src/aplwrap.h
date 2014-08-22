@@ -1,6 +1,6 @@
 #ifndef APLWRAP_H
 #define APLWRAP_H
 
-extern GtkWidget *view;
+void scroll_to_end ();
 
 #endif

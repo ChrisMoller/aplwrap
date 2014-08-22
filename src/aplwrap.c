@@ -1,6 +1,4 @@
-#ifdef HAVE_CONFIG_H
 #include "../config.h"
-#endif
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
@@ -14,57 +12,59 @@
 #include "apl.h"
 #include "menu.h"
 
-#include <signal.h>
-int kill(pid_t pid, int sig);	// compiler issue
-
-GtkWidget *window;
-GtkWidget *scroll;
-GtkWidget *view;
-PangoFontDescription *desc = NULL;
+static GtkWidget *window;
+static GtkWidget *scroll;
+static GtkWidget *view;
+static PangoFontDescription *desc = NULL;
 
 static gboolean
-key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
+key_press_event (GtkWidget *widget,
+                 GdkEvent  *event,
+                 gpointer   user_data)
 {
   if (event->type != GDK_KEY_PRESS) return FALSE;
 
   GdkEventKey *key_event = (GdkEventKey *)event;
 
+  /* Ignore Tab key */
+  if (key_event->keyval == GDK_KEY_Tab) return TRUE;
+
+  /* Handle APL interrupt keys */
   if (key_event->state == GDK_CONTROL_MASK &&
       (key_event->keyval == GDK_KEY_Super_L ||
        key_event->keyval == GDK_KEY_Break)) {
-    if (apl_pid != -1) kill ((pid_t)apl_pid, SIGINT);
-    return FALSE;
+    apl_interrupt ();
+    return TRUE;
   }
 
-  /* Filter out NumLock status from event state */
-  /* and Honor numeric keypad enter key */
-  if (( key_event->state & ~ GDK_MOD2_MASK ) == 0 &&
-      (key_event->keyval == GDK_KEY_Return ||
-       key_event->keyval == GDK_KEY_KP_Enter)) {
+  /* Handle Return and Enter keys */
+  if (key_event->keyval == GDK_KEY_Return ||
+      key_event->keyval == GDK_KEY_KP_Enter) {
     GtkTextIter end_iter;
     gchar *text;
     gint sz;
-    int from_selection;
+
+    if (handle_copy_down ()) return TRUE;
  
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_buffer_place_cursor (buffer, &end_iter);
 
-    // FINISH -- rework with copy-down
-    text = get_input_text(&sz, &from_selection);
+    text = get_input_text(&sz);
 
-    if (at_prompt)
+    if (is_at_prompt ())
       history_insert(text+6, sz-6);
-    apl_send_inp (text+prompt_len, sz-prompt_len);
+    apl_send_inp (text+get_prompt_len (), sz-get_prompt_len ());
 
     gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
     g_free (text);
-    prompt_len = 0;
+    reset_prompt_len ();
     return TRUE;
   }
 
-  // if alt is inactive return false to treat the char as a normal char
+  /* All remaining processing is for keys having Alt modifier */
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
 
+  /* Command history */
   if (key_event->keyval == GDK_KEY_Up) {
     handle_history_replacement(history_prev());
     return TRUE;
@@ -75,6 +75,7 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     return TRUE;
   }
 
+  /* APL characters */
   guint16 kc = key_event->hardware_keycode;
   if (kc < sizeof(keymap) / sizeof(keymap_s)) {
     CHT_Index ix = (key_event->state & GDK_SHIFT_MASK)
@@ -96,6 +97,17 @@ key_press_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
   }
 
   return FALSE;				// pass the event on
+}
+
+void
+scroll_to_end ()
+{
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.0,
+				TRUE,
+				0.2,
+				1.0);
 }
 
 int

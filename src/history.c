@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "history.h"
 
 typedef struct _history {
@@ -15,13 +17,35 @@ static struct {
   direction last_direction;
 } history_cursor = { NULL, prev };
 
-static history *command_history         = NULL;
+static history *command_history = NULL;
+
+static void
+trim (gchar  **text,
+      ssize_t *length)
+{
+  ssize_t b = 0, e = *length;
+  while (e > b && (*text)[e-1] == ' ') --e;
+  while (b < e && (*text)[b] == ' ') ++b;
+  *text = &(*text)[b];
+  *length = e - b;
+}
+
+static int
+same (gchar  *text,
+      ssize_t length)
+{
+  if (command_history == NULL) return 0;
+  return !strncmp (text, command_history->command, length);
+}
 
 void
-history_insert (gchar *command, ssize_t length)
+history_insert (gchar  *command,
+                ssize_t length)
 {
   history *history = g_try_malloc(sizeof(history));
   if (history) {
+    trim(&command, &length);
+    if (length == 0 || same (command, length)) return;
     history->command = g_strndup(command, length);
     if (history->command) {
       if (command_history) {

@@ -6,22 +6,18 @@
 
 GtkTextBuffer *buffer = NULL;
 
-GtkTextTag * err_tag;
-GtkTextTag * out_tag;
+static GtkTextTag* tags[_tag_t_count] = { 0 };
 
-static void
-scroll_to_end ()
+static GtkTextTag*
+get_tag (tag_t select)
 {
-  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
-				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.0,
-				TRUE,
-				0.2,
-				1.0);
+  return (select >= _tag_t_count) ? NULL : tags[select];
 }
 
 void
-tagged_insert (char *text, ssize_t text_idx, GtkTextTag *tag)
+tagged_insert (char   *text,
+               ssize_t text_idx,
+               tag_t   tag)
 {
   GtkTextIter insert_iter;
   GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
@@ -31,7 +27,7 @@ tagged_insert (char *text, ssize_t text_idx, GtkTextTag *tag)
                                     &insert_iter,
                                     text,
                                     text_idx,
-                                    tag,
+                                    get_tag(tag),
                                     NULL);
 
   scroll_to_end ();
@@ -60,22 +56,47 @@ handle_history_replacement (gchar *text)
   scroll_to_end ();
 }
 
-void
-handle_copy_down (gchar *text)
+int
+handle_copy_down ()
 {
-  // TBCL
-  //
-  // Plan:
-  //  If selection is not empty and does not span newline
-  //    copy selection to end of buffer
-  //    If selection does not end with a space
-  //      append a space to end of buffer
-  //
-  // NOTE: Do not scroll_to_end().
+  GtkTextIter start_iter, end_iter;
+  if (gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter)) {
+    //  Case 1: selection is not empty
+    //
+    //  If selection does not span newline
+    //    copy selection to end of buffer
+    //    If selection does not end with a space
+    //      append a space to end of buffer
+    //    *Do not* scroll to end!
+    gchar *text = gtk_text_buffer_get_text (buffer,
+                                            &start_iter,
+                                            &end_iter,
+                                            FALSE);
+    if (text == NULL || strchr (text, '\n')) return 0;
+
+    gtk_text_buffer_get_end_iter (buffer, &end_iter);
+    gtk_text_buffer_place_cursor (buffer, &end_iter);
+    gtk_text_buffer_insert_at_cursor (buffer, text, -1);
+    if (text[strlen(text)-1] != ' ')
+      gtk_text_buffer_insert_at_cursor (buffer, " ", -1);
+
+    g_free (text);
+    return 1;
+  }
+  else {
+    // TBCL
+    //
+    //  Case 2: selection is empty
+    //
+    //  If cursor is in previous input
+    //    copy previous input to end of buffer
+    //    scroll to end of buffer
+    return 0;
+  }
 }
 
 gchar *
-get_input_text (gint *sz, int *from_selection)
+get_input_text (gint *sz)
 {
   GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
   GtkTextIter end_iter, start_iter;
@@ -94,11 +115,16 @@ get_input_text (gint *sz, int *from_selection)
 void
 define_tags ()
 {
-  err_tag = gtk_text_buffer_create_tag (buffer, "err_tag",
-                                        "foreground", "red",
-                                        "editable", FALSE,
-                                        NULL);
-  out_tag = gtk_text_buffer_create_tag (buffer, "out_tag",
-                                        "editable", FALSE,
-                                        NULL);
+  tags[TAG_INP] = gtk_text_buffer_create_tag (buffer, "inp_tag",
+                                              "foreground", "blue",
+                                              "editable", FALSE,
+                                              NULL);
+  tags[TAG_ERR] = gtk_text_buffer_create_tag (buffer, "err_tag",
+                                              "foreground", "red",
+                                              "editable", FALSE,
+                                              NULL);
+  tags[TAG_OUT] = gtk_text_buffer_create_tag (buffer, "out_tag",
+                                              "editable", FALSE,
+                                              NULL);
+  tags[TAG_LCK] = tags[TAG_OUT];
 }

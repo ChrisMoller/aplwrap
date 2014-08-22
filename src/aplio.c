@@ -11,8 +11,26 @@ gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
 gint apl_err = -1;		// to read from apl err
 
-int at_prompt = FALSE;
-ssize_t prompt_len = 0;
+static int at_prompt = FALSE;
+static ssize_t prompt_len = 0;
+
+int
+is_at_prompt ()
+{
+  return at_prompt;
+}
+
+ssize_t
+get_prompt_len ()
+{
+  return prompt_len;
+}
+
+void
+reset_prompt_len ()
+{
+  prompt_len = 0;
+}
 
 static int
 valid_end(char *start, ssize_t size)
@@ -41,9 +59,9 @@ valid_end(char *start, ssize_t size)
 static gchar *last_out = NULL;  // explained in apl_read_err()
 
 gboolean
-apl_read_out (gint fd,
+apl_read_out (gint         fd,
 	      GIOCondition condition,
-	      gpointer user_data)
+	      gpointer     user_data)
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
@@ -69,7 +87,7 @@ apl_read_out (gint fd,
       memcpy(last_out, text, text_idx);
       last_out[text_idx] = '\0';
     }
-    tagged_insert(text, text_idx, out_tag);
+    tagged_insert(text, text_idx, TAG_OUT);
     g_free (text);
   }
 
@@ -79,9 +97,9 @@ apl_read_out (gint fd,
 }
 
 gboolean
-apl_read_err (gint fd,
+apl_read_err (gint         fd,
 	      GIOCondition condition,
-	      gpointer user_data)
+	      gpointer     user_data)
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
@@ -117,6 +135,7 @@ apl_read_err (gint fd,
        suppressing stderr's output in the case that its text matches
        the last text written to stdout. */
     if (last_out) {
+      // FIX - This broke with the cout unbuffer patch to GNU APL.
       ssize_t lolen = strlen(last_out);
       suppress = lolen >= text_idx &&
         !strncmp(last_out+lolen-text_idx, text, text_idx);
@@ -133,7 +152,7 @@ apl_read_err (gint fd,
       at_prompt = !strncmp("      ", text+text_idx-6, 6);
       if (at_prompt)
         history_start();
-      tagged_insert(text, text_idx, nocolour ? out_tag : err_tag);
+      tagged_insert(text, text_idx, nocolour ? TAG_OUT : TAG_ERR);
     }
     g_free (text);
     text = NULL;
@@ -146,7 +165,8 @@ apl_read_err (gint fd,
 }
 
 void
-apl_send_inp (gchar *text, ssize_t sz)
+apl_send_inp (gchar  *text,
+              ssize_t sz)
 {
   ssize_t __attribute__ ((unused)) wrc;
   char nl = '\n';
