@@ -91,6 +91,23 @@ handle_copy_down ()
     //  If cursor is in previous input
     //    copy previous input to end of buffer
     //    scroll to end of buffer
+    GtkTextIter insert_iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+    gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+    if (gtk_text_iter_has_tag (&insert_iter, get_tag(TAG_INP))) {
+      gint sz;
+      gchar *text = get_input_text (&sz);
+      gchar *ztext = g_try_malloc (sz+1-6);
+      if (ztext) {
+        memcpy(ztext, text+6, sz-6);
+        ztext[sz] = '\0';
+        handle_history_replacement (ztext);
+        g_free (ztext);
+      }
+      return 1;
+    }
+    else if (gtk_text_iter_has_tag (&insert_iter, get_tag(TAG_LCK)))
+      return 1;
     return 0;
   }
 }
@@ -101,6 +118,7 @@ get_input_text (gint *sz)
   GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
   GtkTextIter end_iter, start_iter;
   gchar *text;
+  GtkTextTag* tag;
  
   gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
 
@@ -109,6 +127,9 @@ get_input_text (gint *sz)
   gtk_text_iter_forward_to_line_end (&end_iter);
   text = gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);
   *sz = gtk_text_iter_get_bytes_in_line (&start_iter);
+  tag = get_tag (*sz >= 6 && !strncmp ("      ", text, 6) ? TAG_INP : TAG_LCK);
+  gtk_text_buffer_apply_tag (buffer, tag, &start_iter, &end_iter);
+  
   return text;
 }
 
