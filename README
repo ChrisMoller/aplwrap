@@ -4,50 +4,44 @@ Usage:
   aplwrap [OPTION...]
 
 Help Options:
-  --help               Show help options
+  -?, --help               Show help options
   --help-all               Show all help options
   --help-gtk               Show GTK+ Options
 
 Application Options:
-  -s, --ftsize             Font size in points (integer).
-  -w, --width              Width in pixels (integer).
-  -h, --height             Height in pixels (integer).
-  -v, --vwidth             Use variable width font.
-  -n, --nocolour           Turn off coloured error text. (boolean switch).
-  -x, --xeq                Set an absolute or on-path executable APL 
-				other than the default, "apl".  (This
-				is primarily intended to allow the use
-				of uninstalled copies of APL --
-					aplwrap -x ./apl
-				-- for development purposes.  It's 
-				unlikely to work with anything other
-				than GNU APL.)
-  --LX                     Invoke APL ⎕LX on startup. (string: APL command or
-  			   	expression)
+  -s, --ftsize             Font size in points [integer]
+  -w, --width              Width in pixels [integer]
+  -h, --height             Height in pixels [integer]
+  -v, --vwidth             Use variable width font
+  -n, --nocolour           Turn off coloured error text
+  -x, --xeq                Path to the GNU APL executable [string]
+  --LX                     APL startup command or expression [string]
   --display=DISPLAY        X display to use
 
 
-In use, aplwrap simply provides a textual interface to GNU APL.  The
-only things that aren't obvious are:
+aplwrap provides a textual interface to GNU APL. The window shows a
+transcript of the APL session. New input to APL is always at the
+bottom of the window; APL output and inputs that have been committed
+to APL are uneditable.
 
-  1. Pressing "Enter" on any non-empty line sends the contents of that
-     line to apl--you don't have to copy-n-paste to re-execute a line.
+The APL keyboard follows Dyalog APL conventions with a few changes.
+View the keyboard layout using aplwrap's Help > Keymap menu.
 
-  2. The keypad Enter key is synonymous with the main Enter key.
+See KEY_BINDINGS.md for details of keyboard interaction with the
+transcript.
 
-  3. Under the "Help" button is another button that brings up a keymap image.
+aplwrap command line options may be followed by -- and additional
+options. These additional options are ignored by aplwrap. The entire
+GNU APL command line is accessible to the APL program via the ⎕ARG
+system function.
 
-  4. Since ctrl-c is bound to the GTK+ copy operation, APL can be interrupted
-     by pressing either ctrl-Break or ctrl-Windows-key.
+aplwrap is tested using GNU APL 1.4 and later.
 
-  5. Since ctrl-Backquote is used by various desktops like GNOME and KDE,
-     the diamond character can't be mapped to it's usual place at that
-     position.  Aplwrap relocates te character to alt-shift-D.
-     
 
-Contact me if I've screwed anything up or if there's a feature you want added.
+Contact me if I've screwed anything up or if there's a feature you
+want added.
 
 Have fun,
-Chris Moller
-moller@mollerware.com
+  Chris Moller
+  moller@mollerware.com
 

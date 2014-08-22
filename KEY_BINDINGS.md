@@ -30,6 +30,7 @@ Shift-Ctrl-Backspace        delete to end of line
 Shift-Ctrl-Delete           delete to beginning of line
 Ctrl-Return, Ctrl-Enter     insert a line break
 Insert                      toggle insert/overwrite
+Tab                         ignored; use space(s)
 
 Clipboard
 ---------
@@ -53,7 +54,8 @@ Ctrl-Break, Ctrl-Windows    interrupt APL
 APL Characters
 --------------
 
-See Help > Keymap for a display of the APL keyboard layout.
+The APL keyboard follows Dyalog APL conventions with a few changes.
+View the keyboard layout using aplwrap's Help > Keymap menu.
 
 Copy-Down
 ---------
