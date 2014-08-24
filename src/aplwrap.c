@@ -104,9 +104,9 @@ scroll_to_end ()
 {
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.0,
-				TRUE,
-				0.2,
+				0.1,
+				FALSE,
+				0.5,
 				1.0);
 }
 

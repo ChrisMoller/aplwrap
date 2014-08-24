@@ -135,10 +135,10 @@ apl_read_err (gint         fd,
        suppressing stderr's output in the case that its text matches
        the last text written to stdout. */
     if (last_out) {
-      // FIX - This broke with the cout unbuffer patch to GNU APL.
       ssize_t lolen = strlen(last_out);
-      suppress = lolen >= text_idx &&
-        !strncmp(last_out+lolen-text_idx, text, text_idx);
+      suppress = (lolen >= text_idx) ?
+        !strncmp(last_out+lolen-text_idx, text, text_idx) :
+        !strncmp(last_out, text+text_idx-lolen, lolen);
       /* We also need to finesse the data returned to APL in response
          to a quote-quad input; we must send only the input following
          the prompt. See key_press_event() for the other half of this
