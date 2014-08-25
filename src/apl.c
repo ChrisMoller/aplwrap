@@ -63,25 +63,39 @@ make_env ()
   return env;
 }
 
+static gchar **apl_argv      = NULL;
+static int     apl_argv_next = 0;
+static int     apl_argv_max  = 0;
+#define APL_ARGV_INCR	16
+
+static void
+append_argv (gchar *av)
+{
+  if (apl_argv_max <= apl_argv_next) {
+    apl_argv_max += APL_ARGV_INCR;
+    apl_argv = g_realloc (apl_argv, apl_argv_max * sizeof(gchar *));
+  }
+  apl_argv[apl_argv_next++] = av;
+}
+
 int apl_spawn (int   argc,
                char *argv[])
 {
   GError *error = NULL;
   gboolean rc;
-  gchar **apl_argv = g_alloca ((9 + argc) * sizeof (gchar *));
 
-  bzero (apl_argv, (9 + argc) * sizeof (gchar *));
   {
-    gint ix = 0;
-    apl_argv[ix++] = "apl";
-    apl_argv[ix++] = "--noColor";
-    apl_argv[ix++] = "--rawCIN";
-    apl_argv[ix++] = "-w";
-    apl_argv[ix++] = "500";
-    apl_argv[ix++] = "--silent";
+    append_argv ("apl");
+    append_argv ("--noColor");
+    append_argv ("--rawCIN");
+    append_argv ("--emacs_arg");
+    append_argv ("Hi there");
+    append_argv ("-w");
+    append_argv ("500");
+    append_argv ("--silent");
     if (opt_lx) {
-      apl_argv[ix++] = "--LX";
-      apl_argv[ix++] = opt_lx;
+      append_argv ("--LX");
+      append_argv (opt_lx);
     }
 
     if (argc > 1) {
@@ -90,10 +104,10 @@ int apl_spawn (int   argc,
 	if (0 == g_strcmp0 (argv[i], "--")) break;
       }
       for (; i < argc; ++i) {
-        apl_argv[ix++] = argv[i];
+        append_argv (argv[i]);
       }
     }
-    apl_argv[ix++] = NULL;
+    append_argv (NULL);
   }
 
   if (new_fn) apl_argv[0] = new_fn;
@@ -112,6 +126,7 @@ int apl_spawn (int   argc,
 				 &apl_err,	// gint *standard_error,
 				 &error);	// GError **error
   if (new_fn) g_free (new_fn);
+  if (apl_argv) g_free (apl_argv);
   
   if (!rc) {
     g_print ("error opening APL: %s\n", error->message);
