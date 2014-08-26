@@ -1,8 +1,12 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/types.h>
+#include <regex.h>
+
 
 #include "aplio.h"
+#include "apl.h"
 #include "txtbuf.h"
 #include "history.h"
 #include "options.h"
@@ -13,7 +17,8 @@ gint apl_err = -1;		// to read from apl err
 
 static int at_prompt = FALSE;
 static ssize_t prompt_len = 0;
-
+static gchar *comm_mode = NULL;
+static gint   comm_addr = -1;
 int
 is_at_prompt ()
 {
@@ -87,7 +92,32 @@ apl_read_out (gint         fd,
       memcpy(last_out, text, text_idx);
       last_out[text_idx] = '\0';
     }
-    tagged_insert(text, text_idx, TAG_OUT);
+    if (apl_expect_network) {
+      apl_expect_network = FALSE;
+      
+      
+#define NW_PARSE "^.*mode:([[:alpha:]]*)[[:space:]]addr:([[:digit:]]*)*.*$"
+
+	int rc;
+      regex_t preg;
+#define NR_PMATCH 4
+      regmatch_t pmatch[NR_PMATCH];
+      regcomp (&preg, NW_PARSE, REG_EXTENDED | REG_ICASE);
+      rc = regexec (&preg, text, NR_PMATCH, pmatch, 0);
+      if (rc != REG_NOERROR) {
+	gchar eb[256];
+	regerror(rc, &preg, eb, 256);
+	g_print ("eb = \"%s\"\n", eb);
+      }
+      else {
+	comm_mode = g_strndup (&text[pmatch[1].rm_so],
+			       pmatch[1].rm_eo - pmatch[1].rm_so);
+	comm_addr = (gint)g_ascii_strtoll (&text[pmatch[2].rm_so], NULL, 0);
+	//	g_print ("mode %s addr %d\n", comm_mode, comm_addr);
+      }
+      regfree (&preg);
+    }
+    else tagged_insert (text, text_idx, TAG_OUT);
     g_free (text);
   }
 

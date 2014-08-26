@@ -129,6 +129,7 @@ main (int   argc,
     g_clear_error (&error);
   }
 
+  apl_expect_network = FALSE;
   if (apl_spawn(argc, argv)) return 1;
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

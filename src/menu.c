@@ -5,8 +5,11 @@
 
 #include "menu.h"
 #include "apl.h"
+#include "txtbuf.h"
 
 #include "layout.h"
+
+static gchar *filename = NULL;
 
 guchar *
 decompress_image_data ()
@@ -86,6 +89,123 @@ show_about (GtkWidget *widget,
 
 }
 
+static gboolean
+set_filename ()
+{
+  gboolean rc = FALSE;
+  GtkWidget *dialog;
+  gchar *lname = NULL;
+  gchar * dirname;
+
+  dialog = gtk_file_chooser_dialog_new ("Save Log",
+                                        NULL,
+                                        GTK_FILE_CHOOSER_ACTION_SAVE,
+                                        _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                        _("_Save"),   GTK_RESPONSE_ACCEPT,
+                                        NULL);
+  if (filename) dirname = g_path_get_dirname (filename);
+  else dirname = g_strdup (".");
+  gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), dirname);
+  g_free (dirname);
+  gtk_file_chooser_set_create_folders (GTK_FILE_CHOOSER (dialog), TRUE);
+
+  gboolean run = TRUE;
+  while (run) {
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+      lname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+
+      if (g_file_test (lname, G_FILE_TEST_EXISTS)) {
+	GtkWidget *e_dialog;
+	gint response;
+	e_dialog = gtk_message_dialog_new (NULL,
+					   GTK_DIALOG_DESTROY_WITH_PARENT,
+					   GTK_MESSAGE_QUESTION,
+					   GTK_BUTTONS_NONE,
+					   _ ("File %s exists.  Overwrite it?"),
+					   lname);
+	gtk_dialog_add_buttons (GTK_DIALOG (e_dialog),
+				_("Yes"),    GTK_RESPONSE_YES,
+				_("No"),     GTK_RESPONSE_NO,
+				_("Cancel"), GTK_RESPONSE_CANCEL,
+				NULL);
+	gtk_window_set_keep_above (GTK_WINDOW (e_dialog), TRUE);
+	gtk_window_set_position (GTK_WINDOW (e_dialog), GTK_WIN_POS_MOUSE);
+	response = gtk_dialog_run (GTK_DIALOG (e_dialog));
+	gtk_widget_destroy (e_dialog);
+	switch(response) {
+	case GTK_RESPONSE_CANCEL:
+	  run = FALSE;			// fall through
+	case GTK_RESPONSE_NO:
+	  g_free (lname);
+	  lname = NULL;
+	  break;
+	case GTK_RESPONSE_YES:
+	  run = FALSE;
+	  break;
+	}
+      }
+      else run = FALSE;
+    }
+    else run = FALSE;
+  }
+  if (lname) {
+    if (filename) g_free (filename);
+    filename = lname;
+    rc = TRUE;
+  }
+  gtk_widget_destroy (dialog);
+  return rc;
+}
+
+static void
+save_log_fer_real ()
+{
+  gboolean written = FALSE;
+  if (filename) {
+    GtkTextIter start_iter, end_iter;
+    gtk_text_buffer_get_bounds (buffer, &start_iter, &end_iter);
+    gchar *text =
+      gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);
+    FILE *lfile = fopen (filename, "w");
+    if (lfile) {
+      // as brain-dead as it sounds, GTK has no way to get the length of
+      // a buffer in bytes.
+      fwrite (text, 1, strlen (text), lfile);
+      fclose (lfile);
+      written = TRUE;
+    }
+    g_free (text);
+  }
+  if (!written) {
+    GtkWidget *e_dialog;
+    e_dialog = gtk_message_dialog_new (NULL,
+				       GTK_DIALOG_DESTROY_WITH_PARENT,
+				       GTK_MESSAGE_ERROR,
+				       GTK_BUTTONS_OK,
+				       _ ("Write failed"));
+    gtk_window_set_keep_above (GTK_WINDOW (e_dialog), TRUE);
+    gtk_window_set_position (GTK_WINDOW (e_dialog), GTK_WIN_POS_MOUSE);
+    gtk_dialog_run (GTK_DIALOG (e_dialog));
+    gtk_widget_destroy (e_dialog);
+  }
+}
+
+static void
+save_log (GtkWidget *widget,
+	  gpointer   data)
+{
+  gboolean doit = filename ? TRUE : set_filename ();
+  if (doit) save_log_fer_real ();
+}
+
+static void
+save_log_as (GtkWidget *widget,
+	  gpointer   data)
+{
+  gboolean doit = set_filename ();
+  if (doit) save_log_fer_real ();
+}
+
 void
 build_menubar (GtkWidget *vbox)
 {
@@ -113,17 +233,19 @@ build_menubar (GtkWidget *vbox)
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_file), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+#endif
 
-  item = gtk_menu_item_new_with_label (_ ("Save"));
-  //  g_signal_connect (G_OBJECT (item), "activate",
-  //               G_CALLBACK (save_mods), NULL);
+  item = gtk_menu_item_new_with_label (_ ("Save Log"));
+  g_signal_connect (G_OBJECT (item), "activate",
+		    G_CALLBACK (save_log), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Save as"));
-  //  g_signal_connect(G_OBJECT(item), "activate",
-  //               G_CALLBACK (save_mods), NULL);
+  item = gtk_menu_item_new_with_label (_ ("Save Log as"));
+  g_signal_connect(G_OBJECT(item), "activate",
+		   G_CALLBACK (save_log_as), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
+#if 0
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 

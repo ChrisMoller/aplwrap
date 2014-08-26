@@ -1,5 +1,7 @@
 2014-08-25  Chris Moller  <moller@mollerware.com>
 
+	* menu.c (save_log_fer_real): Add "Save Log" capability.
+
 	* apl.c (apl_spawn): Made apl_argv dynamic.
 
 2014-08-17  Chris Moller  <moller@mollerware.com>
