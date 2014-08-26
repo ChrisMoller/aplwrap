@@ -3,7 +3,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <regex.h>
-
+#include <sys/socket.h>
+#define _GNU_SOURCE 
+#include <stdio.h>
 
 #include "aplio.h"
 #include "apl.h"
@@ -92,32 +94,47 @@ apl_read_out (gint         fd,
       memcpy(last_out, text, text_idx);
       last_out[text_idx] = '\0';
     }
+
+    gboolean eaten = FALSE;
     if (apl_expect_network) {
-      apl_expect_network = FALSE;
-      
-      
 #define NW_PARSE "^.*mode:([[:alpha:]]*)[[:space:]]addr:([[:digit:]]*)*.*$"
 
-	int rc;
+      int rc;
       regex_t preg;
 #define NR_PMATCH 4
       regmatch_t pmatch[NR_PMATCH];
       regcomp (&preg, NW_PARSE, REG_EXTENDED | REG_ICASE);
       rc = regexec (&preg, text, NR_PMATCH, pmatch, 0);
-      if (rc != REG_NOERROR) {
-	gchar eb[256];
-	regerror(rc, &preg, eb, 256);
-	g_print ("eb = \"%s\"\n", eb);
-      }
-      else {
+      if (rc == REG_NOERROR) {
+	apl_expect_network = FALSE;
+	eaten = TRUE;
 	comm_mode = g_strndup (&text[pmatch[1].rm_so],
 			       pmatch[1].rm_eo - pmatch[1].rm_so);
 	comm_addr = (gint)g_ascii_strtoll (&text[pmatch[2].rm_so], NULL, 0);
+	//	g_print ("%s", text);
 	//	g_print ("mode %s addr %d\n", comm_mode, comm_addr);
+
+	// TcpListener.cc
+	// emacs_mode/UnixSocketListener.cc : 54
+	
+#if 0
+	int sid = socket( AF_UNIX, SOCK_STREAM, 0 );
+	g_print ("sid = %d\n", sid);
+
+	gchar *sockname;
+	asprintf (&sockname, "/tmp/aplwrap_%d", (int)getpid ());
+
+	struct sockaddr_un addr;
+	addr.sun_family = AF_UNIX;
+#define QUERY "fn:yyyy"
+	ssize_t cnt = write (sid, QUERY, strlen (QUERY));
+	g_print ("cnt = %d\n", (int)cnt);
+	close (sid);
+#endif
       }
       regfree (&preg);
     }
-    else tagged_insert (text, text_idx, TAG_OUT);
+    if (!eaten) tagged_insert (text, text_idx, TAG_OUT);
     g_free (text);
   }
 

@@ -76,7 +76,7 @@ keymap_s keymap[] = {
   {AV_ASCII_BAR,      0},		  	   //	m		58	
   {AV_COMMENT,        AV_COMMA_BAR}, 	  	   //	, (comma},	59	
   {AV_BACKSLASH_BAR,  AV_DELTA_UNDERBAR},	   //	. (dot},	60
-  {AV_FORMAT,	      AV_Quad_COLON},		   // 	/		61
+  {AV_SLASH_BAR,      AV_Quad_COLON},		   // 	/		61
   {0,		      0},		           //			62	
   {0,		      0},		           //			63
 };
