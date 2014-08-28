@@ -83,6 +83,8 @@ keymap_s keymap[] = {
 #define key_alt(k)       keymap[k].cp_alt
 #define key_shift_alt(k) keymap[k].cp_shift_alt
 
+gint keymap_count = sizeof(keymap) / sizeof(keymap_s);
+
 /*******
 
 	Don't know if these are interchangeable

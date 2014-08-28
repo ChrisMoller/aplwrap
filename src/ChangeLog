@@ -1,3 +1,7 @@
+2014-08-28  Chris Moller  <moller@mollerware.com>
+
+	* edit.c (edit_save_cb): New capability: nascent editor
+
 2014-08-25  Chris Moller  <moller@mollerware.com>
 
 	* menu.c (save_log_fer_real): Add "Save Log" capability.

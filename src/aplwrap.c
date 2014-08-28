@@ -17,6 +17,30 @@ static GtkWidget *scroll;
 static GtkWidget *view;
 static PangoFontDescription *desc = NULL;
 
+gchar *
+handle_apl_characters (gsize *bw_p, GdkEventKey *key_event)
+{
+  guint16 kc = key_event->hardware_keycode;
+  gchar *res = NULL;
+  if (kc < keymap_count) {
+    CHT_Index ix = (key_event->state & GDK_SHIFT_MASK)
+      ? key_shift_alt (kc) :  key_alt (kc);
+    if (ix) {
+      gshort uic = char_unicode (ix);
+      gsize br, bw = 0;
+      res = g_convert ((const gchar *)(&uic),
+		       sizeof(gshort),
+		       "utf-8",
+		       "unicode",
+		       &br,
+		       &bw,
+		       NULL);
+      if (res && bw_p) *bw_p = bw;
+    }
+  }
+  return res;
+}
+
 static gboolean
 key_press_event (GtkWidget *widget,
                  GdkEvent  *event,
@@ -76,24 +100,12 @@ key_press_event (GtkWidget *widget,
   }
 
   /* APL characters */
-  guint16 kc = key_event->hardware_keycode;
-  if (kc < sizeof(keymap) / sizeof(keymap_s)) {
-    CHT_Index ix = (key_event->state & GDK_SHIFT_MASK)
-      ? key_shift_alt (kc) :  key_alt (kc);
-    if (ix) {
-      gshort uic = char_unicode (ix);
-      gsize br, bw;
-      gchar *res = g_convert ((const gchar *)(&uic),
-			      sizeof(gshort),
-			      "utf-8",
-			      "unicode",
-			      &br,
-			      &bw,
-			      NULL);
-      gtk_text_buffer_insert_at_cursor (buffer, res, bw);
-      g_free (res);
-      return TRUE;
-    }
+  gsize bw;
+  gchar *res = handle_apl_characters (&bw, key_event);
+  if (res) {
+    gtk_text_buffer_insert_at_cursor (buffer, res, bw);
+    g_free (res);
+    return TRUE;
   }
 
   return FALSE;				// pass the event on
@@ -136,7 +148,7 @@ main (int   argc,
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
     
   g_signal_connect (window, "destroy",
-		    G_CALLBACK (gapl2_quit), NULL);
+		    G_CALLBACK (aplwrap_quit), NULL);
     
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
@@ -150,14 +162,14 @@ main (int   argc,
 
   scroll = gtk_scrolled_window_new (NULL, NULL);
   view = gtk_text_view_new ();
-  gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
+  gtk_container_set_border_width (GTK_CONTAINER (view), 4);
+  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (key_press_event), NULL);
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
-  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   define_tags ();
 
   gtk_widget_show_all (window);

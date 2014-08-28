@@ -17,8 +17,8 @@
 static GPid apl_pid = -1;
 
 void
-gapl2_quit (GtkWidget *widget,
-	     gpointer  data)
+aplwrap_quit (GtkWidget *widget,
+	      gpointer  data)
 {
   if (apl_pid != -1) {
     kill ((pid_t)apl_pid, SIGKILL);
@@ -35,7 +35,7 @@ apl_exit (GPid     pid,
 {
   g_spawn_close_pid (pid);
   apl_pid = -1;
-  gapl2_quit (NULL, NULL);
+  aplwrap_quit (NULL, NULL);
 }
 
 void apl_interrupt ()

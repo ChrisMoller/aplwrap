@@ -93,7 +93,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_aplwrap_OBJECTS = aplwrap-aplwrap.$(OBJEXT) aplwrap-menu.$(OBJEXT) \
 	aplwrap-options.$(OBJEXT) aplwrap-apl.$(OBJEXT) \
 	aplwrap-aplio.$(OBJEXT) aplwrap-history.$(OBJEXT) \
-	aplwrap-txtbuf.$(OBJEXT)
+	aplwrap-txtbuf.$(OBJEXT) aplwrap-edit.$(OBJEXT)
 aplwrap_OBJECTS = $(am_aplwrap_OBJECTS)
 am__DEPENDENCIES_1 =
 aplwrap_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -251,9 +251,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
-			menu.c menu.h options.c options.h \
-			apl.c apl.h aplio.c aplio.h \
-			history.c history.h txtbuf.c txtbuf.h
+                  menu.c menu.h options.c options.h \
+                  apl.c apl.h aplio.c aplio.h \
+                  history.c history.h txtbuf.c txtbuf.h \
+                  edit.c edit.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
 aplwrap_LDADD = $(GTK_LIBS)
@@ -347,6 +348,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-apl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-aplio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-aplwrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-history.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-menu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-options.Po@am__quote@
@@ -463,6 +465,20 @@ aplwrap-txtbuf.obj: txtbuf.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='txtbuf.c' object='aplwrap-txtbuf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-txtbuf.obj `if test -f 'txtbuf.c'; then $(CYGPATH_W) 'txtbuf.c'; else $(CYGPATH_W) '$(srcdir)/txtbuf.c'; fi`
+
+aplwrap-edit.o: edit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.o -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-edit.Tpo $(DEPDIR)/aplwrap-edit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='edit.c' object='aplwrap-edit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
+
+aplwrap-edit.obj: edit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.obj -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-edit.Tpo $(DEPDIR)/aplwrap-edit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='edit.c' object='aplwrap-edit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #define _GNU_SOURCE 
 #include <stdio.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "aplio.h"
 #include "apl.h"
@@ -16,11 +18,14 @@
 gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
 gint apl_err = -1;		// to read from apl err
+gint sockfd  = -1;
+guint event_id;
 
 static int at_prompt = FALSE;
 static ssize_t prompt_len = 0;
 static gchar *comm_mode = NULL;
 static gint   comm_addr = -1;
+
 int
 is_at_prompt ()
 {
@@ -64,6 +69,53 @@ valid_end(char *start, ssize_t size)
 #define BUFFER_SIZE     1024
 
 static gchar *last_out = NULL;  // explained in apl_read_err()
+
+static void (*socket_cb)() = NULL;
+
+void
+set_socket_cb (void (*cb)(gchar *text))
+{
+  socket_cb = cb;
+}
+
+gboolean
+apl_read_sockid (gint         fd,
+		 GIOCondition condition,
+		 gpointer     user_data)
+{
+  static gchar  *text     = NULL;
+  static ssize_t text_idx = 0;
+
+  gboolean run = TRUE;
+  while(run) {
+    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
+    *text = 0;
+    if (text) {
+      errno = 0;
+      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
+      if (sz == -1) run = FALSE;
+      text_idx += sz;
+      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
+    }
+    else run = FALSE;
+  }
+  
+  if (text_idx > 0) {
+    last_out = g_try_malloc(text_idx+1);
+    if (last_out) {
+      memcpy(last_out, text, text_idx);
+      last_out[text_idx] = '\0';
+    }
+
+    if (socket_cb) (*socket_cb)(text);
+    g_free (text);
+  }
+
+  text = NULL;
+  text_idx = 0;
+  return TRUE;
+}
 
 gboolean
 apl_read_out (gint         fd,
@@ -111,26 +163,42 @@ apl_read_out (gint         fd,
 	comm_mode = g_strndup (&text[pmatch[1].rm_so],
 			       pmatch[1].rm_eo - pmatch[1].rm_so);
 	comm_addr = (gint)g_ascii_strtoll (&text[pmatch[2].rm_so], NULL, 0);
-	//	g_print ("%s", text);
-	//	g_print ("mode %s addr %d\n", comm_mode, comm_addr);
 
-	// TcpListener.cc
-	// emacs_mode/UnixSocketListener.cc : 54
-	
-#if 0
-	int sid = socket( AF_UNIX, SOCK_STREAM, 0 );
-	g_print ("sid = %d\n", sid);
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	  fprintf(stderr, "Error in socket() %d, %s",  // fixme
+		  errno, strerror(errno)); 
+	}
+	else {
+	  struct sockaddr_in srv_addr;
+	  srv_addr.sin_family = AF_INET;
+	  srv_addr.sin_port = htons (comm_addr);
+	  srv_addr.sin_addr.s_addr = inet_addr ("127.0.0.1");
 
-	gchar *sockname;
-	asprintf (&sockname, "/tmp/aplwrap_%d", (int)getpid ());
-
-	struct sockaddr_un addr;
-	addr.sun_family = AF_UNIX;
-#define QUERY "fn:yyyy"
-	ssize_t cnt = write (sid, QUERY, strlen (QUERY));
-	g_print ("cnt = %d\n", (int)cnt);
-	close (sid);
+	  if (connect(sockfd, (struct sockaddr*)&srv_addr, sizeof(srv_addr))
+	      < 0) {
+	    perror("Error in connect()");
+	  }
+	  else {
+	    g_unix_set_fd_nonblocking (sockfd, TRUE, NULL);
+	    event_id =
+	      g_unix_fd_add (sockfd,		  // gint fd,
+			     G_IO_IN | G_IO_PRI,  // GIOCondition condition,
+			     apl_read_sockid,	  // GUnixFDSourceFunc function,
+			     NULL);		  // gpointer user_data
+	  }
+#if  0
+	 {
+	    int nbyte;
+#define MESSAGE "proto\n"
+	    if ((nbyte = send(sockfd, MESSAGE, strlen(MESSAGE), 0)) < 0) {
+	      perror("Error in send()");
+	    }
+	    fprintf (stderr, "sent %d bytes\n", nbyte);
+	    //	    shutdown(sockfd, SHUT_RDWR);
+	    //	    close(sockfd);
+	  }
 #endif
+	}
       }
       regfree (&preg);
     }

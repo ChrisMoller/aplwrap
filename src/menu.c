@@ -2,10 +2,13 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
+#include <sys/socket.h>
 
 #include "menu.h"
 #include "apl.h"
+#include "aplio.h"
 #include "txtbuf.h"
+#include "edit.h"
 
 #include "layout.h"
 
@@ -200,10 +203,144 @@ save_log (GtkWidget *widget,
 
 static void
 save_log_as (GtkWidget *widget,
-	  gpointer   data)
+	     gpointer   data)
 {
   gboolean doit = set_filename ();
   if (doit) save_log_fer_real ();
+}
+
+enum {
+  OBJECT_NAME,
+  OBJECT_RAW_NAME,
+  OBJECT_NC,
+  OBJECT_COUNT
+};
+
+typedef struct {
+  gchar *name;
+  gint nc;
+} sym_def_s;
+
+static void
+names_cb (GtkTreeView *tree_view,
+	  GtkTreePath *path,
+	  GtkTreeViewColumn *column,
+	  gpointer user_data)
+{
+  GtkTreeModel *model;
+  GtkTreeIter   iter;
+
+  if (!user_data) return;
+
+  sym_def_s *sd = user_data;
+  
+  model = gtk_tree_view_get_model(tree_view);
+  if (gtk_tree_model_get_iter (model, &iter, path)) {
+    gtk_tree_model_get(model, &iter,
+                       OBJECT_RAW_NAME, &sd->name,
+                       OBJECT_NC,       &sd->nc,
+                       -1);
+  }
+}
+
+static void
+open_object_cb (gchar *text)
+{
+  GtkWidget *dialog;
+  GtkWidget *content;
+  gboolean response;
+  GtkListStore *names_store;
+  GtkWidget *names_tree;
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+  GtkTreeSelection *selection;
+
+  set_socket_cb (NULL);
+
+  dialog =  gtk_dialog_new_with_buttons (_ ("Open Object"),
+                                         NULL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         _ ("_Cancel"), GTK_RESPONSE_CANCEL,
+                                         _ ("_OK"), GTK_RESPONSE_ACCEPT,
+                                         NULL);
+  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+  names_store = gtk_list_store_new (OBJECT_COUNT,
+				    G_TYPE_STRING,
+				    G_TYPE_STRING,
+				    G_TYPE_INT);
+  
+  gchar **names = g_strsplit (text, "\n", 0);
+  for (int i = 0; names[i]; i++) {
+    GtkTreeIter   iter;
+    if (!*names[i]) continue;
+    if (!g_strcmp0 (names[i], END_TAG)) break;
+    guint64 nc;
+    gchar *endptr;
+    nc = g_ascii_strtoull (names[i], &endptr, 0);
+    gtk_list_store_append (names_store, &iter);
+    gchar *nn = g_strdup_printf ((nc = NC_FUNCTION) ? "<i>%s</i>" : "%s",
+				 endptr);
+    gtk_list_store_set (names_store, &iter,
+			OBJECT_NAME,     nn,
+			OBJECT_RAW_NAME, endptr,
+			OBJECT_NC,       (int)nc,
+			-1);
+    g_free (nn);
+  }
+
+  g_strfreev (names);
+
+  names_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL (names_store));
+  selection =  gtk_tree_view_get_selection (GTK_TREE_VIEW (names_tree));
+  gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+  GValue val = G_VALUE_INIT;
+  g_value_init (&val, G_TYPE_BOOLEAN);
+  g_value_set_boolean (&val, TRUE);
+  g_object_set_property (G_OBJECT (names_tree),
+			 "activate-on-single-click", &val);
+  g_value_unset (&val);
+  sym_def_s sd = {NULL, -1};
+  g_signal_connect(G_OBJECT(names_tree), "row-activated",
+                   G_CALLBACK (names_cb), &sd);
+
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("Object",
+						     renderer,
+						     "markup",
+						     OBJECT_NAME,
+						     NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (names_tree), column); 
+   
+  gtk_container_add (GTK_CONTAINER (content), names_tree);
+  gtk_widget_show_all (dialog);
+  response = gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+  if (response == GTK_RESPONSE_ACCEPT) {
+    if (sd.name) {
+      edit_object (sd.name);
+      g_free (sd.name);
+    }
+  }
+}
+
+static void
+open_object (GtkWidget *widget,
+	     gpointer   data)
+{
+#define COMMAND "variables:tagged\n"
+  set_socket_cb (open_object_cb);
+  if (send(sockfd, COMMAND, strlen(COMMAND), 0) < 0) {
+    perror("Error in send()");	// fixme
+  }
+}
+
+static void
+new_object (GtkWidget *widget,
+	    gpointer   data)
+{
+  edit_object (NULL);
 }
 
 void
@@ -223,17 +360,15 @@ build_menubar (GtkWidget *vbox)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-#if 0
   item = gtk_menu_item_new_with_label(_ ("New"));
-  //g_signal_connect (G_OBJECT (item), "activate",
-  //                 G_CALLBACK (create_new_drawing), NULL);
+  g_signal_connect (G_OBJECT (item), "activate",
+                   G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Open"));
   g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (open_file), NULL);
+		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
-#endif
 
   item = gtk_menu_item_new_with_label (_ ("Save Log"));
   g_signal_connect (G_OBJECT (item), "activate",
@@ -260,7 +395,7 @@ build_menubar (GtkWidget *vbox)
 
   item = gtk_menu_item_new_with_label (_ ("Quit"));
   g_signal_connect (G_OBJECT (item), "activate",
-                   G_CALLBACK (gapl2_quit), NULL);
+                   G_CALLBACK (aplwrap_quit), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
 
