@@ -243,6 +243,19 @@ names_cb (GtkTreeView *tree_view,
   }
 }
 
+static gboolean
+file_button_press_cb (GtkWidget      *widget,
+                     GdkEventButton *event,
+                     gpointer        data)
+{
+  if (event-> type == GDK_2BUTTON_PRESS) {
+    gtk_dialog_response (GTK_DIALOG (data), GTK_RESPONSE_ACCEPT);
+    return TRUE;
+  }
+  else return FALSE;
+}
+
+
 static void
 open_object_cb (gchar *text)
 {
@@ -276,9 +289,9 @@ open_object_cb (gchar *text)
     GtkTreeIter   iter;
     if (!*names[i]) continue;
     if (!g_strcmp0 (names[i], END_TAG)) break;
-    guint64 nc;
+    guint nc;
     gchar *endptr;
-    nc = g_ascii_strtoull (names[i], &endptr, 0);
+    sscanf (names[i], "%ms %u", &endptr, &nc);
     gtk_list_store_append (names_store, &iter);
     gchar *nn = g_strdup_printf ((nc = NC_FUNCTION) ? "<i>%s</i>" : "%s",
 				 endptr);
@@ -293,14 +306,19 @@ open_object_cb (gchar *text)
   g_strfreev (names);
 
   names_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL (names_store));
+  gtk_widget_set_events (names_tree, GDK_2BUTTON_PRESS);
+  g_signal_connect (names_tree, "button-press-event",
+		    G_CALLBACK (file_button_press_cb), dialog);
   selection =  gtk_tree_view_get_selection (GTK_TREE_VIEW (names_tree));
   gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+#if 1
   GValue val = G_VALUE_INIT;
   g_value_init (&val, G_TYPE_BOOLEAN);
   g_value_set_boolean (&val, TRUE);
   g_object_set_property (G_OBJECT (names_tree),
 			 "activate-on-single-click", &val);
   g_value_unset (&val);
+#endif
   sym_def_s sd = {NULL, -1};
   g_signal_connect(G_OBJECT(names_tree), "row-activated",
                    G_CALLBACK (names_cb), &sd);

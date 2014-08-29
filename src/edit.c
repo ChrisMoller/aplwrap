@@ -149,6 +149,7 @@ edit_object (const gchar* name)
   PangoFontDescription *desc = NULL;
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (window), name ? : "Unnamed");
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
 
   g_signal_connect (window, "destroy",
