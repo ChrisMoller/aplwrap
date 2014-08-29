@@ -2,8 +2,9 @@
 
 	* menu.c (file_button_press_cb): Add double-click select/accept.
 	* aplwrap.c (main): Add main window title.
-	* edit.c (edit_object): Add edit window title.
 	* edit.c (edit_save_cb): New capability: nascent editor
+	* edit.c (edit_object): Add edit window title.
+	(edit_variable_cb): Add edit-variable framework.
 
 2014-08-25  Chris Moller  <moller@mollerware.com>
 

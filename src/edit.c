@@ -128,7 +128,7 @@ edit_key_press_event (GtkWidget *widget,
 }
 
 static void
-edit_object_cb (gchar *text)
+edit_function_cb (gchar *text)
 {
   set_socket_cb (NULL);
   gchar **lines = g_strsplit (text, "\n", 0);
@@ -140,8 +140,24 @@ edit_object_cb (gchar *text)
   g_strfreev (lines);
 }
 
+static void
+edit_variable_cb (gchar *text)
+{
+  set_socket_cb (NULL);
+  g_print ("vbl: %s\n", text);
+#if 0
+  gchar **lines = g_strsplit (text, "\n", 0);
+  for (int i = 1; lines[i]; i++) {
+    if (!g_strcmp0 (lines[i], END_TAG)) break;
+    gtk_text_buffer_insert_at_cursor (edit_buffer, lines[i], -1);
+    gtk_text_buffer_insert_at_cursor (edit_buffer, "\n", -1);
+  }
+  g_strfreev (lines);
+#endif
+}
+
 void
-edit_object (const gchar* name)
+edit_object (const gchar* name, gint nc)
 {
   GtkWidget *vbox;
   GtkWidget *scroll;
@@ -172,10 +188,21 @@ edit_object (const gchar* name)
   edit_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
   if (name) {
-    set_socket_cb (edit_object_cb);
-    gchar *cmd = g_strdup_printf ("fn:%s\n", name);
-    if (send(sockfd, cmd, strlen(cmd), 0) < 0) {
-      perror("Error in send()");	// fixme
+    if (nc == NC_FUNCTION) {
+      set_socket_cb (edit_function_cb);
+      gchar *cmd = g_strdup_printf ("fn:%s\n", name);
+      if (send(sockfd, cmd, strlen(cmd), 0) < 0) {
+	perror("Error in send()");	// fixme
+      }
+      g_free (cmd);
+    }
+    else if (nc == NC_VARIABLE) {
+      set_socket_cb (edit_variable_cb);
+      gchar *cmd = g_strdup_printf ("getvar:%s\n", name);
+      if (send(sockfd, cmd, strlen(cmd), 0) < 0) {
+	perror("Error in send()");	// fixme
+      }
+      g_free (cmd);
     }
   }
 

@@ -293,7 +293,7 @@ open_object_cb (gchar *text)
     gchar *endptr;
     sscanf (names[i], "%ms %u", &endptr, &nc);
     gtk_list_store_append (names_store, &iter);
-    gchar *nn = g_strdup_printf ((nc = NC_FUNCTION) ? "<i>%s</i>" : "%s",
+    gchar *nn = g_strdup_printf ((nc == NC_FUNCTION) ? "<i>%s</i>" : "%s",
 				 endptr);
     gtk_list_store_set (names_store, &iter,
 			OBJECT_NAME,     nn,
@@ -301,6 +301,7 @@ open_object_cb (gchar *text)
 			OBJECT_NC,       (int)nc,
 			-1);
     g_free (nn);
+    g_free (endptr);
   }
 
   g_strfreev (names);
@@ -311,14 +312,12 @@ open_object_cb (gchar *text)
 		    G_CALLBACK (file_button_press_cb), dialog);
   selection =  gtk_tree_view_get_selection (GTK_TREE_VIEW (names_tree));
   gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
-#if 1
   GValue val = G_VALUE_INIT;
   g_value_init (&val, G_TYPE_BOOLEAN);
   g_value_set_boolean (&val, TRUE);
   g_object_set_property (G_OBJECT (names_tree),
 			 "activate-on-single-click", &val);
   g_value_unset (&val);
-#endif
   sym_def_s sd = {NULL, -1};
   g_signal_connect(G_OBJECT(names_tree), "row-activated",
                    G_CALLBACK (names_cb), &sd);
@@ -337,7 +336,7 @@ open_object_cb (gchar *text)
   gtk_widget_destroy (dialog);
   if (response == GTK_RESPONSE_ACCEPT) {
     if (sd.name) {
-      edit_object (sd.name);
+      edit_object (sd.name, sd.nc);
       g_free (sd.name);
     }
   }
@@ -358,7 +357,7 @@ static void
 new_object (GtkWidget *widget,
 	    gpointer   data)
 {
-  edit_object (NULL);
+  edit_object (NULL, NC_INVALID);
 }
 
 void
