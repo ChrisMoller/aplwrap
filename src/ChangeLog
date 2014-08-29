@@ -1,3 +1,7 @@
+2014-08-29  Chris Moller  <moller@mollerware.com>
+
+	* menu.c (open_object_cb): Temporarily remove variable edit.
+
 2014-08-28  Chris Moller  <moller@mollerware.com>
 
 	* menu.c (file_button_press_cb): Add double-click select/accept.

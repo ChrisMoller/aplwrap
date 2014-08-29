@@ -291,7 +291,12 @@ open_object_cb (gchar *text)
     if (!g_strcmp0 (names[i], END_TAG)) break;
     guint nc;
     gchar *endptr;
+#ifdef EDIT_VARIABLES
     sscanf (names[i], "%ms %u", &endptr, &nc);
+#else
+    sscanf (names[i], "%ms", &endptr);
+    nc = NC_FUNCTION;
+#endif
     gtk_list_store_append (names_store, &iter);
     gchar *nn = g_strdup_printf ((nc == NC_FUNCTION) ? "<i>%s</i>" : "%s",
 				 endptr);
@@ -346,7 +351,11 @@ static void
 open_object (GtkWidget *widget,
 	     gpointer   data)
 {
+#ifdef EDIT_VARIABLES
 #define COMMAND "variables:tagged\n"
+#else
+#define COMMAND "variables:function\n"
+#endif
   set_socket_cb (open_object_cb);
   if (send(sockfd, COMMAND, strlen(COMMAND), 0) < 0) {
     perror("Error in send()");	// fixme
