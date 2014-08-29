@@ -257,7 +257,7 @@ file_button_press_cb (GtkWidget      *widget,
 
 
 static void
-open_object_cb (gchar *text)
+open_object_cb (gchar *text, void *tw)
 {
   GtkWidget *dialog;
   GtkWidget *content;
@@ -268,7 +268,7 @@ open_object_cb (gchar *text)
   GtkTreeViewColumn *column;
   GtkTreeSelection *selection;
 
-  set_socket_cb (NULL);
+  set_socket_cb (NULL, NULL);
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Open Object"),
                                          NULL,
@@ -356,7 +356,7 @@ open_object (GtkWidget *widget,
 #else
 #define COMMAND "variables:function\n"
 #endif
-  set_socket_cb (open_object_cb);
+  set_socket_cb (open_object_cb, NULL);
   if (send(sockfd, COMMAND, strlen(COMMAND), 0) < 0) {
     perror("Error in send()");	// fixme
   }

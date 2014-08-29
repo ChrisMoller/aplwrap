@@ -14,6 +14,7 @@
 #include "txtbuf.h"
 #include "history.h"
 #include "options.h"
+#include "edit.h"
 
 gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
@@ -70,12 +71,14 @@ valid_end(char *start, ssize_t size)
 
 static gchar *last_out = NULL;  // explained in apl_read_err()
 
-static void (*socket_cb)() = NULL;
+static socket_fcn socket_cb   = NULL;
+static window_s *this_window = NULL;
 
 void
-set_socket_cb (void (*cb)(gchar *text))
+set_socket_cb (socket_fcn cb, void *tw)
 {
-  socket_cb = cb;
+  socket_cb   = cb;
+  this_window = tw;
 }
 
 gboolean
@@ -108,7 +111,7 @@ apl_read_sockid (gint         fd,
       last_out[text_idx] = '\0';
     }
 
-    if (socket_cb) (*socket_cb)(text);
+    if (socket_cb) (*socket_cb)(text, this_window);
     g_free (text);
   }
 

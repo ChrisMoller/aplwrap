@@ -1,6 +1,11 @@
 #ifndef EDIT_H
 #define EDIT_H
 
-void edit_object (const gchar* name, gint nc);
+typedef struct {
+  GtkTextBuffer *buffer;
+  //  GtkWidget *window;
+} window_s;
+
+void edit_object (gchar* name, gint nc);
 
 #endif  /* EDIT_H */
