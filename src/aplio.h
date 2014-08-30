@@ -9,7 +9,6 @@ extern gint sockfd;
 typedef void (*socket_fcn)(gchar *text, void *tw);
   
 void     set_socket_cb (socket_fcn, void *tw);
-//void     set_socket_cb (void (*cb)(gchar *text, void *tw), void *tw);
 
 int      is_at_prompt ();
 

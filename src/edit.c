@@ -11,25 +11,32 @@
 #include "options.h"
 #include "edit.h"
 
-static GHashTable *windows = NULL;
+static GHashTable *buffers = NULL;
+static gint seq_nr = 1;
 
 static void
 edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
-  //  window_s *tw = data;
-  // fixme check for mods
-  gtk_widget_destroy(widget);
-#if 0
-  g_print ("destroying %p\n", tw->window);
-  if (tw->window) gtk_widget_destroy(tw->window);
-  tw->window = NULL;
-#endif
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+  if (tb->modified) {
+  }
+  tb->ref_count--;
+  if (0 == tb->ref_count) {
+    g_hash_table_remove (buffers, tb->name);
+    g_free (tb->name);
+    g_free (tb);
+  }
+  gtk_widget_destroy(window (tw));
+  g_free (tw);
 }
 
 static void
-edit_save_cb (gchar *text, void *tw)
+edit_save_cb (gchar *text, void *data)
 {
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
   set_socket_cb (NULL, NULL);
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 0; lines[i]; i++) {
@@ -40,6 +47,7 @@ edit_save_cb (gchar *text, void *tw)
   }
   g_strfreev (lines);
   tagged_insert ("\n      ", -1, TAG_OUT);
+  tb->modified = FALSE;
 }
 
 static void
@@ -47,15 +55,16 @@ edit_save (GtkWidget *widget,
 	   gpointer  data)
 {
   window_s *tw = data;
+  buffer_s *tb = buffer (tw);
   GtkTextIter start_iter, end_iter;
-  gtk_text_buffer_get_bounds (tw->buffer, &start_iter, &end_iter);
+  gtk_text_buffer_get_bounds (tb->buffer, &start_iter, &end_iter);
   gchar *text =
-    gtk_text_buffer_get_text (tw->buffer, &start_iter, &end_iter, FALSE);
+    gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
   if (text[strlen (text) - 1] != '\n') {
-    gtk_text_buffer_insert (tw->buffer, &end_iter, "\n", 1);
-    gtk_text_buffer_get_bounds (tw->buffer, &start_iter, &end_iter);
+    gtk_text_buffer_insert (tb->buffer, &end_iter, "\n", 1);
+    gtk_text_buffer_get_bounds (tb->buffer, &start_iter, &end_iter);
     text =
-      gtk_text_buffer_get_text (tw->buffer, &start_iter, &end_iter, FALSE);
+      gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
   }
   
   set_socket_cb (edit_save_cb, tw);
@@ -130,9 +139,11 @@ edit_key_press_event (GtkWidget *widget,
 
   gsize bw;
   window_s *tw = user_data;
+  buffer_s *tb = buffer (tw);
   gchar *res = handle_apl_characters (&bw, key_event);
   if (res) {
-    gtk_text_buffer_insert_at_cursor (tw->buffer, res, bw);
+    gtk_text_buffer_insert_at_cursor (tb->buffer, res, bw);
+    tb->modified = TRUE;
     g_free (res);
     return TRUE;
   }
@@ -144,12 +155,14 @@ static void
 edit_function_cb (gchar *text, void *data)
 {
   set_socket_cb (NULL, NULL);
+
   window_s *tw = data;
+  buffer_s *tb = buffer (tw);
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 1; lines[i]; i++) {
     if (!g_strcmp0 (lines[i], END_TAG)) break;
-    gtk_text_buffer_insert_at_cursor (tw->buffer, lines[i], -1);
-    gtk_text_buffer_insert_at_cursor (tw->buffer, "\n", -1);
+    gtk_text_buffer_insert_at_cursor (tb->buffer, lines[i], -1);
+    gtk_text_buffer_insert_at_cursor (tb->buffer, "\n", -1);
   }
   g_strfreev (lines);
 }
@@ -179,9 +192,18 @@ edit_object (gchar* name, gint nc)
   GtkWidget *view;
   PangoFontDescription *desc = NULL;
   window_s *this_window = NULL;
+  buffer_s *this_buffer = NULL;
   GtkWidget *window;
 
+  if (!buffers) buffers = g_hash_table_new (g_str_hash, g_str_equal);
+
+  gchar *lname =
+    name ? g_strdup (name) : g_strdup_printf ("Unnamed_%d", seq_nr++);
+
+  this_window = g_malloc (sizeof(window_s));
+  
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  window (this_window) = window;
   gtk_window_set_title (GTK_WINDOW (window), name ? : "Unnamed");
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
 
@@ -195,18 +217,20 @@ edit_object (gchar* name, gint nc)
 
   scroll = gtk_scrolled_window_new (NULL, NULL);
 
-  if (!windows) windows = g_hash_table_new (g_str_hash, g_str_equal);
-
-  if (name && g_hash_table_contains (windows, name))
-    this_window = g_hash_table_lookup (windows, name);
+  if (g_hash_table_contains (buffers, lname)) {
+    this_buffer = g_hash_table_lookup (buffers, lname);
+    this_buffer->ref_count++;
+  }
   
-  if (!this_window) {
-    this_window = g_malloc (sizeof(window_s));
-    this_window->buffer = gtk_text_buffer_new (NULL);
-    //    this_window->window = window;
+  if (!this_buffer) {
+    this_buffer = g_malloc (sizeof(buffer_s));
+    this_buffer->buffer = gtk_text_buffer_new (NULL);
+    this_buffer->modified = FALSE;
+    this_buffer->name = lname;
+    this_buffer->ref_count = 1;
+    g_hash_table_insert (buffers, this_buffer->name, this_buffer);
+
     if (name) {
-      g_hash_table_insert (windows, g_strdup (name), this_window);
-      
       if (nc == NC_FUNCTION) {
 	set_socket_cb (edit_function_cb, this_window);
 	gchar *cmd = g_strdup_printf ("fn:%s\n", name);
@@ -226,11 +250,13 @@ edit_object (gchar* name, gint nc)
     }
   }
 
+  buffer (this_window) = this_buffer;
+
   build_edit_menubar (vbox, this_window);
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (edit_close), this_window);
   
-  view = gtk_text_view_new_with_buffer (this_window->buffer);
+  view = gtk_text_view_new_with_buffer (this_buffer->buffer);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
   g_signal_connect (view, "key-press-event",

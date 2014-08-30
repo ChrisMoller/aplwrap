@@ -51,7 +51,7 @@ make_env ()
   gchar **env = environ;
 
   while (*env++) ++envc;
-  env = g_try_malloc(2 + envc * sizeof(gchar*));
+  env = g_try_malloc((2 + envc) * sizeof(gchar*));
   env[envc+1] = NULL;
   env[envc+0] = "APLWRAP=" VERSION;
   while (envc--) {
