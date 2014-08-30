@@ -1,7 +1,7 @@
 2014-08-30  Chris Moller  <moller@mollerware.com>
 
 	* apl.c (make_env): Fixed a g_malloc mug.
-
+	* edit.c (clone_object): Added clone.
 	* edit.c (edit_object): Cleaned up a lot of stuff in shared buffer
 	stuff. 
 

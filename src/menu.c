@@ -347,7 +347,7 @@ open_object_cb (gchar *text, void *tw)
   }
 }
 
-static void
+void
 open_object (GtkWidget *widget,
 	     gpointer   data)
 {
@@ -362,7 +362,7 @@ open_object (GtkWidget *widget,
   }
 }
 
-static void
+void
 new_object (GtkWidget *widget,
 	    gpointer   data)
 {

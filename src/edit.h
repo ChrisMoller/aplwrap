@@ -6,6 +6,7 @@ typedef struct {
   gboolean modified;
   gchar *name;
   gint ref_count;
+  gint nc;
 } buffer_s;
 
 typedef struct {

@@ -6,6 +6,7 @@
 
 #include "apl.h"
 #include "aplio.h"
+#include "menu.h"
 #include "aplwrap.h"
 #include "txtbuf.h"
 #include "options.h"
@@ -48,6 +49,16 @@ edit_save_cb (gchar *text, void *data)
   g_strfreev (lines);
   tagged_insert ("\n      ", -1, TAG_OUT);
   tb->modified = FALSE;
+}
+
+static void
+clone_object (GtkWidget *widget,
+	      gpointer  data)
+{
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+
+  edit_object (tb->name, tb->nc);
 }
 
 static void
@@ -96,18 +107,18 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
   item = gtk_menu_item_new_with_label(_ ("New"));
-  //  g_signal_connect (G_OBJECT (item), "activate",
-  //                   G_CALLBACK (new_object), NULL);
+  g_signal_connect (G_OBJECT (item), "activate",
+		    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Open"));
-  //  g_signal_connect(G_OBJECT (item), "activate",
-  //		   G_CALLBACK (open_object), NULL);
+  g_signal_connect(G_OBJECT (item), "activate",
+		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Clone"));
-  //  g_signal_connect(G_OBJECT (item), "activate",
-  //		   G_CALLBACK (open_object), NULL);
+  g_signal_connect(G_OBJECT (item), "activate",
+  		   G_CALLBACK (clone_object), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Save"));
@@ -228,6 +239,7 @@ edit_object (gchar* name, gint nc)
     this_buffer->modified = FALSE;
     this_buffer->name = lname;
     this_buffer->ref_count = 1;
+    this_buffer->nc = name ? nc : NC_FUNCTION; // fixme
     g_hash_table_insert (buffers, this_buffer->name, this_buffer);
 
     if (name) {
