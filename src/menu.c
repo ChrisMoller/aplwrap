@@ -285,6 +285,9 @@ open_object_cb (gchar *text, void *tw)
 				    G_TYPE_STRING,
 				    G_TYPE_STRING,
 				    G_TYPE_INT);
+  gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (names_store),
+                                          OBJECT_NAME, GTK_SORT_ASCENDING);
+
   
   gchar **names = g_strsplit (text, "\n", 0);
   for (int i = 0; names[i]; i++) {
@@ -336,8 +339,11 @@ open_object_cb (gchar *text, void *tw)
 						     OBJECT_NAME,
 						     NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (names_tree), column); 
-   
-  gtk_container_add (GTK_CONTAINER (content), names_tree);
+
+  GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_set_size_request (scroll, -1, 300);
+  gtk_container_add (GTK_CONTAINER (scroll), names_tree);
+  gtk_container_add (GTK_CONTAINER (content), scroll);
   gtk_widget_show_all (dialog);
   response = gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);

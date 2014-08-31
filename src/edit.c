@@ -19,6 +19,7 @@ static void
 edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
+#if 0
   window_s *tw = data;
   buffer_s *tb = buffer (tw);
   if (tb->modified) {
@@ -31,6 +32,25 @@ edit_close (GtkWidget *widget,
   }
   gtk_widget_destroy(window (tw));
   g_free (tw);
+#endif
+}
+static gboolean
+edit_delete (GtkWidget *widget,
+	     GdkEvent  *event,
+	     gpointer   data )
+{
+  /* If you return FALSE in the "delete-event" signal handler,
+   * GTK will emit the "destroy" signal. Returning TRUE means
+   * you don't want the window to be destroyed.
+   * This is useful for popping up 'are you sure you want to quit?'
+   * type dialogs. */
+
+  g_print ("delete event occurred\n");
+
+  /* Change TRUE to FALSE and the main window will be destroyed with
+   * a "delete-event". */
+
+  return TRUE;
 }
 
 static void
@@ -122,7 +142,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   		   G_CALLBACK (clone_object), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Save"));
+  item = gtk_menu_item_new_with_mnemonic ("_Save");
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (edit_save), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -141,8 +161,13 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
   item = gtk_menu_item_new_with_label (_ ("Close"));
+#if 1
+  g_signal_connect (G_OBJECT (item), "activate",
+		    G_CALLBACK (edit_delete), tw);
+#else
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (edit_close), tw);
+#endif
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
@@ -276,6 +301,12 @@ edit_object (gchar* name, gint nc)
   buffer (this_window) = this_buffer;
 
   build_edit_menubar (vbox, this_window);
+
+#if 0
+  g_signal_connect (window, "delete-event",
+		      G_CALLBACK (delete_event), this_window);
+#endif
+
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (edit_close), this_window);
   

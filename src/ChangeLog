@@ -1,3 +1,8 @@
+2014-08-31  Chris Moller  <moller@mollerware.com>
+
+	* menu.c (open_object_cb): Put open list inside a scrolled
+	window.  Also sorted the list.
+
 2014-08-30  Chris Moller  <moller@mollerware.com>
 
 	* apl.c (make_env): Fixed a g_malloc mug.
