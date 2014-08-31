@@ -98,6 +98,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   GtkWidget *menu;
   GtkWidget *item;
 
+  buffer_s *tb = buffer (tw);
   menubar = gtk_menu_bar_new();
 
   menu = gtk_menu_new();
@@ -124,6 +125,16 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   item = gtk_menu_item_new_with_label (_ ("Save"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (edit_save), tw);
+  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+  item = gtk_menu_item_new_with_label (_ ("Save File"));
+  g_signal_connect(G_OBJECT (item), "activate",
+		   G_CALLBACK (save_log), tb->buffer);
+  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+  item = gtk_menu_item_new_with_label (_ ("Save File As"));
+  g_signal_connect(G_OBJECT (item), "activate",
+		   G_CALLBACK (save_log_as), tb->buffer);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
   
   item = gtk_separator_menu_item_new();

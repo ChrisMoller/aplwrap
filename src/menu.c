@@ -161,7 +161,7 @@ set_filename ()
 }
 
 static void
-save_log_fer_real ()
+save_log_fer_real (GtkTextBuffer *buffer)
 {
   gboolean written = FALSE;
   if (filename) {
@@ -193,20 +193,22 @@ save_log_fer_real ()
   }
 }
 
-static void
+void
 save_log (GtkWidget *widget,
 	  gpointer   data)
 {
+  GtkTextBuffer *lbuffer = data ? : buffer;
   gboolean doit = filename ? TRUE : set_filename ();
-  if (doit) save_log_fer_real ();
+  if (doit) save_log_fer_real (lbuffer);
 }
 
-static void
+void
 save_log_as (GtkWidget *widget,
 	     gpointer   data)
 {
+  GtkTextBuffer *lbuffer = data ? : buffer;
   gboolean doit = set_filename ();
-  if (doit) save_log_fer_real ();
+  if (doit) save_log_fer_real (lbuffer);
 }
 
 enum {
