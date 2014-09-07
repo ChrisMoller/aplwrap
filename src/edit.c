@@ -2,7 +2,6 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
-#include <sys/socket.h>
 
 #include "apl.h"
 #include "aplio.h"
@@ -36,7 +35,7 @@ edit_close (GtkWidget *widget,
 static void
 edit_save_cb (gchar *text, void *data)
 {
-  set_socket_cb (NULL, NULL);
+  set_send_cb (NULL, NULL);
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 0; lines[i]; i++) {
     if (!*lines[i]) continue;
@@ -81,19 +80,21 @@ edit_save (GtkWidget *widget,
       gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
   }
 
-  // widget is just serving as a flag as to whether the window is bein closed
-  set_socket_cb (edit_save_cb, (widget == NULL) ? NULL : tw);
-  send (sockfd, "def\n", strlen("def\n"), 0);
+  // widget is just serving as a flag as to whether the window is being closed
+#define DEF_CMD "def\n"
+  set_send_cb (edit_save_cb, (widget == NULL) ? NULL : tw);
+  send_apl (DEF_CMD, strlen (DEF_CMD));
+
   gchar *ptr     = text;
   while (ptr && *ptr) {
     gchar *end_ptr = strchr (ptr, '\n');
     if (end_ptr++) {
-      send (sockfd, ptr, end_ptr - ptr, 0);
+      send_apl (ptr, end_ptr - ptr);
       ptr = end_ptr;
     }
   }
   g_free (text);
-  send (sockfd, END_TAGNL, strlen(END_TAGNL), 0);
+  send_apl (END_TAGNL, strlen(END_TAGNL));
 }
 
 static gboolean
@@ -260,7 +261,7 @@ edit_key_press_event (GtkWidget *widget,
 static void
 edit_function_cb (gchar *text, void *data)
 {
-  set_socket_cb (NULL, NULL);
+  set_send_cb (NULL, NULL);
 
   window_s *tw = data;
   buffer_s *tb = buffer (tw);
@@ -276,7 +277,7 @@ edit_function_cb (gchar *text, void *data)
 static void
 edit_variable_cb (gchar *text, void *data)
 {
-  set_socket_cb (NULL, NULL);
+  set_send_cb (NULL, NULL);
   g_print ("vbl: %s\n", text);
 #if 0
   window_s *tw = data;
@@ -339,19 +340,15 @@ edit_object (gchar* name, gint nc)
 
     if (name) {
       if (nc == NC_FUNCTION) {
-	set_socket_cb (edit_function_cb, this_window);
+	set_send_cb (edit_function_cb, this_window);
 	gchar *cmd = g_strdup_printf ("fn:%s\n", name);
-	if (send(sockfd, cmd, strlen(cmd), 0) < 0) {
-	  perror("Error in send()");	// fixme
-	}
+	send_apl (cmd, strlen(cmd));
 	g_free (cmd);
       }
       else if (nc == NC_VARIABLE) {
-	set_socket_cb (edit_variable_cb, this_window);
+	set_send_cb (edit_variable_cb, this_window);
 	gchar *cmd = g_strdup_printf ("getvar:%s\n", name);
-	if (send(sockfd, cmd, strlen(cmd), 0) < 0) {
-	  perror("Error in send()");	// fixme
-	}
+	send_apl (cmd, strlen(cmd));
 	g_free (cmd);
       }
     }

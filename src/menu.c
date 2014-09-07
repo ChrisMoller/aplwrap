@@ -2,7 +2,6 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
-#include <sys/socket.h>
 
 #include "menu.h"
 #include "apl.h"
@@ -270,7 +269,7 @@ open_object_cb (gchar *text, void *tw)
   GtkTreeViewColumn *column;
   GtkTreeSelection *selection;
 
-  set_socket_cb (NULL, NULL);
+  set_send_cb (NULL, NULL);
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Open Object"),
                                          NULL,
@@ -364,10 +363,8 @@ open_object (GtkWidget *widget,
 #else
 #define COMMAND "variables:function\n"
 #endif
-  set_socket_cb (open_object_cb, NULL);
-  if (send(sockfd, COMMAND, strlen(COMMAND), 0) < 0) {
-    perror("Error in send()");	// fixme
-  }
+  set_send_cb (open_object_cb, NULL);
+  send_apl (COMMAND, strlen(COMMAND));
 }
 
 void

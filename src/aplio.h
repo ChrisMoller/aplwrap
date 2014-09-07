@@ -10,7 +10,8 @@ extern gint sockfd;
 
 typedef void (*socket_fcn)(gchar *text, void *tw);
   
-void     set_socket_cb (socket_fcn, void *tw);
+gboolean send_apl (const void *buf, size_t len);
+void     set_send_cb (socket_fcn fcn, void *tw);
 
 int      is_at_prompt ();
 

@@ -75,10 +75,17 @@ static socket_fcn socket_cb   = NULL;
 static window_s *this_window = NULL;
 
 void
-set_socket_cb (socket_fcn cb, void *tw)
+set_send_cb (socket_fcn cb, void *tw)
 {
   socket_cb   = cb;
   this_window = tw;
+}
+
+gboolean
+send_apl (const void *buf, size_t len)
+{
+  ssize_t rv = send (sockfd, buf, len, 0);
+  return (rv != -1);
 }
 
 gboolean
