@@ -266,8 +266,12 @@ apl_read_err (gint         fd,
     }
     else { /* eval */
       eval = !!strncmp("\r      ", text+text_idx-7, 7);
-      if (!eval)
-        (*eval_callback)(eval_result, eval_result_idx, eval_state);
+      if (!eval) {
+        if (eval_callback)
+          (*eval_callback)(eval_result, eval_result_idx, eval_state);
+        else
+          apl_eval_end ();
+      }
     }
     g_free (text);
     text = NULL;
