@@ -15,6 +15,7 @@ gboolean vwidth   = FALSE;
 gboolean nocolour = FALSE;
 gchar *new_fn = NULL;
 gchar *opt_lx = NULL;
+gchar *rows_v = NULL;
 
 GOptionEntry entries[] = {
   { "ftsize", 's', 0, G_OPTION_ARG_INT,
@@ -44,6 +45,10 @@ GOptionEntry entries[] = {
   { "LX", 0, 0, G_OPTION_ARG_STRING,
     &opt_lx,
     "APL startup command or expression [string]",
+    NULL },
+  { "rows-var", 0, 0, G_OPTION_ARG_STRING,
+    &rows_v,
+    "APL variable name for display row count [string]",
     NULL },
   { NULL }
 };

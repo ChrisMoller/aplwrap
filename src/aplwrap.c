@@ -18,6 +18,50 @@ static GtkWidget *scroll;
 static GtkWidget *view;
 static PangoFontDescription *desc = NULL;
 
+static gint rows_old = 0, rows_new;
+
+gchar *
+get_rows_assign ()
+{
+  static gchar expr[80];
+  if (rows_new && rows_v) {
+    snprintf(expr, sizeof(expr), "%.60s←%.2d", rows_v, rows_new);
+    rows_new = 0;
+    return expr;
+  }
+  else
+    return NULL;
+}
+
+static gboolean
+aplwrap_configure_window (GdkWindow *event_window,
+                          GdkEvent *event,
+                          gpointer data)
+{
+  gint ypos, line_height, rows;
+  GtkTextIter first;
+  GdkRectangle view_rect;
+  
+  if (GTK_WIDGET (event_window) == window) {
+    gtk_text_buffer_get_start_iter (buffer, &first);
+    gtk_text_view_get_line_yrange (GTK_TEXT_VIEW (view),
+                                   &first, &ypos, &line_height);
+    line_height += gtk_text_view_get_pixels_above_lines (GTK_TEXT_VIEW (view));
+    line_height += gtk_text_view_get_pixels_below_lines (GTK_TEXT_VIEW (view));
+    gtk_text_view_get_visible_rect (GTK_TEXT_VIEW (view), &view_rect);
+    rows = view_rect.height / line_height;
+    if ( rows != rows_old )
+      rows_old = rows_new = rows;
+    if (is_at_prompt ()) {
+      gchar *rows_assign = get_rows_assign ();
+      if (rows_assign)
+        apl_eval (rows_assign, -1, NULL, NULL);
+    }
+  }
+
+  return FALSE;
+}
+
 void
 beep ()
 {
@@ -93,11 +137,10 @@ key_press_event (GtkWidget *widget,
 
     if (is_at_prompt ())
       history_insert(text+6, sz-6);
-    apl_send_inp (text+get_prompt_len (), sz-get_prompt_len ());
+    apl_send_inp (text, sz);
 
     gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
     g_free (text);
-    reset_prompt_len ();
     return TRUE;
   }
 
@@ -193,6 +236,9 @@ main (int   argc,
     
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (aplwrap_quit), NULL);
+    
+  g_signal_connect (window, "configure-event",
+		    G_CALLBACK (aplwrap_configure_window), NULL);
     
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);

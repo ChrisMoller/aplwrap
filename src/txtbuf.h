@@ -8,6 +8,7 @@ typedef enum {
   TAG_ERR,
   TAG_OUT,
   TAG_LCK,
+  TAG_PRM,
   _tag_t_count
 } tag_t;
 

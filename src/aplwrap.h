@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
+gchar *get_rows_assign ();
+
 void beep ();
 
 void scroll_to_end ();

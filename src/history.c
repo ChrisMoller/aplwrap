@@ -4,6 +4,7 @@
 
 typedef struct _history {
   gchar *command;
+  ssize_t length;
   struct _history *prev;
   struct _history *next;
 } history;
@@ -35,18 +36,20 @@ same (gchar  *text,
       ssize_t length)
 {
   if (command_history == NULL) return 0;
-  return !strncmp (text, command_history->command, length);
+  return (length == command_history->length) &&
+    !memcmp (text, command_history->command, length);
 }
 
 void
 history_insert (gchar  *command,
                 ssize_t length)
 {
-  history *history = g_try_malloc(sizeof(history));
+  history *history = g_try_malloc(sizeof(struct _history));
   if (history) {
     trim(&command, &length);
     if (length == 0 || same (command, length)) return;
     history->command = g_strndup(command, length);
+    history->length = length;
     if (history->command) {
       if (command_history) {
         history->prev = command_history;

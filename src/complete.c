@@ -109,25 +109,32 @@ lookup_callback (gchar *result, size_t idx, void *state)
   if (!strncmp(&result[i], "¯", strlen("¯"))) i += strlen("¯");
   while (i < idx && result[i] >= '0' && result[i] <= '9') ++i;
   e = i;
-  if (e-b < PSIZE) {
+  if (e == b) {
+    strcpy(((state_t*)state)->position, "0");
+  }
+  else if (e-b < PSIZE) {
     memset(((state_t*)state)->position, 0, PSIZE);
     strncpy(((state_t*)state)->position, &result[b], e-b);
   }
-  /* Parse the completion text */
-  while (i < idx && result[i] == ' ') ++i;
-  b = i;
-  while (i < idx && result[i] != ' ' && result[i] != '\n') ++i;
-  e = i;
-  /* Update the completion */
-  if (e-b) {
+  if (e > b) {
+    /* Parse the completion text */
+    while (i < idx && result[i] == ' ') ++i;
+    b = i;
+    while (i < idx && result[i] != ' ' && result[i] != '\n') ++i;
+    e = i;
+    /* Update the completion */
+    if (e-b) {
 #if TRACE
-    printf("completion [%3s] (%2d): %.*s\n", ((state_t*)state)->position,
-           (int)(e-b), (int)(e-b), result+b);
+      printf("completion [%3s] (%2d): %.*s\n", ((state_t*)state)->position,
+             (int)(e-b), (int)(e-b), result+b);
 #endif
-    replace_completion (result+b, e-b, state);
+      replace_completion (result+b, e-b, state);
+    }
+    else
+      beep (); /* no completion */
   }
   else
-    beep ();
+    beep (); /* no index */
 
   ((state_t*)state)->refresh_context = FALSE;
   apl_eval_end();

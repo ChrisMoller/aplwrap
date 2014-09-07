@@ -16,6 +16,7 @@ Application Options:
   -n, --nocolour           Turn off coloured error text
   -x, --xeq                Path to the GNU APL executable [string]
   --LX                     APL startup command or expression [string]
+  --rows-var               APL variable name for display row count [string]
   --display=DISPLAY        X display to use
 
 

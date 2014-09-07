@@ -148,4 +148,9 @@ define_tags ()
                                               "editable", FALSE,
                                               NULL);
   tags[TAG_LCK] = tags[TAG_OUT];
+
+  tags[TAG_PRM] = gtk_text_buffer_create_tag (buffer, "prompt_tag",
+                                              "foreground", "grey",
+                                              "editable", FALSE,
+                                              NULL);
 }

@@ -15,6 +15,7 @@
 #include "history.h"
 #include "options.h"
 #include "edit.h"
+#include "aplwrap.h"
 
 gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
@@ -23,7 +24,6 @@ gint sockfd  = -1;
 guint event_id;
 
 static int at_prompt = FALSE;
-static ssize_t prompt_len = 0;
 static gchar *comm_mode = NULL;
 static gint   comm_addr = -1;
 
@@ -31,18 +31,6 @@ int
 is_at_prompt ()
 {
   return at_prompt;
-}
-
-ssize_t
-get_prompt_len ()
-{
-  return prompt_len;
-}
-
-void
-reset_prompt_len ()
-{
-  prompt_len = 0;
 }
 
 static int
@@ -68,8 +56,6 @@ valid_end(char *start, ssize_t size)
 }
 
 #define BUFFER_SIZE     1024
-
-static gchar *last_out = NULL;  // explained in apl_read_err()
 
 static socket_fcn socket_cb   = NULL;
 static window_s *this_window = NULL;
@@ -112,12 +98,6 @@ apl_read_sockid (gint         fd,
   }
   
   if (text_idx > 0) {
-    last_out = g_try_malloc(text_idx+1);
-    if (last_out) {
-      memcpy(last_out, text, text_idx);
-      last_out[text_idx] = '\0';
-    }
-
     if (socket_cb) (*socket_cb)(text, this_window);
     g_free (text);
   }
@@ -159,12 +139,6 @@ apl_read_out (gint         fd,
   if (text) {
     if (!eval) {
       at_prompt = FALSE;
-      last_out = g_try_malloc(text_idx+1);
-      if (last_out) {
-        memcpy(last_out, text, text_idx);
-        last_out[text_idx] = '\0';
-      }
-
       gboolean eaten = FALSE;
       if (apl_expect_network) {
 #define NW_PARSE "^.*mode:([[:alpha:]]*)[[:space:]]addr:([[:digit:]]*)*.*$"
@@ -264,41 +238,31 @@ apl_read_err (gint         fd,
 
   if (text) {
     if (!eval) {
-      int suppress = FALSE;
-
-      /* GNU APL's stderr is prefixed with a '\r'; GTK treats that as a
-         newline. Assume that we're already at the beginning of the line
-         and remove the '\r'. */
-      if (text[0] == '\r')
+      /* GNU APL prefixes a prompt with a '\r' expecting a move to
+         column 0 in the current line. GTK treats '\r' as a newline.
+         Remove the '\r' and mimic a carriage return by moving the
+         cursor and clearing the line. */
+      gboolean prompt_text = text[0] == '\r';
+      if (prompt_text) {
         memmove(text, text+1, --text_idx);
 
-      /* GNU APL pushes quote-quad's prompt onto stdin just before
-         reading from quote-quad. Then aplwrap sees that prompt and
-         echoes it to stdout. After that, GNU APL writes the intended
-         prompt to stderr, duplicating the prompt that aplwrap alread
-         echoed to stdout. We work around that odd interaction by
-         suppressing stderr's output in the case that its text matches
-         the last text written to stdout. */
-      if (last_out) {
-        ssize_t lolen = strlen(last_out);
-        suppress = (lolen >= text_idx) ?
-          !strncmp(last_out+lolen-text_idx, text, text_idx) :
-          !strncmp(last_out, text+text_idx-lolen, lolen);
-        /* We also need to finesse the data returned to APL in response
-           to a quote-quad input; we must send only the input following
-           the prompt. See key_press_event() for the other half of this
-           interaction. */
-        prompt_len = suppress ? text_idx : 0;
-        g_free(last_out);
-        last_out = NULL;
+	GtkTextIter line_iter, end_iter;
+        GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
+        gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
+        end_iter = line_iter;
+        gtk_text_iter_set_line_offset (&line_iter, 0);
+        gtk_text_buffer_place_cursor (buffer, &line_iter);
+        gtk_text_buffer_delete (buffer, &line_iter, &end_iter);
       }
 
-      if (!suppress) {
-        at_prompt = !strncmp("      ", text+text_idx-6, 6);
-        if (at_prompt)
-          history_start();
-        tagged_insert(text, text_idx, nocolour ? TAG_OUT : TAG_ERR);
+      at_prompt = !strncmp("      ", text+text_idx-6, 6);
+      if (at_prompt) {
+        gchar *rows_assign = get_rows_assign ();
+        if (rows_assign) apl_eval (rows_assign, -1, NULL, NULL);
+        history_start();
       }
+      tagged_insert(text, text_idx,
+                    nocolour ? TAG_OUT : (prompt_text ? TAG_PRM : TAG_ERR));
     }
     else { /* eval */
       eval = !!strncmp("\r      ", text+text_idx-7, 7);
@@ -339,7 +303,7 @@ apl_eval (gchar  *expr,
   eval_result_idx = 0;
   if (eval_result) {
     if (len < 0) len = strlen(expr);
-   eval_state = state;
+    eval_state = state;
     eval_callback = callback;
     eval = TRUE;
     apl_send_inp (expr, len);
