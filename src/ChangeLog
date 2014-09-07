@@ -1,7 +1,7 @@
 2014-09-07  Chris Moller  <moller@mollerware.com>
 
 	* aplio.c (send_apl): Added convenience wrapper to send().  (Also
-	affected fcns in edit.c and menu.c.
+	affected fcns in edit.c and menu.c.)
 
 2014-08-31  Chris Moller  <moller@mollerware.com>
 
