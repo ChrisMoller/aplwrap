@@ -1,6 +1,8 @@
 #ifndef APLIO_H
 #define APLIO_H
 
+#include <gtk/gtk.h>
+
 extern gint apl_in;
 extern gint apl_out;
 extern gint apl_err;
@@ -27,6 +29,14 @@ gboolean apl_read_err (gint         fd,
 void     apl_send_inp (gchar  *text,
 		       ssize_t sz);
 
+void     apl_eval     (gchar  *expr,
+                       gint    len,
+                       void  (*callback)(gchar *result,
+                                         size_t idx,
+                                         void  *state),
+                       void   *state);
+
+void     apl_eval_end ();
 
 /* copied from <aplsrc>/src/NamedObject.hh */
 

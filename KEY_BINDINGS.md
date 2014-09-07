@@ -35,7 +35,8 @@ Shift-Ctrl-Backspace        delete to end of line
 Shift-Ctrl-Delete           delete to beginning of line
 Ctrl-Return, Ctrl-Enter     insert a line break
 Insert                      toggle insert/overwrite
-Tab                         ignored; use space(s)
+Tab                         completion (see COMPLETION.md)
+Esc                         move cursor to end of completion
 ```
 
 Clipboard

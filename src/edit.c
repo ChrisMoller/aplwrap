@@ -19,45 +19,23 @@ static void
 edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
-#if 0
   window_s *tw = data;
-  buffer_s *tb = buffer (tw);
-  if (tb->modified) {
+  if (!gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
+    buffer_s *tb = buffer (tw);
+    tb->ref_count--;
+    if (0 == tb->ref_count) {
+      g_hash_table_remove (buffers, tb->name);
+      g_free (tb->name);
+      g_free (tb);
+    }
+    gtk_widget_destroy(window (tw));
+    g_free (tw);
   }
-  tb->ref_count--;
-  if (0 == tb->ref_count) {
-    g_hash_table_remove (buffers, tb->name);
-    g_free (tb->name);
-    g_free (tb);
-  }
-  gtk_widget_destroy(window (tw));
-  g_free (tw);
-#endif
-}
-static gboolean
-edit_delete (GtkWidget *widget,
-	     GdkEvent  *event,
-	     gpointer   data )
-{
-  /* If you return FALSE in the "delete-event" signal handler,
-   * GTK will emit the "destroy" signal. Returning TRUE means
-   * you don't want the window to be destroyed.
-   * This is useful for popping up 'are you sure you want to quit?'
-   * type dialogs. */
-
-  g_print ("delete event occurred\n");
-
-  /* Change TRUE to FALSE and the main window will be destroyed with
-   * a "delete-event". */
-
-  return TRUE;
 }
 
 static void
 edit_save_cb (gchar *text, void *data)
 {
-  window_s *tw = data;
-  buffer_s *tb = buffer (tw);
   set_socket_cb (NULL, NULL);
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 0; lines[i]; i++) {
@@ -68,7 +46,11 @@ edit_save_cb (gchar *text, void *data)
   }
   g_strfreev (lines);
   tagged_insert ("\n      ", -1, TAG_OUT);
-  tb->modified = FALSE;
+  if (data) {
+    window_s *tw = data;
+    buffer_s *tb = buffer (tw);
+    tb->modified = FALSE;
+  }
 }
 
 static void
@@ -94,11 +76,13 @@ edit_save (GtkWidget *widget,
   if (text[strlen (text) - 1] != '\n') {
     gtk_text_buffer_insert (tb->buffer, &end_iter, "\n", 1);
     gtk_text_buffer_get_bounds (tb->buffer, &start_iter, &end_iter);
+    g_free (text);
     text =
       gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
   }
-  
-  set_socket_cb (edit_save_cb, tw);
+
+  // widget is just serving as a flag as to whether the window is bein closed
+  set_socket_cb (edit_save_cb, (widget == NULL) ? NULL : tw);
   send (sockfd, "def\n", strlen("def\n"), 0);
   gchar *ptr     = text;
   while (ptr && *ptr) {
@@ -108,7 +92,82 @@ edit_save (GtkWidget *widget,
       ptr = end_ptr;
     }
   }
+  g_free (text);
   send (sockfd, END_TAGNL, strlen(END_TAGNL), 0);
+}
+
+static gboolean
+edit_delete_real (GtkWidget *widget,
+		  gpointer   data)
+{
+  /* If you return FALSE in the "delete-event" signal handler,
+   * GTK will emit the "destroy" signal. Returning TRUE means
+   * you don't want the window to be destroyed.
+   * This is useful for popping up 'are you sure you want to quit?'
+   * type dialogs. */
+
+  /* Change TRUE to FALSE and the main window will be destroyed with
+   * a "delete-event". */
+  
+  window_s *tw = data;
+
+  buffer_s *tb = buffer (tw);
+  if (tb->modified) {
+    GtkWidget *e_dialog;
+    gint response;
+    e_dialog = gtk_message_dialog_new (NULL,
+				       GTK_DIALOG_DESTROY_WITH_PARENT,
+				       GTK_MESSAGE_QUESTION,
+				       GTK_BUTTONS_NONE,
+				       _ ("Buffer %s modified.  Save it?"),
+				       tb->name);
+    gtk_dialog_add_buttons (GTK_DIALOG (e_dialog),
+			    _("Yes"),    GTK_RESPONSE_YES,
+			    _("No"),     GTK_RESPONSE_NO,
+			    _("Cancel"), GTK_RESPONSE_CANCEL,
+			    NULL);
+    gtk_window_set_keep_above (GTK_WINDOW (e_dialog), TRUE);
+    gtk_window_set_position (GTK_WINDOW (e_dialog), GTK_WIN_POS_MOUSE);
+    response = gtk_dialog_run (GTK_DIALOG (e_dialog));
+    gtk_widget_destroy (e_dialog);
+    switch(response) {
+    case GTK_RESPONSE_CANCEL:
+      return TRUE;			// abort close
+      break;
+    case GTK_RESPONSE_NO:
+      return FALSE;			// close without saving
+      break;
+    case GTK_RESPONSE_YES:
+      edit_save (NULL, tw);
+      return FALSE;			// close
+      break;
+    }
+  }
+  return FALSE;			// close
+}
+
+/***
+    this is called as a result of a "destroy" signal to the window.
+    a return FALSE will automatically result in a real closure
+ ***/
+static gboolean
+edit_delete_event (GtkWidget *widget,
+		   GdkEvent  *event,
+		   gpointer   data)
+{
+  return edit_delete_real (widget, data);
+}
+
+/***
+    this is called as a result of pressing the close button in the
+    file pulldown.
+ ***/
+static void
+edit_delete (GtkWidget *widget,
+	     gpointer   data)
+{
+  gboolean rc = edit_delete_real (widget, data);
+  if (!rc) edit_close (widget, data);
 }
 
 static void
@@ -180,17 +239,17 @@ edit_key_press_event (GtkWidget *widget,
 {
   if (event->type != GDK_KEY_PRESS) return FALSE;
 
+  window_s *tw = user_data;
+  buffer_s *tb = buffer (tw);
+  tb->modified = TRUE;
   GdkEventKey *key_event = (GdkEventKey *)event;
 
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE;
 
   gsize bw;
-  window_s *tw = user_data;
-  buffer_s *tb = buffer (tw);
   gchar *res = handle_apl_characters (&bw, key_event);
   if (res) {
     gtk_text_buffer_insert_at_cursor (tb->buffer, res, bw);
-    tb->modified = TRUE;
     g_free (res);
     return TRUE;
   }
@@ -302,9 +361,9 @@ edit_object (gchar* name, gint nc)
 
   build_edit_menubar (vbox, this_window);
 
-#if 0
+#if 1
   g_signal_connect (window, "delete-event",
-		      G_CALLBACK (delete_event), this_window);
+		      G_CALLBACK (edit_delete_event), this_window);
 #endif
 
   g_signal_connect (window, "destroy",

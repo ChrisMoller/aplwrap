@@ -11,11 +11,18 @@
 #include "options.h"
 #include "apl.h"
 #include "menu.h"
+#include "complete.h"
 
 static GtkWidget *window;
 static GtkWidget *scroll;
 static GtkWidget *view;
 static PangoFontDescription *desc = NULL;
+
+void
+beep ()
+{
+  gdk_window_beep (gtk_widget_get_window (window));
+}
 
 gchar *
 handle_apl_characters (gsize *bw_p, GdkEventKey *key_event)
@@ -50,8 +57,17 @@ key_press_event (GtkWidget *widget,
 
   GdkEventKey *key_event = (GdkEventKey *)event;
 
-  /* Ignore Tab key */
-  if (key_event->keyval == GDK_KEY_Tab) return TRUE;
+  /* Tab key runs completion */
+  if (key_event->keyval == GDK_KEY_Tab) {
+    complete();
+    return TRUE;
+  }
+
+  /* Esc key moves cursor to end of completion */
+  if (key_event->keyval == GDK_KEY_Escape) {
+    cursor_to_completion_end ();
+    return TRUE;
+  }
 
   /* Handle APL interrupt keys */
   if (key_event->state == GDK_CONTROL_MASK &&
@@ -83,6 +99,21 @@ key_press_event (GtkWidget *widget,
     g_free (text);
     reset_prompt_len ();
     return TRUE;
+  }
+
+  /* Special handling of Home key in input area */
+  if (key_event->keyval == GDK_KEY_Home &&
+      !(key_event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK|GDK_MOD1_MASK))) {
+    if (cursor_in_input_area ()) {
+      GtkTextIter line_iter;
+      GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
+      gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
+      gtk_text_iter_set_line_offset (&line_iter, 6);
+      gtk_text_buffer_place_cursor (buffer, &line_iter);
+      return TRUE;
+    }
+    else
+      return FALSE;
   }
 
   /* All remaining processing is for keys having Alt modifier */
@@ -122,6 +153,16 @@ scroll_to_end ()
 				1.0);
 }
 
+static int
+have_window_name (char *argv[])
+{
+  while (*argv) {
+    if (!(strcmp ("--name", *argv))) return 1;
+    ++argv;
+  }
+  return 0;
+}
+
 int
 main (int   argc,
       char *argv[])
@@ -129,11 +170,13 @@ main (int   argc,
   GError *error = NULL;
   GOptionContext *context;
   GtkWidget *vbox;
+  int override_name;
 
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
   g_option_context_add_group (context, gtk_get_option_group (TRUE));
     
+  override_name = !have_window_name (argv);
   gtk_init (&argc, &argv);
   
   if (!g_option_context_parse (context, &argc, &argv, &error)) {
@@ -145,7 +188,7 @@ main (int   argc,
   if (apl_spawn(argc, argv)) return 1;
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (window), "APLwrap");
+  if (override_name) gtk_window_set_title (GTK_WINDOW (window), "APLwrap");
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
     
   g_signal_connect (window, "destroy",
