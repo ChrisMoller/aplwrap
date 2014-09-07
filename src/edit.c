@@ -207,12 +207,12 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 		   G_CALLBACK (edit_save), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Save File"));
+  item = gtk_menu_item_new_with_label (_ ("Export File"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (save_log), tb->buffer);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Save File As"));
+  item = gtk_menu_item_new_with_label (_ ("Export File As"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (save_log_as), tb->buffer);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);

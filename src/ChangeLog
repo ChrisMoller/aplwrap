@@ -1,5 +1,7 @@
 2014-09-07  Chris Moller  <moller@mollerware.com>
 
+	* edit.c (build_edit_menubar): Renamed "Save File" to "Export File".
+
 	* aplio.c (send_apl): Added convenience wrapper to send().  (Also
 	affected fcns in edit.c and menu.c.)
 
