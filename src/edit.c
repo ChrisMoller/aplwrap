@@ -15,6 +15,23 @@ static GHashTable *buffers = NULL;
 static gint seq_nr = 1;
 
 static void
+set_status_line (window_s *tw, buffer_s *tb)
+{
+  GtkTextIter line_iter;
+  GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
+  gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
+  gint line_nr = gtk_text_iter_get_line (&line_iter);
+  gint offset  = gtk_text_iter_get_line_offset (&line_iter);
+  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer);
+  
+  gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
+			       tb->modified ? "**" : "  ",
+			       line_nr + 1, line_ct, offset + 1);
+  gtk_label_set_text (GTK_LABEL (status (tw)), st);
+  g_free (st);
+}
+
+static void
 edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
@@ -45,11 +62,14 @@ edit_save_cb (gchar *text, void *data)
   }
   g_strfreev (lines);
   tagged_insert ("\n      ", -1, TAG_OUT);
+#if 1
   if (data) {
     window_s *tw = data;
     buffer_s *tb = buffer (tw);
     tb->modified = FALSE;
+    set_status_line (tw, tb);
   }
+#endif
 }
 
 static void
@@ -239,31 +259,25 @@ edit_key_press_event (GtkWidget *widget,
   window_s *tw = user_data;
   buffer_s *tb = buffer (tw);
 
-  tb->modified = TRUE;
   GdkEventKey *key_event = (GdkEventKey *)event;
-
-  if (!(key_event->state & GDK_MOD1_MASK)) return FALSE;
-
+  
   gsize bw;
-  gchar *res = handle_apl_characters (&bw, key_event);
+  gchar *res = NULL;
+  
+  if (key_event->state & GDK_MOD1_MASK)
+    res = handle_apl_characters (&bw, key_event);
+
+  if (res || g_ascii_isprint (key_event->keyval)) tb->modified = TRUE;
+
+  set_status_line (tw, tb);
+
+  // if (!(key_event->state & GDK_MOD1_MASK)) return FALSE;
+
   if (res) {
     gtk_text_buffer_insert_at_cursor (tb->buffer, res, bw);
     g_free (res);
     rc = TRUE;
   }
-
-  GtkTextIter line_iter;
-  GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
-  gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
-  gint line_nr = gtk_text_iter_get_line (&line_iter);
-  gint offset  = gtk_text_iter_get_line_offset (&line_iter);
-  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer);
-  
-  gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
-			       tb->modified ? "**" : "  ",
-			       line_nr + 1, line_ct, offset + 1);
-  gtk_label_set_text (GTK_LABEL (status (tw)), st);
-  g_free (st);
 
   return rc;
 }
@@ -384,6 +398,9 @@ edit_object (gchar* name, gint nc)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   status (this_window) = gtk_label_new ("status");
+  gtk_misc_set_alignment (GTK_MISC (status (this_window)), 0.0, 0.0);
+  set_status_line (this_window, this_buffer);
+
   gtk_box_pack_start (GTK_BOX (vbox), status (this_window), FALSE, FALSE, 2);
   
   gtk_widget_show_all (window);

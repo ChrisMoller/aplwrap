@@ -1,5 +1,8 @@
 2014-09-08  Chris Moller  <moller@mollerware.com>
 
+	* edit.c (set_status_line): Added a status line showing
+	modification and position.
+
 	* txtbuf.c (tagged_insert): Added filter for invalid UTF8 chars.
 	(tagged_insert): Added filter for unprintable chars.  Also catch
 	the ASCII BEL character and call gdk_beep().  For reasons I don't
