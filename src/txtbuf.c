@@ -52,8 +52,8 @@ tagged_insert (char   *text,
       ptr = g_utf8_next_char (ptr);
       if (!g_unichar_isprint (c) && *op != '\n') {
 	gint cl = ptr - op;
-	for (int i = 0; i < cl; i++) *op++ = ' ';
 	if (*op == '\a') gdk_beep ();
+	for (int i = 0; i < cl; i++) *op++ = ' ';
       }
     }
   }

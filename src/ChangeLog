@@ -4,6 +4,7 @@
 	(tagged_insert): Added filter for unprintable chars.  Also catch
 	the ASCII BEL character and call gdk_beep().  For reasons I don't
 	know, it doesn't actually beep.
+	(tagged_insert): Little bug fix.
 
 	* aplio.c (apl_read_out): Removed some commented-out diagnostic code.
 
