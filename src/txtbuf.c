@@ -44,14 +44,12 @@ tagged_insert (char   *text,
     else run = FALSE;
   }
 
-  rc = g_utf8_validate (text, text_idx, NULL);
-  if (rc) gtk_text_buffer_insert_with_tags (buffer,
-					    &insert_iter,
-					    text,
-					    text_idx,
-					    get_tag(tag),
-					    NULL);
-  else g_print ("Still something bad\n");
+  gtk_text_buffer_insert_with_tags (buffer,
+				    &insert_iter,
+				    text,
+				    text_idx,
+				    get_tag(tag),
+				    NULL);
 
   scroll_to_end ();
 }
