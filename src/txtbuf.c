@@ -44,6 +44,21 @@ tagged_insert (char   *text,
     else run = FALSE;
   }
 
+  {
+    gchar *ptr = text;
+    while(ptr < text + text_idx) {
+      gunichar c = g_utf8_get_char_validated (ptr, -1);
+      gchar *op = ptr;
+      ptr = g_utf8_next_char (ptr);
+      if (!g_unichar_isprint (c) && *op != '\n') {
+	gint cl = ptr - op;
+	for (int i = 0; i < cl; i++) *op++ = ' ';
+	if (*op == '\a') gdk_beep ();
+      }
+    }
+  }
+  
+
   gtk_text_buffer_insert_with_tags (buffer,
 				    &insert_iter,
 				    text,
