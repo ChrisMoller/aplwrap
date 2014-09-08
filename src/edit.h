@@ -11,10 +11,12 @@ typedef struct {
 
 typedef struct {
   GtkWidget *window;
+  GtkWidget *status_line;
   buffer_s  *buffer;
 } window_s;
 #define window(w) (w)->window
 #define buffer(w) (w)->buffer
+#define status(w) (w)->status_line
 
 void edit_object (gchar* name, gint nc);
 

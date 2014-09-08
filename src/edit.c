@@ -221,13 +221,8 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
   item = gtk_menu_item_new_with_label (_ ("Close"));
-#if 1
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (edit_delete), tw);
-#else
-  g_signal_connect (G_OBJECT (item), "activate",
-		    G_CALLBACK (edit_close), tw);
-#endif
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
@@ -238,10 +233,12 @@ edit_key_press_event (GtkWidget *widget,
 		      GdkEvent  *event,
 		      gpointer   user_data)
 {
+  gboolean rc = FALSE;
   if (event->type != GDK_KEY_PRESS) return FALSE;
-
+  
   window_s *tw = user_data;
   buffer_s *tb = buffer (tw);
+
   tb->modified = TRUE;
   GdkEventKey *key_event = (GdkEventKey *)event;
 
@@ -252,10 +249,23 @@ edit_key_press_event (GtkWidget *widget,
   if (res) {
     gtk_text_buffer_insert_at_cursor (tb->buffer, res, bw);
     g_free (res);
-    return TRUE;
+    rc = TRUE;
   }
 
-  return FALSE;				// pass the event on
+  GtkTextIter line_iter;
+  GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
+  gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
+  gint line_nr = gtk_text_iter_get_line (&line_iter);
+  gint offset  = gtk_text_iter_get_line_offset (&line_iter);
+  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer);
+  
+  gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
+			       tb->modified ? "**" : "  ",
+			       line_nr + 1, line_ct, offset + 1);
+  gtk_label_set_text (GTK_LABEL (status (tw)), st);
+  g_free (st);
+
+  return rc;
 }
 
 static void
@@ -358,10 +368,8 @@ edit_object (gchar* name, gint nc)
 
   build_edit_menubar (vbox, this_window);
 
-#if 1
   g_signal_connect (window, "delete-event",
 		      G_CALLBACK (edit_delete_event), this_window);
-#endif
 
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (edit_close), this_window);
@@ -374,5 +382,9 @@ edit_object (gchar* name, gint nc)
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
+  
+  status (this_window) = gtk_label_new ("status");
+  gtk_box_pack_start (GTK_BOX (vbox), status (this_window), FALSE, FALSE, 2);
+  
   gtk_widget_show_all (window);
 }

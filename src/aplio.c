@@ -178,18 +178,6 @@ apl_read_out (gint         fd,
                                apl_read_sockid,	  // GUnixFDSourceFunc function,
                                NULL);		  // gpointer user_data
             }
-#if  0
-            {
-              int nbyte;
-#define MESSAGE "proto\n"
-              if ((nbyte = send(sockfd, MESSAGE, strlen(MESSAGE), 0)) < 0) {
-                perror("Error in send()");
-              }
-              fprintf (stderr, "sent %d bytes\n", nbyte);
-              //	    shutdown(sockfd, SHUT_RDWR);
-              //	    close(sockfd);
-            }
-#endif
           }
         }
         regfree (&preg);

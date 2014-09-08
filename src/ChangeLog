@@ -1,3 +1,7 @@
+2014-09-08  Chris Moller  <moller@mollerware.com>
+
+	* aplio.c (apl_read_out): Removed some commented-out diagnostic code.
+
 2014-09-07  Chris Moller  <moller@mollerware.com>
 
 	* edit.c (build_edit_menubar): Renamed "Save File" to "Export File".
