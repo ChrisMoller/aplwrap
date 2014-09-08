@@ -19,16 +19,39 @@ tagged_insert (char   *text,
                ssize_t text_idx,
                tag_t   tag)
 {
+  gboolean rc;
   GtkTextIter insert_iter;
   GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
   gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
 
-  gtk_text_buffer_insert_with_tags (buffer,
-                                    &insert_iter,
-                                    text,
-                                    text_idx,
-                                    get_tag(tag),
-                                    NULL);
+  gboolean run = TRUE;
+  while (run) {
+    gchar *end = NULL;
+    gchar *ptr = text;
+    ssize_t remaining  = text_idx;
+    
+    rc = g_utf8_validate (ptr, remaining, (const gchar **)(&end));
+
+    if (!rc) {
+      if (end) {
+	*end = ' ';
+	remaining -= (end - ptr) + 1;
+	ptr = end + 1;
+	end = NULL;
+      }
+      continue;
+    }
+    else run = FALSE;
+  }
+
+  rc = g_utf8_validate (text, text_idx, NULL);
+  if (rc) gtk_text_buffer_insert_with_tags (buffer,
+					    &insert_iter,
+					    text,
+					    text_idx,
+					    get_tag(tag),
+					    NULL);
+  else g_print ("Still something bad\n");
 
   scroll_to_end ();
 }

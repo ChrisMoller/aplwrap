@@ -1,5 +1,7 @@
 2014-09-08  Chris Moller  <moller@mollerware.com>
 
+	* txtbuf.c (tagged_insert): Added filter for invalid UTF8 chars.
+
 	* aplio.c (apl_read_out): Removed some commented-out diagnostic code.
 
 2014-09-07  Chris Moller  <moller@mollerware.com>
