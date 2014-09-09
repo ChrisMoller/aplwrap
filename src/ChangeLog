@@ -1,3 +1,7 @@
+2014-09-09  Chris Moller  <moller@mollerware.com>
+
+	* apl.c (apl_spawn): Fixed emacs_arg.
+
 2014-09-08  Chris Moller  <moller@mollerware.com>
 
 	* edit.c (set_status_line): Added a status line showing

@@ -89,7 +89,7 @@ int apl_spawn (int   argc,
     append_argv ("--noColor");
     append_argv ("--rawCIN");
     append_argv ("--emacs_arg");
-    append_argv ("Hi there");
+    append_argv ("0");
     append_argv ("-w");
     append_argv ("500");
     append_argv ("--silent");
