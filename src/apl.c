@@ -16,6 +16,12 @@
 
 static GPid apl_pid = -1;
 
+GPid
+get_apl_pid ()
+{
+  return apl_pid;
+}
+
 void
 aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)

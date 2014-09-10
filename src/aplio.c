@@ -16,6 +16,7 @@
 #include "options.h"
 #include "edit.h"
 #include "aplwrap.h"
+#include "pstat.h"
 
 gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
@@ -202,6 +203,8 @@ apl_read_out (gint         fd,
   return TRUE;
 }
 
+static pstat stat_begin, stat_delta;
+
 gboolean
 apl_read_err (gint         fd,
 	      GIOCondition condition,
@@ -248,6 +251,9 @@ apl_read_err (gint         fd,
         gchar *rows_assign = get_rows_assign ();
         if (rows_assign) apl_eval (rows_assign, -1, NULL, NULL);
         history_start();
+        get_pstat (get_apl_pid (), &stat_delta);
+        diff_pstat (&stat_begin, &stat_delta);
+        update_status_line (format_pstat (&stat_delta));
       }
       tagged_insert(text, text_idx,
                     nocolour ? TAG_OUT : (prompt_text ? TAG_PRM : TAG_ERR));
@@ -278,6 +284,10 @@ apl_send_inp (gchar  *text,
   ssize_t __attribute__ ((unused)) wrc;
   char nl = '\n';
 
+  if (!eval && at_prompt) {
+    update_status_line ("Working…");
+    get_pstat (get_apl_pid (), &stat_begin);
+  }
   wrc = write (apl_in, text, sz);
   wrc = write (apl_in, &nl, 1);
 }
@@ -308,3 +318,15 @@ apl_eval_end ()
   g_free (eval_result);
   eval_result = 0;
 }
+
+#if 0
+void
+apl_create_plot_socket ()
+{
+  struct addrinfo *addr;
+  
+  int plot_socket = socket (AF_INET, SOCK_STREAM, 0);
+  bind (plot_socket, addr->ai_addr, addr->ai_addrlen);
+  listen (plot_socket, 2);
+}
+#endif

@@ -1,4 +1,4 @@
-AC_INIT([aplwrap], [1.0], [moller@mollerware.com])
+AC_INIT([aplwrap], [2.0], [moller@mollerware.com])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_CC

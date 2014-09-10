@@ -7,6 +7,8 @@ gchar *get_rows_assign ();
 
 void beep ();
 
+void update_status_line (gchar *text);
+
 void scroll_to_end ();
 
 gchar *handle_apl_characters (gsize *bw_p, GdkEventKey *key_event);

@@ -206,6 +206,14 @@ have_window_name (char *argv[])
   return 0;
 }
 
+static GtkWidget *status;
+
+void
+update_status_line (gchar *text)
+{
+  gtk_label_set_text (GTK_LABEL (status), text);
+}
+
 int
 main (int   argc,
       char *argv[])
@@ -260,6 +268,11 @@ main (int   argc,
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
+  status = gtk_label_new ("status");
+  gtk_misc_set_alignment (GTK_MISC (status), 0.0, 0.0);
+  update_status_line ("Starting…");
+  gtk_box_pack_start (GTK_BOX (vbox), status, FALSE, FALSE, 2);
+
   define_tags ();
 
   gtk_widget_show_all (window);
