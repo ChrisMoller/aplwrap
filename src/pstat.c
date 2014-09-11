@@ -102,18 +102,18 @@ format_pstat (pstat *stats)
   tps = sysconf(_SC_CLK_TCK);
   pgsz = sysconf(_SC_PAGESIZE);
   snprintf(tmp, sizeof(tmp), "%.2f", stats->utime/(float)tps);
-  out += snprintf(buf+out, sizeof(buf)-out, "u: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆u: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%.2f", stats->stime/(float)tps);
-  out += snprintf(buf+out, sizeof(buf)-out, "s: %s ", commas(tmp));
-  snprintf(tmp, sizeof(tmp), "%lu", stats->vsize);
-  out += snprintf(buf+out, sizeof(buf)-out, "v: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆s: %s ", commas(tmp));
+  snprintf(tmp, sizeof(tmp), "%ld", stats->vsize);
+  out += snprintf(buf+out, sizeof(buf)-out, "∆v: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%ld", stats->rssize*pgsz);
-  out += snprintf(buf+out, sizeof(buf)-out, "r: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆r: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->minflt);
-  out += snprintf(buf+out, sizeof(buf)-out, "f: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆f: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->majflt);
-  out += snprintf(buf+out, sizeof(buf)-out, "F: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆F: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%.2f", stats->biowait/100.0);
-  out += snprintf(buf+out, sizeof(buf)-out, "b: %s ", commas(tmp));
+  out += snprintf(buf+out, sizeof(buf)-out, "∆b: %s ", commas(tmp));
   return buf;
 }

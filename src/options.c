@@ -16,6 +16,7 @@ gboolean nocolour = FALSE;
 gchar *new_fn = NULL;
 gchar *opt_lx = NULL;
 gchar *rows_v = NULL;
+gchar *script = NULL;
 
 GOptionEntry entries[] = {
   { "ftsize", 's', 0, G_OPTION_ARG_INT,
@@ -49,6 +50,10 @@ GOptionEntry entries[] = {
   { "rows-var", 0, 0, G_OPTION_ARG_STRING,
     &rows_v,
     "APL variable name for display row count [string]",
+    NULL },
+  { "file", 'f', 0, G_OPTION_ARG_STRING,
+    &script,
+    "APL script file",
     NULL },
   { NULL }
 };

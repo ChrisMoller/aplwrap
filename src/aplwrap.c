@@ -92,6 +92,17 @@ handle_apl_characters (gsize *bw_p, GdkEventKey *key_event)
   return res;
 }
 
+void
+scroll_to_end ()
+{
+  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
+				gtk_text_buffer_get_mark (buffer, "insert"),
+				0.1,
+				FALSE,
+				0.0,
+				0.0);
+}
+
 static gboolean
 key_press_event (GtkWidget *widget,
                  GdkEvent  *event,
@@ -159,6 +170,14 @@ key_press_event (GtkWidget *widget,
       return FALSE;
   }
 
+  /* Cause Control-End to always scroll the view, even when the cursor
+     is already at the end. */
+  if (key_event->keyval == GDK_KEY_End &&
+      key_event->state == GDK_CONTROL_MASK) {
+    scroll_to_end ();
+    return FALSE; /* GTK+ moves the cursor. */
+  }
+
   /* All remaining processing is for keys having Alt modifier */
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
 
@@ -183,17 +202,6 @@ key_press_event (GtkWidget *widget,
   }
 
   return FALSE;				// pass the event on
-}
-
-void
-scroll_to_end ()
-{
-  gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
-				gtk_text_buffer_get_mark (buffer, "insert"),
-				0.1,
-				FALSE,
-				0.5,
-				1.0);
 }
 
 static int

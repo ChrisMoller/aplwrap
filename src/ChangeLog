@@ -1,3 +1,7 @@
+2014-09-11  Chris Moller  <moller@mollerware.com>
+
+	* apl.c (apl_spawn): Added -f option to pass a script to APL.
+
 2014-09-09  Chris Moller  <moller@mollerware.com>
 
 	* apl.c (apl_spawn): Fixed emacs_arg.

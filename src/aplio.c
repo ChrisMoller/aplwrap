@@ -139,7 +139,6 @@ apl_read_out (gint         fd,
   
   if (text) {
     if (!eval) {
-      at_prompt = FALSE;
       gboolean eaten = FALSE;
       if (apl_expect_network) {
 #define NW_PARSE "^.*mode:([[:alpha:]]*)[[:space:]]addr:([[:digit:]]*)*.*$"
@@ -183,7 +182,10 @@ apl_read_out (gint         fd,
         }
         regfree (&preg);
       }
-      if (!eaten) tagged_insert (text, text_idx, TAG_OUT);
+      if (!eaten) {
+        tagged_insert (text, text_idx, TAG_OUT);
+        at_prompt = FALSE;
+      }
     }
     else { /* eval */
       if (eval_result) {

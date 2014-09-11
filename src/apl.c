@@ -103,6 +103,10 @@ int apl_spawn (int   argc,
       append_argv ("--LX");
       append_argv (opt_lx);
     }
+    if (script) {
+      append_argv ("-f");
+      append_argv (script);
+    }
 
     if (argc > 1) {
       int i;
@@ -132,8 +136,9 @@ int apl_spawn (int   argc,
 				 &apl_out,	// gint *standard_output,
 				 &apl_err,	// gint *standard_error,
 				 &error);	// GError **error
-  if (new_fn) g_free (new_fn);
+  if (new_fn)   g_free (new_fn);
   if (apl_argv) g_free (apl_argv);
+  if (script)   g_free (script);
   
   if (!rc) {
     g_print ("error opening APL: %s\n", error->message);
