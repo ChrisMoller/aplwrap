@@ -59,7 +59,7 @@ get_pstat (GPid   pid,
   long int rss;
   int conv;
 
-  memset(stats, sizeof(struct _pstat), 0);
+  memset(stats, 0, sizeof(struct _pstat));
   if (pid < 0) return;
   snprintf(path, sizeof(path), "/proc/%d/stat", pid);
   fp = fopen(path, "r");
