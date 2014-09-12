@@ -110,6 +110,26 @@ scroll_to_cursor ()
 				0.0);
 }
 
+static void
+send_input_area_to_apl ()
+{
+  GtkTextIter end_iter;
+  gchar *text;
+  gint sz;
+
+  gtk_text_buffer_get_end_iter (buffer, &end_iter);
+  gtk_text_buffer_place_cursor (buffer, &end_iter);
+
+  text = get_input_text(&sz);
+
+  if (sz >= 6 && is_at_prompt ())
+    history_insert(text+6, sz-6);
+  apl_send_inp (text, sz);
+
+  gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
+  g_free (text);
+}
+
 static gboolean
 maybe_copy_selected_text_without_tags ()
 {
@@ -121,8 +141,20 @@ maybe_copy_selected_text_without_tags ()
     if (gtk_text_iter_can_insert (&start, TRUE)) return FALSE;
     selection = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
     gtk_clipboard_set_text (clipboard, selection, strlen(selection));
+    g_free (selection);
   }
   return TRUE;
+}
+
+static void
+home_to_end_of_apl_prompt ()
+{
+  GtkTextIter line_iter;
+  GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
+  gtk_text_iter_set_line_offset (&line_iter, 6);
+  gtk_text_buffer_place_cursor (buffer, &line_iter);
+  scroll_to_cursor ();
 }
 
 static gboolean
@@ -133,6 +165,7 @@ key_press_event (GtkWidget *widget,
   if (event->type != GDK_KEY_PRESS) return FALSE;
 
   GdkEventKey *key_event = (GdkEventKey *)event;
+  GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
 
   /* Tab key runs completion */
   if (key_event->keyval == GDK_KEY_Tab) {
@@ -147,7 +180,7 @@ key_press_event (GtkWidget *widget,
   }
 
   /* Handle APL interrupt keys */
-  if (key_event->state == GDK_CONTROL_MASK &&
+  if ((key_event->state & mod_mask) == GDK_CONTROL_MASK &&
       (key_event->keyval == GDK_KEY_Super_L ||
        key_event->keyval == GDK_KEY_Break)) {
     apl_interrupt ();
@@ -157,23 +190,8 @@ key_press_event (GtkWidget *widget,
   /* Handle Return and Enter keys */
   if (key_event->keyval == GDK_KEY_Return ||
       key_event->keyval == GDK_KEY_KP_Enter) {
-    GtkTextIter end_iter;
-    gchar *text;
-    gint sz;
-
     if (handle_copy_down ()) return TRUE;
- 
-    gtk_text_buffer_get_end_iter (buffer, &end_iter);
-    gtk_text_buffer_place_cursor (buffer, &end_iter);
-
-    text = get_input_text(&sz);
-
-    if (sz >= 6 && is_at_prompt ())
-      history_insert(text+6, sz-6);
-    apl_send_inp (text, sz);
-
-    gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
-    g_free (text);
+    send_input_area_to_apl ();
     return TRUE;
   }
 
@@ -181,12 +199,7 @@ key_press_event (GtkWidget *widget,
   if (cursor_in_input_area ()) {
     if (key_event->keyval == GDK_KEY_Home &&
         !(key_event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK|GDK_MOD1_MASK))) {
-      GtkTextIter line_iter;
-      GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
-      gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
-      gtk_text_iter_set_line_offset (&line_iter, 6);
-      gtk_text_buffer_place_cursor (buffer, &line_iter);
-      scroll_to_cursor ();
+      home_to_end_of_apl_prompt ();
       return TRUE;
     }
   }
@@ -199,9 +212,12 @@ key_press_event (GtkWidget *widget,
   }
 
   /* Override copy and cut behaviors to not copy tags from transcript. */
-  if ((key_event->keyval == GDK_KEY_c || key_event->keyval == GDK_KEY_x) &&
-      key_event->state == GDK_CONTROL_MASK)
-    return maybe_copy_selected_text_without_tags ();
+  {
+    guint key = gdk_keyval_to_lower (key_event->keyval);
+    if ((key == GDK_KEY_c || key == GDK_KEY_x) &&
+        (key_event->state & mod_mask) == GDK_CONTROL_MASK)
+      return maybe_copy_selected_text_without_tags ();
+  }
 
   /* All remaining processing is for keys having Alt modifier */
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
