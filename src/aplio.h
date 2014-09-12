@@ -15,6 +15,10 @@ void     set_send_cb (socket_fcn fcn, void *tw);
 
 int      is_at_prompt ();
 
+gboolean apl_read_plot_pipe (gint         fd,
+			     GIOCondition condition,
+			     gpointer     user_data);
+
 gboolean apl_read_out (gint         fd,
                        GIOCondition condition,
                        gpointer     user_data);

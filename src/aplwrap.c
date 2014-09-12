@@ -2,6 +2,12 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
 #include "Avec.h"
 #include "keymap.h"
 
@@ -10,6 +16,7 @@
 #include "aplio.h"
 #include "options.h"
 #include "apl.h"
+#include "aplwrap.h"
 #include "menu.h"
 #include "complete.h"
 
@@ -242,6 +249,17 @@ main (int   argc,
     g_warning ("option parsing failed: %s\n", error->message);
     g_clear_error (&error);
   }
+
+  if (printversion) {
+    g_print ("aplwrap version %s\n", VERSION);
+    exit (0);
+  }
+
+  plot_pipe_name = g_strdup_printf ("/tmp/aplwrap-%d", (int)getpid ());
+  plot_pipe_fd = (0 == mkfifo (plot_pipe_name, 0600)) ?
+    // O_CLOEXEC seems to be a GNU extension
+    open (plot_pipe_name, O_RDONLY /* | O_CLOEXEC */ | O_NONBLOCK) : -1;
+  
 
   apl_expect_network = FALSE;
   if (apl_spawn(argc, argv)) return 1;

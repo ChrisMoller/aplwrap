@@ -11,8 +11,9 @@ gint width = WIDTH_FALLBACK;
 #define HEIGHT_FALLBACK	440
 gint height = HEIGHT_FALLBACK;
 
-gboolean vwidth   = FALSE;
-gboolean nocolour = FALSE;
+gboolean vwidth       = FALSE;
+gboolean nocolour     = FALSE;
+gboolean printversion = FALSE;
 gchar *new_fn = NULL;
 gchar *opt_lx = NULL;
 gchar *rows_v = NULL;
@@ -54,6 +55,10 @@ GOptionEntry entries[] = {
   { "file", 'f', 0, G_OPTION_ARG_STRING,
     &script,
     "APL script file",
+    NULL },
+  { "version", 'v', 0, G_OPTION_ARG_NONE,
+    &printversion,
+    "Print version and exit",
     NULL },
   { NULL }
 };

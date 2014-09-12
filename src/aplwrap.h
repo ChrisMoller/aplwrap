@@ -3,6 +3,9 @@
 
 #include <gtk/gtk.h>
 
+gchar *plot_pipe_name;
+gint   plot_pipe_fd;
+
 gchar *get_rows_assign ();
 
 void beep ();

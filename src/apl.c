@@ -8,6 +8,7 @@
 #include <strings.h>
 
 #include "apl.h"
+#include "aplwrap.h"
 #include "aplio.h"
 #include "options.h"
 
@@ -29,6 +30,12 @@ aplwrap_quit (GtkWidget *widget,
   if (apl_pid != -1) {
     kill ((pid_t)apl_pid, SIGKILL);
     g_spawn_close_pid (apl_pid);
+  }
+
+  if (plot_pipe_fd != -1) close (plot_pipe_fd);
+  if (plot_pipe_name) {
+    unlink (plot_pipe_name);
+    g_free (plot_pipe_name);
   }
 
   gtk_main_quit ();
@@ -57,8 +64,9 @@ make_env ()
   gchar **env = environ;
 
   while (*env++) ++envc;
-  env = g_try_malloc((2 + envc) * sizeof(gchar*));
-  env[envc+1] = NULL;
+  env = g_try_malloc((3 + envc) * sizeof(gchar*));
+  env[envc+2] = NULL;
+  env[envc+1] = g_strdup_printf ("APLPLOT=%s",plot_pipe_name);
   env[envc+0] = "APLWRAP=" VERSION;
   while (envc--) {
     if (!strncmp(environ[envc], "TERM=", 5))
@@ -161,6 +169,14 @@ int apl_spawn (int   argc,
 		   G_IO_IN | G_IO_PRI,	// GIOCondition condition,
 		   apl_read_err,	// GUnixFDSourceFunc function,
 		   NULL);		// gpointer user_data
+    
+    if (-1 != plot_pipe_fd) {
+      g_unix_set_fd_nonblocking (plot_pipe_fd, TRUE, NULL);
+      g_unix_fd_add (plot_pipe_fd,		// gint fd,
+		     G_IO_IN | G_IO_PRI,	// GIOCondition condition,
+		     apl_read_plot_pipe,	// GUnixFDSourceFunc function,
+		     NULL);			// gpointer user_data
+    }
   }
   else {
     g_print ("error opening APL file descriptors.");

@@ -6,6 +6,7 @@
 extern gint         ft_size;
 extern gint         width;
 extern gint         height;
+extern gboolean     printversion;
 extern gboolean     vwidth;
 extern gboolean     nocolour;
 extern gchar       *new_fn;

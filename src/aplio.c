@@ -76,6 +76,64 @@ send_apl (const void *buf, size_t len)
 }
 
 gboolean
+apl_read_plot_pipe (gint         fd,
+		    GIOCondition condition,
+		    gpointer     user_data)
+{
+  static gchar  *text     = NULL;
+  static ssize_t text_idx = 0;
+
+  gboolean run = TRUE;
+  while(run) {
+    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
+    *text = 0;
+    if (text) {
+      errno = 0;
+      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
+      if (sz == -1) run = FALSE;
+      text_idx += sz;
+      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
+    }
+    else run = FALSE;
+  }
+  
+  if (text_idx > 0) {
+    text = g_try_realloc (text, (gsize)(text_idx + 16));
+    text[text_idx] = 0;
+    gint w, h;
+    gdk_pixbuf_get_file_info (text, &w, &h);
+    GdkPixbuf *pb = gdk_pixbuf_new_from_file (text, NULL);
+    if (pb) {
+      GtkTextIter insert_iter;
+      GtkTextMark *mark;
+      
+      mark = gtk_text_buffer_get_insert (buffer);
+      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+      tagged_insert ("\n", 1, TAG_OUT);
+      
+      mark = gtk_text_buffer_get_insert (buffer);
+      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+      gtk_text_buffer_insert_pixbuf (buffer, &insert_iter, pb);
+      g_object_unref (pb);
+      unlink (text);
+
+#define PROMPT_LINE "\n\n      "
+      mark = gtk_text_buffer_get_insert (buffer);
+      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+      tagged_insert (PROMPT_LINE, -1, TAG_OUT);
+      scroll_to_end ();
+    }
+    g_free (text);
+  }
+
+  text = NULL;
+  text_idx = 0;
+  
+  return TRUE;
+}
+
+gboolean
 apl_read_sockid (gint         fd,
 		 GIOCondition condition,
 		 gpointer     user_data)
@@ -321,14 +379,3 @@ apl_eval_end ()
   eval_result = 0;
 }
 
-#if 0
-void
-apl_create_plot_socket ()
-{
-  struct addrinfo *addr;
-  
-  int plot_socket = socket (AF_INET, SOCK_STREAM, 0);
-  bind (plot_socket, addr->ai_addr, addr->ai_addrlen);
-  listen (plot_socket, 2);
-}
-#endif
