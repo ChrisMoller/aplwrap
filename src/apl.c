@@ -23,10 +23,25 @@ get_apl_pid ()
   return apl_pid;
 }
 
+static guint out_source = 0;
+static guint err_source = 0;
+static guint plot_source = 0;
+
+gboolean quitting = FALSE;
+
 void
 aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
+  quitting = TRUE;
+
+  if (out_source)
+    g_source_remove (out_source);
+  if (err_source)
+    g_source_remove (err_source);
+  if (plot_source)
+    g_source_remove (plot_source);
+
   if (apl_pid != -1) {
     kill ((pid_t)apl_pid, SIGKILL);
     g_spawn_close_pid (apl_pid);
@@ -46,9 +61,11 @@ apl_exit (GPid     pid,
 	  gint     status,
 	  gpointer user_data)
 {
-  g_spawn_close_pid (pid);
-  apl_pid = -1;
-  aplwrap_quit (NULL, NULL);
+  if (!quitting) {
+    g_spawn_close_pid (pid);
+    apl_pid = -1;
+    aplwrap_quit (NULL, NULL);
+  }
 }
 
 void apl_interrupt ()
@@ -159,23 +176,26 @@ int apl_spawn (int   argc,
   
   if (apl_in != -1 && apl_out != -1 && apl_err != -1) {
     g_unix_set_fd_nonblocking (apl_out, TRUE, NULL);
-    g_unix_fd_add (apl_out,		// gint fd,
-		   G_IO_IN | G_IO_PRI,	// GIOCondition condition,
-		   apl_read_out,	// GUnixFDSourceFunc function,
-		   NULL);		// gpointer user_data
+    out_source =
+      g_unix_fd_add (apl_out,			// gint fd,
+                     G_IO_IN | G_IO_PRI,	// GIOCondition condition,
+                     apl_read_out,		// GUnixFDSourceFunc function,
+                     NULL);			// gpointer user_data
 
     g_unix_set_fd_nonblocking (apl_err, TRUE, NULL);
-    g_unix_fd_add (apl_err,		// gint fd,
-		   G_IO_IN | G_IO_PRI,	// GIOCondition condition,
-		   apl_read_err,	// GUnixFDSourceFunc function,
-		   NULL);		// gpointer user_data
+    err_source =
+      g_unix_fd_add (apl_err,			// gint fd,
+                     G_IO_IN | G_IO_PRI,	// GIOCondition condition,
+                     apl_read_err,		// GUnixFDSourceFunc function,
+                     NULL);			// gpointer user_data
     
     if (-1 != plot_pipe_fd) {
       g_unix_set_fd_nonblocking (plot_pipe_fd, TRUE, NULL);
-      g_unix_fd_add (plot_pipe_fd,		// gint fd,
-		     G_IO_IN | G_IO_PRI,	// GIOCondition condition,
-		     apl_read_plot_pipe,	// GUnixFDSourceFunc function,
-		     NULL);			// gpointer user_data
+      plot_source =
+        g_unix_fd_add (plot_pipe_fd,		// gint fd,
+                       G_IO_IN | G_IO_PRI,	// GIOCondition condition,
+                       apl_read_plot_pipe,	// GUnixFDSourceFunc function,
+                       NULL);			// gpointer user_data
     }
   }
   else {
