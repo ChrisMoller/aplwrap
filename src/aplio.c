@@ -157,6 +157,8 @@ apl_read_sockid (gint         fd,
   }
   
   if (text_idx > 0) {
+    text = g_try_realloc (text, (gsize)(text_idx + 16));
+    text[text_idx] = 0;
     if (socket_cb) (*socket_cb)(text, this_window);
     g_free (text);
   }

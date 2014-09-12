@@ -1,3 +1,7 @@
+2014-09-12  Chris Moller  <moller@mollerware.com>
+
+	* aplio.c (apl_read_sockid): forced a null-term in call-back.
+
 2014-09-11  Chris Moller  <moller@mollerware.com>
 
 	* options.c (]): Added a --version flag.
