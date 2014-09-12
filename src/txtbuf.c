@@ -66,7 +66,7 @@ tagged_insert (char   *text,
 				    get_tag(tag),
 				    NULL);
 
-  scroll_to_end ();
+  scroll_to_cursor ();
 }
 
 void
@@ -89,7 +89,7 @@ handle_history_replacement (gchar *text)
   gtk_text_buffer_insert_at_cursor (buffer, text, strlen(text));
 
   // reveal
-  scroll_to_end ();
+  scroll_to_cursor ();
 }
 
 int
@@ -120,8 +120,6 @@ handle_copy_down ()
     return 1;
   }
   else {
-    // TBCL
-    //
     //  Case 2: selection is empty
     //
     //  If cursor is in previous input
@@ -148,17 +146,37 @@ handle_copy_down ()
   }
 }
 
+static gint input_offset;
+
+void
+mark_input ()
+{
+  GtkTextIter input_iter;
+  GtkTextMark *input_mark = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &input_iter, input_mark);
+  gtk_text_iter_set_line_offset (&input_iter, 0);
+  input_offset = gtk_text_iter_get_offset (&input_iter);
+}
+
 gchar *
 get_input_text (gint *sz)
 {
   GtkTextMark *mark    = gtk_text_buffer_get_insert (buffer);
-  GtkTextIter end_iter, start_iter;
+  GtkTextIter end_iter, start_iter, input_iter;
   gchar *text;
   GtkTextTag* tag;
  
   gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
-
   gtk_text_iter_set_line_offset (&start_iter, 0);
+  gtk_text_buffer_get_iter_at_offset (buffer, &input_iter, input_offset);
+  if (!gtk_text_iter_begins_tag (&start_iter, get_tag (TAG_PRM)) &&
+      !gtk_text_iter_equal (&input_iter, &start_iter)) {
+    gtk_text_buffer_get_end_iter (buffer, &end_iter);
+    gtk_text_iter_set_line_offset (&input_iter, 6);
+    gtk_text_buffer_delete (buffer, &input_iter, &end_iter);
+    gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
+    beep ();
+  }
   end_iter = start_iter;
   gtk_text_iter_forward_to_line_end (&end_iter);
   text = gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);

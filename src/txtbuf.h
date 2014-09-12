@@ -18,6 +18,8 @@ int handle_copy_down ();
 
 gchar *get_input_text (gint *sz);
 
+void mark_input ();
+
 void tagged_insert (char   *text,
                     ssize_t text_idx,
                     tag_t   tag);

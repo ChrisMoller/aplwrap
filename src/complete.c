@@ -219,6 +219,9 @@ void complete ()
     GtkTextIter buff_iter, last_mark_iter;
     int prefix_chars = 0;
     
+#if TRACE
+    puts("start completion");
+#endif
     /* Establish marks to be used for bounding the completion. */
     gtk_text_buffer_get_end_iter (buffer, &buff_iter);
     if (completion_begin == NULL)
@@ -305,8 +308,8 @@ void complete ()
     if (!gtk_text_iter_equal (&last_mark_iter, &cursor_iter) ||
         state.context_length != state.prior_context_length ||
         state.prefix_length  != state.prior_prefix_length ||
-        strcmp(state.context, state.prior_context) ||
-        strcmp(state.prefix,  state.prior_prefix)) {
+        (state.prior_context && strcmp(state.context, state.prior_context)) ||
+        (state.prior_prefix  && strcmp(state.prefix,  state.prior_prefix))) {
 #if TRACE
       puts("reset");
 #endif

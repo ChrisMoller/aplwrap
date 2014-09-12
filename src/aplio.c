@@ -122,7 +122,7 @@ apl_read_plot_pipe (gint         fd,
       mark = gtk_text_buffer_get_insert (buffer);
       gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
       tagged_insert (PROMPT_LINE, -1, TAG_OUT);
-      scroll_to_end ();
+      scroll_to_cursor ();
     }
     g_free (text);
   }
@@ -240,10 +240,7 @@ apl_read_out (gint         fd,
         }
         regfree (&preg);
       }
-      if (!eaten) {
-        tagged_insert (text, text_idx, TAG_OUT);
-        at_prompt = FALSE;
-      }
+      if (!eaten) tagged_insert (text, text_idx, TAG_OUT);
     }
     else { /* eval */
       if (eval_result) {
@@ -264,6 +261,7 @@ apl_read_out (gint         fd,
 }
 
 static pstat stat_begin, stat_delta;
+static unsigned sequence = 0;
 
 gboolean
 apl_read_err (gint         fd,
@@ -313,10 +311,13 @@ apl_read_err (gint         fd,
         history_start();
         get_pstat (get_apl_pid (), &stat_delta);
         diff_pstat (&stat_begin, &stat_delta);
+        stat_delta.sequence = sequence++;
         update_status_line (format_pstat (&stat_delta));
       }
       tagged_insert(text, text_idx,
                     nocolour ? TAG_OUT : (prompt_text ? TAG_PRM : TAG_ERR));
+      if (at_prompt)
+        mark_input ();
     }
     else { /* eval */
       eval = !!strncmp("\r      ", text+text_idx-7, 7);
@@ -347,6 +348,7 @@ apl_send_inp (gchar  *text,
   if (!eval && at_prompt) {
     update_status_line ("Working…");
     get_pstat (get_apl_pid (), &stat_begin);
+    at_prompt = FALSE;
   }
   wrc = write (apl_in, text, sz);
   wrc = write (apl_in, &nl, 1);

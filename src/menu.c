@@ -167,7 +167,11 @@ save_log_fer_real (GtkTextBuffer *buffer)
     GtkTextIter start_iter, end_iter;
     gtk_text_buffer_get_bounds (buffer, &start_iter, &end_iter);
     gchar *text =
-      gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);
+      gtk_text_buffer_get_slice (buffer, &start_iter, &end_iter, TRUE);
+
+    // gtk-text-iter-get-pixbuf.
+
+      
     FILE *lfile = fopen (filename, "w");
     if (lfile) {
       // as brain-dead as it sounds, GTK has no way to get the length of

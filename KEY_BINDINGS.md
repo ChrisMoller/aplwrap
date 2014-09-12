@@ -5,9 +5,9 @@ Navigation
 ----------
 
 ```
-PageUp, PageDown            backward/forward by page
+PageUp, PageDown            backward/forward by page height
+Ctrl-PageUp, Ctrl-PageDown  backward/forward by page width
 Home, End                   beginning/end of line
-Ctrl-PageUp, Ctrl-PageDown  beginning/end of line
 Ctrl-Home, Ctrl-End         beginning/end of buffer
 Up, Down, Left, Right       move by line/character
 Ctrl-Up, Ctrl-Down          beginning/end of previous/next line
@@ -81,6 +81,15 @@ The buffer does not scroll to the input area.
 When the cursor is on a previous APL input, pressing Return or Enter
 copies the entire input to the current APL input area. The buffer
 scrolls to the input area.
+
+Invalid Input
+-------------
+
+APL expects to receive its input one line at a time. If the APL input
+area contains multiple lines (which can only happen if you paste text
+containing newline characters), this is treated as invalid. When you
+press the Return or Enter key, aplwrap will delete the invalid input
+and beep.
 
 Nabla Editor
 ------------

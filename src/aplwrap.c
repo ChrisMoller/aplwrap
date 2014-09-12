@@ -100,7 +100,7 @@ handle_apl_characters (gsize *bw_p, GdkEventKey *key_event)
 }
 
 void
-scroll_to_end ()
+scroll_to_cursor ()
 {
   gtk_text_view_scroll_to_mark (GTK_TEXT_VIEW (view),
 				gtk_text_buffer_get_mark (buffer, "insert"),
@@ -153,7 +153,7 @@ key_press_event (GtkWidget *widget,
 
     text = get_input_text(&sz);
 
-    if (is_at_prompt ())
+    if (sz >= 6 && is_at_prompt ())
       history_insert(text+6, sz-6);
     apl_send_inp (text, sz);
 
@@ -163,25 +163,23 @@ key_press_event (GtkWidget *widget,
   }
 
   /* Special handling of Home key in input area */
-  if (key_event->keyval == GDK_KEY_Home &&
-      !(key_event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK|GDK_MOD1_MASK))) {
-    if (cursor_in_input_area ()) {
+  if (cursor_in_input_area ()) {
+    if (key_event->keyval == GDK_KEY_Home &&
+        !(key_event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK|GDK_MOD1_MASK))) {
       GtkTextIter line_iter;
       GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
       gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
       gtk_text_iter_set_line_offset (&line_iter, 6);
       gtk_text_buffer_place_cursor (buffer, &line_iter);
+      scroll_to_cursor ();
       return TRUE;
     }
-    else
-      return FALSE;
   }
 
-  /* Cause Control-End to always scroll the view, even when the cursor
-     is already at the end. */
-  if (key_event->keyval == GDK_KEY_End &&
-      key_event->state == GDK_CONTROL_MASK) {
-    scroll_to_end ();
+  /* Cause Home and End keys to always scroll the view, even when the
+     cursor is already at the limit. */
+  if (key_event->keyval == GDK_KEY_End || key_event->keyval == GDK_KEY_Home) {
+    scroll_to_cursor ();
     return FALSE; /* GTK+ moves the cursor. */
   }
 
@@ -295,6 +293,8 @@ main (int   argc,
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   status = gtk_label_new ("status");
+  gtk_label_set_ellipsize (GTK_LABEL(status), PANGO_ELLIPSIZE_END);
+  gtk_label_set_selectable (GTK_LABEL(status), TRUE);
   gtk_misc_set_alignment (GTK_MISC (status), 0.0, 0.0);
   update_status_line ("Starting…");
   gtk_box_pack_start (GTK_BOX (vbox), status, FALSE, FALSE, 2);
