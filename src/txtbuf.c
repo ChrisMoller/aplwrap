@@ -207,4 +207,9 @@ define_tags ()
                                               "foreground", "grey",
                                               "editable", FALSE,
                                               NULL);
+
+  tags[TAG_EDM] = gtk_text_buffer_create_tag (buffer, "editor_message_tag",
+                                              "foreground", "green",
+                                              "editable", FALSE,
+                                              NULL);
 }

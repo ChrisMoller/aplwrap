@@ -57,11 +57,12 @@ edit_save_cb (gchar *text, void *data)
   for (int i = 0; lines[i]; i++) {
     if (!*lines[i]) continue;
     if (!g_strcmp0 (lines[i], END_TAG)) break;
-    tagged_insert (lines[i], -1, TAG_OUT);
-    tagged_insert (" ", -1, TAG_OUT);
+    tagged_insert (lines[i], -1, TAG_EDM);
+    tagged_insert (" ", -1, TAG_EDM);
   }
   g_strfreev (lines);
-  tagged_insert ("\n      ", -1, TAG_OUT);
+  tagged_insert ("\n      ", -1, TAG_PRM);
+  mark_input ();
 #if 1
   if (data) {
     window_s *tw = data;
