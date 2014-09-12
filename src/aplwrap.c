@@ -111,6 +111,21 @@ scroll_to_cursor ()
 }
 
 static gboolean
+maybe_copy_selected_text_without_tags ()
+{
+  GtkClipboard *clipboard = gtk_widget_get_clipboard ( GTK_WIDGET (view),
+                                                       GDK_SELECTION_CLIPBOARD);
+  GtkTextIter start, end;
+  gchar *selection;
+  if (gtk_text_buffer_get_selection_bounds (buffer, &start, &end)) {
+    if (gtk_text_iter_can_insert (&start, TRUE)) return FALSE;
+    selection = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
+    gtk_clipboard_set_text (clipboard, selection, strlen(selection));
+  }
+  return TRUE;
+}
+
+static gboolean
 key_press_event (GtkWidget *widget,
                  GdkEvent  *event,
                  gpointer   user_data)
@@ -182,6 +197,11 @@ key_press_event (GtkWidget *widget,
     scroll_to_cursor ();
     return FALSE; /* GTK+ moves the cursor. */
   }
+
+  /* Override copy and cut behaviors to not copy tags from transcript. */
+  if ((key_event->keyval == GDK_KEY_c || key_event->keyval == GDK_KEY_x) &&
+      key_event->state == GDK_CONTROL_MASK)
+    return maybe_copy_selected_text_without_tags ();
 
   /* All remaining processing is for keys having Alt modifier */
   if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
