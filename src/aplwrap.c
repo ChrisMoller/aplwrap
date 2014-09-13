@@ -257,21 +257,6 @@ button_press_event (GtkWidget *widget,
   return FALSE;				// pass the event on
 }
 
-#if 0
-static gboolean
-button_press_event (GtkWidget *widget,
-                    GdkEvent  *event,
-                    gpointer   user_data)
-{
-  GdkEventButton *button_event = (GdkEventButton *)event;
-
-  if (button_event->type == GDK_BUTTON_PRESS && button_event->button == 2)
-    return TRUE;
-
-  return FALSE;				// pass the event on
-}
-#endif
-
 static int
 have_window_name (char *argv[])
 {
