@@ -42,13 +42,12 @@ get_rows_assign ()
 }
 
 static gboolean
-aplwrap_configure_window (GdkWindow *event_window,
-                          GdkEvent *event,
-                          gpointer data)
+aplwrap_count_rows (GdkWindow *event_window,
+                    GdkEvent *event,
+                    gpointer data)
 {
   gint ypos, line_height, rows;
   GtkTextIter first;
-  GdkRectangle view_rect;
   
   if (GTK_WIDGET (event_window) == window) {
     gtk_text_buffer_get_start_iter (buffer, &first);
@@ -56,8 +55,7 @@ aplwrap_configure_window (GdkWindow *event_window,
                                    &first, &ypos, &line_height);
     line_height += gtk_text_view_get_pixels_above_lines (GTK_TEXT_VIEW (view));
     line_height += gtk_text_view_get_pixels_below_lines (GTK_TEXT_VIEW (view));
-    gtk_text_view_get_visible_rect (GTK_TEXT_VIEW (view), &view_rect);
-    rows = view_rect.height / line_height;
+    rows = gtk_widget_get_allocated_height (GTK_WIDGET (view)) / line_height;
     if ( rows != rows_old )
       rows_old = rows_new = rows;
     if (is_at_prompt ()) {
@@ -315,8 +313,8 @@ main (int   argc,
   g_signal_connect (window, "destroy",
 		    G_CALLBACK (aplwrap_quit), NULL);
     
-  g_signal_connect (window, "configure-event",
-		    G_CALLBACK (aplwrap_configure_window), NULL);
+  g_signal_connect (window, "size-allocate",
+                    G_CALLBACK (aplwrap_count_rows), NULL);
     
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
