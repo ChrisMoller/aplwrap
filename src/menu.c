@@ -5,6 +5,7 @@
 
 #include "menu.h"
 #include "apl.h"
+#include "aplwrap.h"
 #include "aplio.h"
 #include "txtbuf.h"
 #include "edit.h"
@@ -12,6 +13,46 @@
 #include "layout.h"
 
 static gchar *filename = NULL;
+static gboolean show_status = TRUE;
+
+static void
+ps_toggle_cb (GtkToggleButton *togglebutton,
+	      gpointer         user_data)
+{
+  show_status = gtk_toggle_button_get_active (togglebutton);
+  set_status_visibility (show_status);
+}
+  
+static void
+settings_cb (GtkWidget *widget,
+	     gpointer   data)
+{
+  GtkWidget *dialog;
+  GtkWidget *content;
+  GtkWidget *vbox;
+  GtkWidget *ps_toggle;
+
+  dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
+                                         NULL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         _ ("_OK"), GTK_RESPONSE_ACCEPT,
+                                         NULL);
+  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
+  gtk_window_set_keep_above (GTK_WINDOW (dialog), TRUE);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
+  gtk_container_add (GTK_CONTAINER (content), vbox);
+
+  ps_toggle = gtk_check_button_new_with_label (_ ("Enable pstat line."));
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (ps_toggle),
+				show_status);
+  g_signal_connect (ps_toggle, "toggled",
+		    G_CALLBACK (ps_toggle_cb), NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
+  gtk_widget_show_all (dialog);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
 
 guchar *
 decompress_image_data ()
@@ -58,7 +99,8 @@ show_keymap (GtkWidget *widget,
                                          _ ("_OK"), GTK_RESPONSE_ACCEPT,
                                          NULL);
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
-
+  gtk_window_set_keep_above (GTK_WINDOW (dialog), TRUE);
+  
   g_signal_connect_swapped (dialog,
 			    "response",
 			    G_CALLBACK (gtk_widget_destroy),
@@ -427,6 +469,20 @@ build_menubar (GtkWidget *vbox)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 #endif
+
+  item = gtk_separator_menu_item_new();
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+
+  item = gtk_menu_item_new_with_label(_ ("Settings"));
+  g_signal_connect (G_OBJECT (item), "activate",
+                   G_CALLBACK (settings_cb), NULL);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);  
+
+
+
+  
+  item = gtk_separator_menu_item_new();
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Quit"));
   g_signal_connect (G_OBJECT (item), "activate",

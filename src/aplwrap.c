@@ -258,6 +258,13 @@ have_window_name (char *argv[])
 static GtkWidget *status;
 
 void
+set_status_visibility (gboolean show)
+{
+  if (show) gtk_widget_show (status);
+  else gtk_widget_hide (status);
+}
+
+void
 update_status_line (gchar *text)
 {
   gtk_label_set_text (GTK_LABEL (status), text);
