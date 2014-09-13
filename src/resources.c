@@ -6,7 +6,7 @@
 #include "menu.h"
 #include "aplwrap.h"
 
-#define GROUP_APLWRAP  "AplwrapReources"
+#define GROUP_APLWRAP  "AplwrapResources"
 #define KEY_SHOW_PSTAT "ShowPstat"
 
 void

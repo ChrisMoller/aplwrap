@@ -125,7 +125,7 @@ send_input_area_to_apl ()
     history_insert(text+6, sz-6);
   apl_send_inp (text, sz);
 
-  gtk_text_buffer_insert_at_cursor (buffer, "\n", 1);
+  tagged_insert ("\n", 1, TAG_OUT);
   g_free (text);
 }
 
@@ -244,6 +244,34 @@ key_press_event (GtkWidget *widget,
   return FALSE;				// pass the event on
 }
 
+static gboolean
+button_press_event (GtkWidget *widget,
+                    GdkEvent  *event,
+                    gpointer   user_data)
+{
+  GdkEventButton *button_event = (GdkEventButton *)event;
+
+  if (button_event->type == GDK_BUTTON_PRESS && button_event->button == 2)
+    return TRUE;
+
+  return FALSE;				// pass the event on
+}
+
+#if 0
+static gboolean
+button_press_event (GtkWidget *widget,
+                    GdkEvent  *event,
+                    gpointer   user_data)
+{
+  GdkEventButton *button_event = (GdkEventButton *)event;
+
+  if (button_event->type == GDK_BUTTON_PRESS && button_event->button == 2)
+    return TRUE;
+
+  return FALSE;				// pass the event on
+}
+#endif
+
 static int
 have_window_name (char *argv[])
 {
@@ -332,6 +360,8 @@ main (int   argc,
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (key_press_event), NULL);
+  g_signal_connect (view, "button-press-event",
+		    G_CALLBACK (button_press_event), NULL);
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);

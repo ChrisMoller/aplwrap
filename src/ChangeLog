@@ -10,7 +10,7 @@
 
 	* options.c (]): Added a --version flag.
 
-	* aplio.c (apl_read_plot_pipe): dded embedded plot capability.
+	* aplio.c (apl_read_plot_pipe): Added embedded plot capability.
 
 	* apl.c (apl_spawn): Added -f option to pass a script to APL.
 
