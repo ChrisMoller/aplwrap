@@ -205,6 +205,7 @@ define_tags ()
 
   tags[TAG_PRM] = gtk_text_buffer_create_tag (buffer, "prompt_tag",
                                               "foreground", "grey",
+                                              "background", "azure",
                                               "editable", FALSE,
                                               NULL);
 
