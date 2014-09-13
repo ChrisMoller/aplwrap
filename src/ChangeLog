@@ -1,5 +1,7 @@
 2014-09-12  Chris Moller  <moller@mollerware.com>
 
+	* resources.c (restore_resources): Save and restore resources.
+
 	* menu.c (ps_toggle_cb): Added a toggle for the pstat line.
 
 	* aplio.c (apl_read_sockid): forced a null-term in call-back.

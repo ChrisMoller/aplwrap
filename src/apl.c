@@ -11,6 +11,7 @@
 #include "aplwrap.h"
 #include "aplio.h"
 #include "options.h"
+#include "resources.h"
 
 #include <sys/types.h>
 #include <signal.h>
@@ -34,6 +35,8 @@ aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
   quitting = TRUE;
+
+  save_resources ();
 
   if (out_source)
     g_source_remove (out_source);

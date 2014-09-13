@@ -13,7 +13,7 @@
 #include "layout.h"
 
 static gchar *filename = NULL;
-static gboolean show_status = TRUE;
+gboolean show_status = TRUE;
 
 static void
 ps_toggle_cb (GtkToggleButton *togglebutton,

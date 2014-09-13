@@ -94,7 +94,8 @@ am_aplwrap_OBJECTS = aplwrap-aplwrap.$(OBJEXT) aplwrap-menu.$(OBJEXT) \
 	aplwrap-options.$(OBJEXT) aplwrap-apl.$(OBJEXT) \
 	aplwrap-aplio.$(OBJEXT) aplwrap-history.$(OBJEXT) \
 	aplwrap-txtbuf.$(OBJEXT) aplwrap-edit.$(OBJEXT) \
-	aplwrap-complete.$(OBJEXT) aplwrap-pstat.$(OBJEXT)
+	aplwrap-complete.$(OBJEXT) aplwrap-pstat.$(OBJEXT) \
+	aplwrap-resources.$(OBJEXT)
 aplwrap_OBJECTS = $(am_aplwrap_OBJECTS)
 am__DEPENDENCIES_1 =
 aplwrap_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -256,7 +257,7 @@ aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
                   apl.c apl.h aplio.c aplio.h \
                   history.c history.h txtbuf.c txtbuf.h \
                   edit.c edit.h complete.c complete.h \
-                  pstat.c pstat.h
+                  pstat.c pstat.h resources.c resources.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
 aplwrap_LDADD = $(GTK_LIBS)
@@ -356,6 +357,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-menu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-pstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-resources.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-txtbuf.Po@am__quote@
 
 .c.o:
@@ -511,6 +513,20 @@ aplwrap-pstat.obj: pstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pstat.c' object='aplwrap-pstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-pstat.obj `if test -f 'pstat.c'; then $(CYGPATH_W) 'pstat.c'; else $(CYGPATH_W) '$(srcdir)/pstat.c'; fi`
+
+aplwrap-resources.o: resources.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.o -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-resources.Tpo $(DEPDIR)/aplwrap-resources.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='resources.c' object='aplwrap-resources.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
+
+aplwrap-resources.obj: resources.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.obj -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-resources.Tpo $(DEPDIR)/aplwrap-resources.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='resources.c' object='aplwrap-resources.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

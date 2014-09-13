@@ -19,6 +19,7 @@
 #include "aplwrap.h"
 #include "menu.h"
 #include "complete.h"
+#include "resources.h"
 
 static GtkWidget *window;
 static GtkWidget *scroll;
@@ -285,6 +286,8 @@ main (int   argc,
     
   override_name = !have_window_name (argv);
   gtk_init (&argc, &argv);
+
+  restore_resources ();
   
   if (!g_option_context_parse (context, &argc, &argv, &error)) {
     g_warning ("option parsing failed: %s\n", error->message);
@@ -345,6 +348,8 @@ main (int   argc,
   define_tags ();
 
   gtk_widget_show_all (window);
+  set_status_visibility (show_status);
+  
   gtk_main ();
     
   return 0;
