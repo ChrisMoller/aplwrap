@@ -1,5 +1,8 @@
 2014-09-14  Chris Moller  <moller@mollerware.com>
 
+	* aplio.c (update_pstat_strings): Force initial values into pstat
+	info dialogue.
+
 	* menu.c (ps_button_cb): Prevent multiple pstat info dialogues.
 
 2014-09-13  Chris Moller  <moller@mollerware.com>

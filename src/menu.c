@@ -90,6 +90,7 @@ ps_button_cb (GtkToggleButton *togglebutton,
     gtk_grid_attach (GTK_GRID (pstat_grid), lbl, 0, i, 1, 1);
     gtk_grid_attach (GTK_GRID (pstat_grid), val, 1, i, 1, 1);
   }
+  update_pstat_strings ();
   
   gtk_box_pack_start (GTK_BOX (vbox), pstat_grid, FALSE, FALSE, 2);
   gtk_widget_show_all (dialog);

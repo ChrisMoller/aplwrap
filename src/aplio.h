@@ -8,6 +8,8 @@ extern gint apl_out;
 extern gint apl_err;
 extern gint sockfd;
 
+void update_pstat_strings ();
+
 typedef void (*socket_fcn)(gchar *text, void *tw);
   
 gboolean send_apl (const void *buf, size_t len);

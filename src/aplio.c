@@ -341,6 +341,12 @@ apl_read_err (gint         fd,
 }
 
 void
+update_pstat_strings ()
+{
+  update_status_line (format_pstat (&stat_delta));
+}
+
+void
 apl_send_inp (gchar  *text,
               ssize_t sz)
 {
