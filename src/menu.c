@@ -22,21 +22,21 @@ typedef struct {
 } pstat_ety_s;
 
 pstat_ety_s pstat_etys[] = {
-  {"sequence",		NULL},
-  {"∆ wall ticks",	NULL},
-  {"∆ utime",		NULL},
-  {"∆ stime",		NULL},
-  {"∆ vsize",		NULL},
-  {"∆ rsize",		NULL},
-  {"∆ minflt",		NULL},
-  {"∆ majflt",		NULL},
-  {"∆ biowait",		NULL},
-  {"∆ rchar",		NULL},
-  {"∆ wchar",		NULL},
+  {"# sequence",	NULL},
+  {"∆ elapsed time",	NULL},
+  {"∆ user time",	NULL},
+  {"∆ system time",	NULL},
+  {"∆ virtual size",	NULL},
+  {"∆ resident size",	NULL},
+  {"∆ minor faults",	NULL},
+  {"∆ major faults",	NULL},
+  {"∆ block io wait",	NULL},
+  {"∆ read chars",	NULL},
+  {"∆ write chars",	NULL},
   {"∆ read bytes",	NULL},
   {"∆ write bytes",	NULL},
-  {"∆ syscr",		NULL},
-  {"∆ syscw",		NULL},
+  {"∆ syscalls read",	NULL},
+  {"∆ syscalls write",	NULL},
   {"∆ canceled bytes",	NULL},
 };
 
@@ -82,7 +82,7 @@ ps_button_cb (GtkToggleButton *togglebutton,
     GtkWidget *lbl = gtk_label_new (pstat_etys[i].label);
     gtk_misc_set_alignment (GTK_MISC (lbl), 1.0, 0.0);
     GtkWidget *val = gtk_label_new ("");
-    gtk_misc_set_alignment (GTK_MISC (val), 0.0, 0.0);
+    gtk_misc_set_alignment (GTK_MISC (val), 1.0, 0.0);
     pstat_etys[i].value = val;
     gtk_grid_attach (GTK_GRID (grid), lbl, 0, i, 1, 1);
     gtk_grid_attach (GTK_GRID (grid), val, 1, i, 1, 1);

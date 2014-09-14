@@ -6,7 +6,7 @@
 extern gboolean show_status;
 
 #define PSTAT_SEQUENCE			 0
-#define PSTAT_WALL_TICKS		 1
+#define PSTAT_ELAPSED			 1
 #define PSTAT_UTIME			 2
 #define PSTAT_STIME			 3
 #define PSTAT_VSIZE			 4

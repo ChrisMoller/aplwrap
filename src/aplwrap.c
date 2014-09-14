@@ -264,6 +264,7 @@ button_press_event (GtkWidget *widget,
                                                (gint)button_event->y,
                                                &x,
                                                &y);
+        x += gtk_container_get_border_width (GTK_CONTAINER (view));
         gtk_text_view_get_iter_at_position (GTK_TEXT_VIEW (view),
                                             &insert,
                                             &trailing,
