@@ -15,6 +15,7 @@
 
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
+static GtkWidget *pstat_grid = NULL;
 
 typedef struct {
   const gchar *label;
@@ -46,6 +47,7 @@ ps_dialog_cb (GtkDialog *dialog,
 	      gpointer   user_data)
 {
   gtk_widget_destroy (GTK_WIDGET (dialog));
+  pstat_grid = NULL;
 }
 
 void
@@ -62,7 +64,8 @@ ps_button_cb (GtkToggleButton *togglebutton,
   GtkWidget *dialog;
   GtkWidget *content;
   GtkWidget *vbox;
-  GtkWidget *grid;
+
+  if (pstat_grid) return;
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Pstat"),
                                          NULL,
@@ -75,8 +78,8 @@ ps_button_cb (GtkToggleButton *togglebutton,
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (content), vbox);
-  grid = gtk_grid_new ();
-  gtk_grid_set_column_spacing (GTK_GRID (grid), 8);
+  pstat_grid = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 8);
 
   for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
     GtkWidget *lbl = gtk_label_new (pstat_etys[i].label);
@@ -84,11 +87,11 @@ ps_button_cb (GtkToggleButton *togglebutton,
     GtkWidget *val = gtk_label_new ("");
     gtk_misc_set_alignment (GTK_MISC (val), 1.0, 0.0);
     pstat_etys[i].value = val;
-    gtk_grid_attach (GTK_GRID (grid), lbl, 0, i, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), val, 1, i, 1, 1);
+    gtk_grid_attach (GTK_GRID (pstat_grid), lbl, 0, i, 1, 1);
+    gtk_grid_attach (GTK_GRID (pstat_grid), val, 1, i, 1, 1);
   }
   
-  gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), pstat_grid, FALSE, FALSE, 2);
   gtk_widget_show_all (dialog);
 }
 
@@ -109,7 +112,7 @@ settings_cb (GtkWidget *widget,
   GtkWidget *vbox;
   GtkWidget *ps_toggle;
   GtkWidget *ps_button;
-
+  
   dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
                                          NULL,
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
