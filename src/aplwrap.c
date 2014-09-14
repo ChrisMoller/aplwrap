@@ -251,8 +251,33 @@ button_press_event (GtkWidget *widget,
 {
   GdkEventButton *button_event = (GdkEventButton *)event;
 
-  if (button_event->type == GDK_BUTTON_PRESS && button_event->button == 2)
-    return TRUE;
+  if (button_event->type == GDK_BUTTON_PRESS && button_event->button == 2) {
+    GtkClipboard *clipboard = gtk_clipboard_get (GDK_SELECTION_PRIMARY);
+    if (clipboard) {
+      gchar *text = gtk_clipboard_wait_for_text (clipboard);
+      if (text) {
+        gint x, y, trailing;
+        GtkTextIter insert;
+        gtk_text_view_window_to_buffer_coords (GTK_TEXT_VIEW (view),
+                                               GTK_TEXT_WINDOW_WIDGET,
+                                               (gint)button_event->x,
+                                               (gint)button_event->y,
+                                               &x,
+                                               &y);
+        gtk_text_view_get_iter_at_position (GTK_TEXT_VIEW (view),
+                                            &insert,
+                                            &trailing,
+                                            x,
+                                            y);
+        gtk_text_iter_forward_chars (&insert, trailing);
+        gtk_text_buffer_place_cursor (buffer, &insert);
+        if (gtk_text_iter_can_insert (&insert, TRUE))
+          gtk_text_buffer_insert_at_cursor (buffer, text, -1);
+        g_free (text);
+      }
+      return TRUE;
+    }
+  }
 
   return FALSE;				// pass the event on
 }

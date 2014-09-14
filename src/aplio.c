@@ -15,6 +15,7 @@
 #include "history.h"
 #include "options.h"
 #include "edit.h"
+#include "menu.h"
 #include "aplwrap.h"
 #include "pstat.h"
 
@@ -316,8 +317,7 @@ apl_read_err (gint         fd,
         stat_delta.sequence = sequence++;
         update_status_line (format_pstat (&stat_delta));
       }
-      tagged_insert(text, text_idx,
-                    nocolour ? TAG_OUT : (prompt_text ? TAG_PRM : TAG_ERR));
+      tagged_insert(text, text_idx, prompt_text ? TAG_PRM : TAG_ERR);
       if (at_prompt)
         mark_input ();
     }

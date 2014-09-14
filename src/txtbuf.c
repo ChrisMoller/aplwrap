@@ -3,6 +3,7 @@
 
 #include "aplwrap.h"
 #include "txtbuf.h"
+#include "options.h"
 
 GtkTextBuffer *buffer = NULL;
 
@@ -190,27 +191,49 @@ get_input_text (gint *sz)
 void
 define_tags ()
 {
-  tags[TAG_INP] = gtk_text_buffer_create_tag (buffer, "inp_tag",
-                                              "foreground", "blue",
-                                              "editable", FALSE,
-                                              NULL);
-  tags[TAG_ERR] = gtk_text_buffer_create_tag (buffer, "err_tag",
-                                              "foreground", "red",
-                                              "editable", FALSE,
-                                              NULL);
-  tags[TAG_OUT] = gtk_text_buffer_create_tag (buffer, "out_tag",
-                                              "editable", FALSE,
-                                              NULL);
-  tags[TAG_LCK] = tags[TAG_OUT];
+  if (nocolour) {
+   tags[TAG_INP] = gtk_text_buffer_create_tag (buffer, "inp_tag",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_ERR] = gtk_text_buffer_create_tag (buffer, "err_tag",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_OUT] = gtk_text_buffer_create_tag (buffer, "out_tag",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_LCK] = tags[TAG_OUT];
 
-  tags[TAG_PRM] = gtk_text_buffer_create_tag (buffer, "prompt_tag",
-                                              "foreground", "grey",
-                                              "background", "azure",
-                                              "editable", FALSE,
-                                              NULL);
+   tags[TAG_PRM] = gtk_text_buffer_create_tag (buffer, "prompt_tag",
+                                               "editable", FALSE,
+                                               NULL);
 
-  tags[TAG_EDM] = gtk_text_buffer_create_tag (buffer, "editor_message_tag",
-                                              "foreground", "green",
-                                              "editable", FALSE,
-                                              NULL);
+   tags[TAG_EDM] = gtk_text_buffer_create_tag (buffer, "editor_message_tag",
+                                               "editable", FALSE,
+                                               NULL);
+  }
+  else {
+   tags[TAG_INP] = gtk_text_buffer_create_tag (buffer, "inp_tag",
+                                               "foreground", "blue",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_ERR] = gtk_text_buffer_create_tag (buffer, "err_tag",
+                                               "foreground", "red",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_OUT] = gtk_text_buffer_create_tag (buffer, "out_tag",
+                                               "editable", FALSE,
+                                               NULL);
+   tags[TAG_LCK] = tags[TAG_OUT];
+
+   tags[TAG_PRM] = gtk_text_buffer_create_tag (buffer, "prompt_tag",
+                                               "foreground", "grey",
+                                               "background", "azure",
+                                               "editable", FALSE,
+                                               NULL);
+
+   tags[TAG_EDM] = gtk_text_buffer_create_tag (buffer, "editor_message_tag",
+                                               "foreground", "green",
+                                               "editable", FALSE,
+                                               NULL);
+  }
 }

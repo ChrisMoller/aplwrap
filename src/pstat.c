@@ -4,6 +4,7 @@
 #include <sys/time.h>
 
 #include "pstat.h"
+#include "menu.h"
 
 /*
   Get user time, system time, virtual size, resident set size, minor
@@ -149,39 +150,55 @@ format_pstat (pstat *stats)
   pgsz = sysconf(_SC_PAGESIZE);
   /* sequence */
   snprintf(tmp, sizeof(tmp), "%u", stats->sequence);
+  set_pstat_value (PSTAT_SEQUENCE, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "#%s ", commas(tmp));
   /* wall time */
   snprintf(tmp, sizeof(tmp), "%.2f", stats->wall_ticks/100.0);
+  set_pstat_value (PSTAT_WALL_TICKS, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆e: %s ", commas(tmp));
   /* stat */
   snprintf(tmp, sizeof(tmp), "%.2f", stats->utime/(float)tps);
+  set_pstat_value (PSTAT_UTIME, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆u: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%.2f", stats->stime/(float)tps);
+  set_pstat_value (PSTAT_STIME, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆s: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%ld", stats->vsize);
+  set_pstat_value (PSTAT_VSIZE, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆v: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%ld", stats->rssize*pgsz);
+  set_pstat_value (PSTAT_RSIZE, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆r: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->minflt);
+  set_pstat_value (PSTAT_MINFLT, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆f: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->majflt);
+  set_pstat_value (PSTAT_MAJFLT, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆F: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%.2f", stats->biowait/100.0);
+  set_pstat_value (PSTAT_BIOWAIT, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆b: %s ", commas(tmp));
   /* io */
   snprintf(tmp, sizeof(tmp), "%lu", stats->rchar);
+  set_pstat_value (PSTAT_RCHAR, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆rc: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->wchar);
+  set_pstat_value (PSTAT_WCHAR, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆wc: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->read_bytes);
+  set_pstat_value (PSTAT_READ_BYTES, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆rb: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->write_bytes);
+  set_pstat_value (PSTAT_WRITE_BYTES, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆wb: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->syscr);
+  set_pstat_value (PSTAT_SYSCR, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆ic: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->syscw);
+  set_pstat_value (PSTAT_SYSCW, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆oc: %s ", commas(tmp));
   snprintf(tmp, sizeof(tmp), "%lu", stats->cancelled_write_bytes);
+  set_pstat_value (PSTAT_CANCELED_BYTES, tmp);
   out += snprintf(buf+out, sizeof(buf)-out, "∆cw: %s ", commas(tmp));
   return buf;
 }

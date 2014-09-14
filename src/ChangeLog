@@ -1,3 +1,7 @@
+2014-09-13  Chris Moller  <moller@mollerware.com>
+
+	* menu.c (ps_button_cb): Added a pstat popup.
+
 2014-09-12  Chris Moller  <moller@mollerware.com>
 
 	* resources.c (restore_resources): Save and restore resources.

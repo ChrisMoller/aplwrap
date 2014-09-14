@@ -9,11 +9,88 @@
 #include "aplio.h"
 #include "txtbuf.h"
 #include "edit.h"
+#include "pstat.h"
 
 #include "layout.h"
 
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
+
+typedef struct {
+  const gchar *label;
+  GtkWidget   *value;
+} pstat_ety_s;
+
+pstat_ety_s pstat_etys[] = {
+  {"sequence",		NULL},
+  {"∆ wall ticks",	NULL},
+  {"∆ utime",		NULL},
+  {"∆ stime",		NULL},
+  {"∆ vsize",		NULL},
+  {"∆ rsize",		NULL},
+  {"∆ minflt",		NULL},
+  {"∆ majflt",		NULL},
+  {"∆ biowait",		NULL},
+  {"∆ rchar",		NULL},
+  {"∆ wchar",		NULL},
+  {"∆ read bytes",	NULL},
+  {"∆ write bytes",	NULL},
+  {"∆ syscr",		NULL},
+  {"∆ syscw",		NULL},
+  {"∆ canceled bytes",	NULL},
+};
+
+void
+ps_dialog_cb (GtkDialog *dialog,
+	      gint       response_id,
+	      gpointer   user_data)
+{
+  gtk_widget_destroy (GTK_WIDGET (dialog));
+}
+
+void
+set_pstat_value (gint idx, const gchar *val)
+{
+  if (idx >= 0 && idx < PSTAT_MAX && pstat_etys[idx].value) 
+    gtk_label_set_text (GTK_LABEL (pstat_etys[idx].value), val);
+}
+
+static void
+ps_button_cb (GtkToggleButton *togglebutton,
+	      gpointer         user_data)
+{
+  GtkWidget *dialog;
+  GtkWidget *content;
+  GtkWidget *vbox;
+  GtkWidget *grid;
+
+  dialog =  gtk_dialog_new_with_buttons (_ ("Pstat"),
+                                         NULL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         _ ("_Close"), GTK_RESPONSE_ACCEPT,
+                                         NULL);
+  g_signal_connect_swapped (dialog, "response",
+                          G_CALLBACK (ps_dialog_cb),
+                          dialog);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
+  gtk_container_add (GTK_CONTAINER (content), vbox);
+  grid = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (grid), 8);
+
+  for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
+    GtkWidget *lbl = gtk_label_new (pstat_etys[i].label);
+    gtk_misc_set_alignment (GTK_MISC (lbl), 1.0, 0.0);
+    GtkWidget *val = gtk_label_new ("");
+    gtk_misc_set_alignment (GTK_MISC (val), 0.0, 0.0);
+    pstat_etys[i].value = val;
+    gtk_grid_attach (GTK_GRID (grid), lbl, 0, i, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), val, 1, i, 1, 1);
+  }
+  
+  gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 2);
+  gtk_widget_show_all (dialog);
+}
 
 static void
 ps_toggle_cb (GtkToggleButton *togglebutton,
@@ -31,6 +108,7 @@ settings_cb (GtkWidget *widget,
   GtkWidget *content;
   GtkWidget *vbox;
   GtkWidget *ps_toggle;
+  GtkWidget *ps_button;
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
                                          NULL,
@@ -49,6 +127,12 @@ settings_cb (GtkWidget *widget,
   g_signal_connect (ps_toggle, "toggled",
 		    G_CALLBACK (ps_toggle_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
+
+  ps_button = gtk_button_new_with_label (_ ("Open pstat window."));
+  g_signal_connect (ps_button, "clicked",
+		    G_CALLBACK (ps_button_cb), NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), ps_button, FALSE, FALSE, 2);
+
   gtk_widget_show_all (dialog);
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
