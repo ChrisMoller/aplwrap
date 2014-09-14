@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ctype.h>
 
 #include "complete.h"
 #include "aplio.h"
@@ -102,31 +103,50 @@ replace_completion (gchar *text, size_t length, state_t *state)
 static void
 lookup_callback (gchar *result, size_t idx, void *state)
 {
-  /* Parse the next lookup index */
+#if TRACE
+  puts ("lookup");
+#endif
+  /* Check the result for valid UTF-8. */
+  if (!g_utf8_validate (result, idx, NULL)) {
+#if TRACE
+    puts ("invalid UTF-8");
+#endif
+    return;
+  }
+#if TRACE
+  printf ("%.*s", (int)idx, result);
+#endif
+  /* Parse the next lookup index, ignoring possible boxing
+     characters. */
   size_t i = 0, b, e;
-  while (i < idx && result[i] == ' ') ++i;
+  while (i < idx && !isdigit (result[i])) ++i;
   b = i;
-  if (!strncmp(&result[i], "¯", strlen("¯"))) i += strlen("¯");
-  while (i < idx && result[i] >= '0' && result[i] <= '9') ++i;
+  if (!strncmp (&result[i], "¯", strlen ("¯"))) i += strlen ("¯");
+  while (i < idx &&  isdigit (result[i])) ++i;
   e = i;
   if (e == b) {
-    strcpy(((state_t*)state)->position, "0");
+    strcpy (((state_t*)state)->position, "0");
   }
   else if (e-b < PSIZE) {
-    memset(((state_t*)state)->position, 0, PSIZE);
-    strncpy(((state_t*)state)->position, &result[b], e-b);
+    memset (((state_t*)state)->position, 0, PSIZE);
+    strncpy (((state_t*)state)->position, &result[b], e-b);
   }
   if (e > b) {
-    /* Parse the completion text */
-    while (i < idx && result[i] == ' ') ++i;
-    b = i;
-    while (i < idx && result[i] != ' ' && result[i] != '\n') ++i;
-    e = i;
-    /* Update the completion */
+    /* Parse the completion text, ignoring possible boxing
+       characters. */
+    gchar *p = &result[i];
+    gchar *lim = result + idx;
+    while (p < lim && !is_ident_char (g_utf8_get_char (p)))
+      p = g_utf8_next_char (p);
+    b = p - result;
+    while (p < lim &&  is_ident_char (g_utf8_get_char (p)))
+      p = g_utf8_next_char (p);
+    e = p - result;
+    /* Update the completion. */
     if (e-b) {
 #if TRACE
-      printf("completion [%3s] (%2d): %.*s\n", ((state_t*)state)->position,
-             (int)(e-b), (int)(e-b), result+b);
+      printf ("completion [%3s] (%2d): %.*s\n", ((state_t*)state)->position,
+              (int)(e-b), (int)(e-b), result+b);
 #endif
       replace_completion (result+b, e-b, state);
     }
@@ -137,7 +157,7 @@ lookup_callback (gchar *result, size_t idx, void *state)
     beep (); /* no index */
 
   ((state_t*)state)->refresh_context = FALSE;
-  apl_eval_end();
+  apl_eval_end ();
 }
 
 #define LOOKUPEXPR "%s ___ '%.*s'"
@@ -149,8 +169,8 @@ lookup (struct _state *state)
 {
   gchar expr[SIZE];
   int len;
-  len = snprintf(expr, SIZE, LOOKUPEXPR,
-                 state->position, (int)state->prefix_length, state->prefix);
+  len = snprintf (expr, SIZE, LOOKUPEXPR,
+                  state->position, (int)state->prefix_length, state->prefix);
   if (len > 0 && len < SIZE)
     apl_eval (expr, len, lookup_callback, state);
 }
@@ -158,7 +178,10 @@ lookup (struct _state *state)
 static void
 context_callback(gchar *result, size_t idx, void *state)
 {
-  strncpy(((state_t*)state)->position, "0", PSIZE);
+#if TRACE
+  puts ("context");
+#endif
+  strncpy (((state_t*)state)->position, "0", PSIZE);
   lookup (state);
 }
 
@@ -169,8 +192,8 @@ set_context (struct _state *state)
 {
   gchar expr[SIZE];
   int len;
-  len = snprintf(expr, SIZE, CTXEXPR,
-                 (int)state->context_length, state->context);
+  len = snprintf (expr, SIZE, CTXEXPR,
+                  (int)state->context_length, state->context);
   if (len > 0 && len < SIZE)
     apl_eval (expr, len, context_callback, state);
 }
@@ -178,13 +201,21 @@ set_context (struct _state *state)
 static void
 aplfx_callback (gchar *result, size_t idx, void *state)
 {
+#if TRACE
+  puts ("fix");
+#endif
   set_context (state);
 }
 
 static void
 aplck_callback (gchar *result, size_t idx, void *state)
 {
-  if (result[0] == '0')
+#if TRACE
+  puts ("check");
+#endif
+  size_t i = 0;
+  while (i < idx && !isdigit(result[i])) ++i;
+  if (result[i] == '0')
     apl_eval (aplfx, -1, aplfx_callback, state);
   else if (((state_t*)state)->refresh_context)
     set_context (state);
@@ -196,7 +227,7 @@ static void
 run_completer (struct _state *state)
 {
   if (((state_t*)state)->prefix_length > 0)
-    apl_eval(aplck, -1, aplck_callback, state);
+    apl_eval (aplck, -1, aplck_callback, state);
 }
 
 int
@@ -220,7 +251,7 @@ void complete ()
     int prefix_chars = 0;
     
 #if TRACE
-    puts("start completion");
+    puts ("start completion");
 #endif
     /* Establish marks to be used for bounding the completion. */
     gtk_text_buffer_get_end_iter (buffer, &buff_iter);
@@ -257,20 +288,20 @@ void complete ()
 
     if (gtk_text_iter_equal (&cursor_iter, &prefix_iter)) return;
 
-    gtk_text_iter_forward_char(&prefix_iter);
+    gtk_text_iter_forward_char (&prefix_iter);
     --prefix_chars;
     state.prefix_chars = prefix_chars;
 
     while (is_ident_char (gtk_text_iter_get_char (&end_iter)))
-      gtk_text_iter_forward_char(&end_iter);
+      gtk_text_iter_forward_char (&end_iter);
 
     /* Set marks around the identifier to be replaced by
        completion. */
     gtk_text_buffer_move_mark (buffer, completion_begin, &prefix_iter);
     gtk_text_buffer_move_mark (buffer, completion_end, &end_iter);
 
-    while (gtk_text_iter_get_line_offset(&context_iter) > 6)
-      gtk_text_iter_backward_char(&context_iter);
+    while (gtk_text_iter_get_line_offset (&context_iter) > 6)
+      gtk_text_iter_backward_char (&context_iter);
 
     /* Save the previous context and prefix for comparison. */
     if (state.prior_context) g_free (state.prior_context);
@@ -311,13 +342,13 @@ void complete ()
         (state.prior_context && strcmp(state.context, state.prior_context)) ||
         (state.prior_prefix  && strcmp(state.prefix,  state.prior_prefix))) {
 #if TRACE
-      puts("reset");
+      puts ("reset");
 #endif
       state.refresh_context = TRUE;
     }
 
 #if TRACE
-    printf("context: %s\nprefix:  %s\n", state.context, state.prefix);
+    printf ("context: %s\nprefix:  %s\n", state.context, state.prefix);
 #endif
 
     /* Run the completion. */
