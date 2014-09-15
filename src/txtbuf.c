@@ -20,13 +20,13 @@ tagged_insert (char   *text,
                ssize_t text_idx,
                tag_t   tag)
 {
-  gboolean rc;
   GtkTextIter insert_iter;
   GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
   gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
 
   gboolean run = TRUE;
   while (run) {
+    gboolean rc;
     gchar *end = NULL;
     gchar *ptr = text;
     ssize_t remaining  = text_idx;
@@ -51,22 +51,41 @@ tagged_insert (char   *text,
       gunichar c = g_utf8_get_char_validated (ptr, -1);
       gchar *op = ptr;
       ptr = g_utf8_next_char (ptr);
-      if (!g_unichar_isprint (c) && *op != '\n') {
+      if (g_unichar_iscntrl (c) && *op != '\n' && *op != '\r') {
 	gint cl = ptr - op;
-	if (*op == '\a') gdk_beep ();
-	for (int i = 0; i < cl; i++) *op++ = ' ';
+	if (*op == '\a') {
+          gdk_beep ();
+          memmove (op, op+1, text_idx-(ptr-text)+1);
+          --text_idx;
+          --ptr;
+        }
+        else
+          for (int i = 0; i < cl; i++) *op++ = '.';
       }
     }
   }
-  
 
-  gtk_text_buffer_insert_with_tags (buffer,
-				    &insert_iter,
-				    text,
-				    text_idx,
-				    get_tag(tag),
-				    NULL);
-
+  if (strncmp (text+text_idx-7, "\r      ", 7))
+      gtk_text_buffer_insert_with_tags (buffer,
+                                        &insert_iter,
+                                        text,
+                                        text_idx,
+                                        get_tag(tag),
+                                        NULL);
+  else {
+      gtk_text_buffer_insert_with_tags (buffer,
+                                        &insert_iter,
+                                        text,
+                                        text_idx-7,
+                                        get_tag(tag),
+                                        NULL);
+      gtk_text_buffer_insert_with_tags (buffer,
+                                        &insert_iter,
+                                        text+text_idx-7,
+                                        7,
+                                        get_tag(TAG_PRM),
+                                        NULL);
+  }    
   scroll_to_cursor ();
 }
 

@@ -222,6 +222,25 @@ show_about (GtkWidget *widget,
 }
 
 static gboolean
+import_object ()
+{
+  GtkWidget *dialog;
+
+  dialog = gtk_file_chooser_dialog_new ("Import File",
+                                        NULL,
+					GTK_FILE_CHOOSER_ACTION_OPEN,
+                                        _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                        _("_Open"),   GTK_RESPONSE_ACCEPT,
+                                        NULL);
+  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+    gchar *lname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+    g_print ("fn = %s\n", lname);
+  }
+  gtk_widget_destroy (dialog);
+  return TRUE;		/* handled */
+}
+
+static gboolean
 set_filename ()
 {
   gboolean rc = FALSE;
@@ -534,6 +553,14 @@ build_menubar (GtkWidget *vbox)
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+  item = gtk_menu_item_new_with_label (_ ("Import"));
+  g_signal_connect(G_OBJECT (item), "activate",
+		   G_CALLBACK (import_object), NULL);
+  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+  item = gtk_separator_menu_item_new();
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_label (_ ("Save Log"));
   g_signal_connect (G_OBJECT (item), "activate",
