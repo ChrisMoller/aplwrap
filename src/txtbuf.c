@@ -90,6 +90,44 @@ tagged_insert (char   *text,
 }
 
 void
+image_insert (gchar     *text_before,
+              GdkPixbuf *image_pixbuf,
+              gchar     *text_after)
+{
+  GtkTextIter insert_iter, left_iter, right_iter;
+  GtkTextMark *mark;
+  static GtkTextMark *pixbuf_left = 0, *pixbuf_right = 0;
+
+  if (pixbuf_left == NULL) {
+    GtkTextIter start_iter;
+    pixbuf_left = gtk_text_mark_new ("pixbuf-left", TRUE);
+    gtk_text_buffer_get_start_iter (buffer, &start_iter);
+    gtk_text_buffer_add_mark (buffer, pixbuf_left, &start_iter);
+  }
+  if (pixbuf_right == NULL) {
+    GtkTextIter start_iter;
+    pixbuf_right = gtk_text_mark_new ("pixbuf-right", FALSE);
+    gtk_text_buffer_get_start_iter (buffer, &start_iter);
+    gtk_text_buffer_add_mark (buffer, pixbuf_right, &start_iter);
+  }
+
+  tagged_insert (text_before, -1, TAG_OUT);
+  mark = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+  gtk_text_buffer_move_mark (buffer, pixbuf_left, &insert_iter);
+  gtk_text_buffer_insert_pixbuf (buffer, &insert_iter, image_pixbuf);
+  mark = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
+  gtk_text_buffer_move_mark (buffer, pixbuf_right, &insert_iter);
+  gtk_text_buffer_get_iter_at_mark (buffer, &left_iter, pixbuf_left);
+  gtk_text_buffer_get_iter_at_mark (buffer, &right_iter, pixbuf_right);
+  gtk_text_buffer_apply_tag (buffer, get_tag (TAG_OUT),
+                             &left_iter, &right_iter);
+  tagged_insert (text_after, -1, TAG_OUT);
+  scroll_to_cursor ();
+}
+
+void
 handle_history_replacement (gchar *text)
 {
   GtkTextIter start_iter, end_iter;

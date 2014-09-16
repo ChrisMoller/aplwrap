@@ -106,24 +106,9 @@ apl_read_plot_pipe (gint         fd,
     gdk_pixbuf_get_file_info (text, &w, &h);
     GdkPixbuf *pb = gdk_pixbuf_new_from_file (text, NULL);
     if (pb) {
-      GtkTextIter insert_iter;
-      GtkTextMark *mark;
-      
-      mark = gtk_text_buffer_get_insert (buffer);
-      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
-      tagged_insert ("\n", 1, TAG_OUT);
-      
-      mark = gtk_text_buffer_get_insert (buffer);
-      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
-      gtk_text_buffer_insert_pixbuf (buffer, &insert_iter, pb);
+      image_insert ("\n", pb, "\n\n");
       g_object_unref (pb);
       unlink (text);
-
-#define PROMPT_LINE "\n\n      "
-      mark = gtk_text_buffer_get_insert (buffer);
-      gtk_text_buffer_get_iter_at_mark (buffer, &insert_iter, mark);
-      tagged_insert (PROMPT_LINE, -1, TAG_OUT);
-      scroll_to_cursor ();
     }
     g_free (text);
   }

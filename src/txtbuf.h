@@ -25,6 +25,10 @@ void tagged_insert (char   *text,
                     ssize_t text_idx,
                     tag_t   tag);
 
+void image_insert (gchar     *text_before,
+                   GdkPixbuf *image,
+                   gchar     *text_after);
+
 void define_tags ();
 
 #endif
