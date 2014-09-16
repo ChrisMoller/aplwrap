@@ -4,6 +4,7 @@
 #include "aplwrap.h"
 #include "txtbuf.h"
 #include "options.h"
+#include "aplio.h"
 
 GtkTextBuffer *buffer = NULL;
 
@@ -130,24 +131,26 @@ image_insert (gchar     *text_before,
 void
 handle_history_replacement (gchar *text)
 {
-  GtkTextIter start_iter, end_iter;
+  if (is_at_prompt ()) {
+    GtkTextIter start_iter, end_iter;
 
-  // mark
-  gtk_text_buffer_get_end_iter (buffer, &start_iter);
-  gtk_text_iter_set_line_offset (&start_iter, 6);
-  end_iter = start_iter;
-  gtk_text_iter_forward_to_line_end (&end_iter);
+    // mark
+    gtk_text_buffer_get_end_iter (buffer, &start_iter);
+    gtk_text_iter_set_line_offset (&start_iter, 6);
+    end_iter = start_iter;
+    gtk_text_iter_forward_to_line_end (&end_iter);
 
-  // delete
-  gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
+    // delete
+    gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
 
-  // insert
-  gtk_text_buffer_get_end_iter (buffer, &end_iter);
-  gtk_text_buffer_place_cursor (buffer, &end_iter);
-  gtk_text_buffer_insert_at_cursor (buffer, text, strlen(text));
+    // insert
+    gtk_text_buffer_get_end_iter (buffer, &end_iter);
+    gtk_text_buffer_place_cursor (buffer, &end_iter);
+    gtk_text_buffer_insert_at_cursor (buffer, text, strlen(text));
 
-  // reveal
-  scroll_to_cursor ();
+    // reveal
+    scroll_to_cursor ();
+  }
 }
 
 int
