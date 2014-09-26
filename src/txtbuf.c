@@ -10,7 +10,7 @@ GtkTextBuffer *buffer = NULL;
 
 static GtkTextTag* tags[_tag_t_count] = { 0 };
 
-static GtkTextTag*
+GtkTextTag*
 get_tag (tag_t select)
 {
   return (select >= _tag_t_count) ? NULL : tags[select];

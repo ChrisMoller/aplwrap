@@ -28,7 +28,7 @@ static guint out_source = 0;
 static guint err_source = 0;
 static guint plot_source = 0;
 
-gboolean quitting = FALSE;
+static gboolean quitting = FALSE;
 
 void
 aplwrap_quit (GtkWidget *widget,

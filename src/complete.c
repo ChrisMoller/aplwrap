@@ -368,3 +368,13 @@ cursor_to_completion_end ()
     gtk_text_buffer_place_cursor (buffer, &cursor);
   }
 }
+
+void reset_completion_marks ()
+{
+  if (completion_begin && completion_end) {
+    GtkTextIter end_iter;
+    gtk_text_buffer_get_end_iter (buffer, &end_iter);
+    gtk_text_buffer_move_mark (buffer, completion_begin, &end_iter);
+    gtk_text_buffer_move_mark (buffer, completion_end, &end_iter);
+  }
+}

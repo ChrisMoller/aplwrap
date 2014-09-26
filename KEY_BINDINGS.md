@@ -12,6 +12,7 @@ Ctrl-Home, Ctrl-End         beginning/end of buffer
 Up, Down, Left, Right       move by line/character
 Ctrl-Up, Ctrl-Down          beginning/end of previous/next line
 Ctrl-Left, Ctrl-Right       backward/forward word
+Alt-PageUp, Alt-PageDown    backward/forward by APL prompt
 ```
 
 Selection

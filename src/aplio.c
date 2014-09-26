@@ -1,10 +1,10 @@
+#define _GNU_SOURCE 
 #include <gtk/gtk.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <regex.h>
 #include <sys/socket.h>
-#define _GNU_SOURCE 
 #include <stdio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "aplwrap.h"
 #include "pstat.h"
+#include "complete.h"
 
 gint apl_in  = -1;		// to write to apl in
 gint apl_out = -1;		// to read from apl out
@@ -59,6 +60,41 @@ valid_end(char *start, ssize_t size)
 
 #define BUFFER_SIZE     1024
 
+static void
+reader (gint     fd,
+        gchar  **ptext,
+        ssize_t *ptext_idx,
+        gchar   *who)
+{
+  gchar   *text     = *ptext;
+  ssize_t  text_idx = *ptext_idx;
+  gboolean run      =  TRUE;
+
+  while(run) {
+    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
+    if (text) {
+      errno = 0;
+      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
+      if (sz == -1) {
+        if      (errno == EAGAIN) sz = 0;
+        else if (errno == EINTR)  continue;
+        else {
+          char msg[80];
+          snprintf (msg, sizeof(msg), "reader (%s)", who);
+          perror (msg);
+          run = FALSE;
+        }
+      }
+      else
+        text_idx += sz;
+      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
+    }
+    else run = FALSE;
+  }
+  *ptext = text;
+  *ptext_idx = text_idx;
+}
+
 static socket_fcn socket_cb   = NULL;
 static window_s *this_window = NULL;
 
@@ -83,21 +119,7 @@ apl_read_plot_pipe (gint         fd,
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
-
-  gboolean run = TRUE;
-  while(run) {
-    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
-    *text = 0;
-    if (text) {
-      errno = 0;
-      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
-      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
-      if (sz == -1) run = FALSE;
-      text_idx += sz;
-      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
-    }
-    else run = FALSE;
-  }
+  reader (fd, &text, &text_idx, "apl_read_plot_pipe");
   
   if (text_idx > 0) {
     text = g_try_realloc (text, (gsize)(text_idx + 16));
@@ -126,21 +148,7 @@ apl_read_sockid (gint         fd,
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
-
-  gboolean run = TRUE;
-  while(run) {
-    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
-    *text = 0;
-    if (text) {
-      errno = 0;
-      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
-      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
-      if (sz == -1) run = FALSE;
-      text_idx += sz;
-      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
-    }
-    else run = FALSE;
-  }
+  reader (fd, &text, &text_idx, "apl_read_sockid");
   
   if (text_idx > 0) {
     text = g_try_realloc (text, (gsize)(text_idx + 16));
@@ -168,20 +176,7 @@ apl_read_out (gint         fd,
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
-
-  gboolean run = TRUE;
-  while(run) {
-    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
-    if (text) {
-      errno = 0;
-      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
-      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
-      if (sz == -1) run = FALSE;
-      text_idx += sz;
-      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
-    }
-    else run = FALSE;
-  }
+  reader (fd, &text, &text_idx, "apl_read_out");
   
   if (text) {
     if (!eval) {
@@ -258,20 +253,7 @@ apl_read_err (gint         fd,
 {
   static gchar  *text     = NULL;
   static ssize_t text_idx = 0;
-
-  gboolean run = TRUE;
-  while(run) {
-    text = g_try_realloc (text, (gsize)(text_idx + BUFFER_SIZE));
-    if (text) {
-      errno = 0;
-      ssize_t sz = read (fd, &text[text_idx], BUFFER_SIZE);
-      if (sz == -1 && (errno == EAGAIN || errno == EINTR)) continue;
-      if (sz == -1) run = FALSE;
-      text_idx += sz;
-      if (sz < BUFFER_SIZE && valid_end(text, text_idx)) run = FALSE;
-    }
-    else run = FALSE;
-  }
+  reader (fd, &text, &text_idx, "apl_read_err");
 
   if (text) {
     if (!eval) {
@@ -281,6 +263,8 @@ apl_read_err (gint         fd,
          cursor and clearing the line. */
       gboolean prompt_text = text[0] == '\r';
       if (prompt_text) {
+        mark_input ();
+        reset_completion_marks ();
         memmove(text, text+1, --text_idx);
 
 	GtkTextIter line_iter, end_iter;
@@ -303,8 +287,10 @@ apl_read_err (gint         fd,
         update_status_line (format_pstat (&stat_delta));
       }
       tagged_insert(text, text_idx, prompt_text ? TAG_PRM : TAG_ERR);
-      if (at_prompt)
+      if (at_prompt) {
         mark_input ();
+        reset_completion_marks ();
+      }
     }
     else { /* eval */
       eval = !!strncmp("\r      ", text+text_idx-7, 7);

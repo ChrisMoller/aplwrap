@@ -13,6 +13,8 @@ typedef enum {
   _tag_t_count
 } tag_t;
 
+GtkTextTag* get_tag (tag_t select);
+
 void handle_history_replacement (gchar *text);
 
 int handle_copy_down ();

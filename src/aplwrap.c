@@ -55,7 +55,9 @@ aplwrap_count_rows (GdkWindow *event_window,
                                    &first, &ypos, &line_height);
     line_height += gtk_text_view_get_pixels_above_lines (GTK_TEXT_VIEW (view));
     line_height += gtk_text_view_get_pixels_below_lines (GTK_TEXT_VIEW (view));
-    rows = gtk_widget_get_allocated_height (GTK_WIDGET (view)) / line_height;
+    rows = (gtk_widget_get_allocated_height (GTK_WIDGET (view))
+            - gtk_container_get_border_width (GTK_CONTAINER (view)) * 2)
+      / line_height;
     if ( rows != rows_old )
       rows_old = rows_new = rows;
     if (is_at_prompt ()) {
@@ -151,9 +153,30 @@ home_to_end_of_apl_prompt ()
   GtkTextIter line_iter;
   GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
   gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
-  gtk_text_iter_set_line_offset (&line_iter, 6);
+  gtk_text_iter_set_line_offset (&line_iter, 0);
+  while (gtk_text_iter_has_tag (&line_iter, get_tag (TAG_PRM)))
+    gtk_text_iter_forward_char (&line_iter);
   gtk_text_buffer_place_cursor (buffer, &line_iter);
   scroll_to_cursor ();
+}
+
+static void
+advance_by_apl_prompt (gboolean forward)
+{
+  GtkTextIter line_iter;
+  GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
+  gtk_text_iter_set_line_offset (&line_iter, 0);
+  gboolean (*move_fn)(GtkTextIter*) =
+    forward ? gtk_text_iter_forward_line : gtk_text_iter_backward_line;
+  while ((*move_fn) (&line_iter)
+         && (gtk_text_iter_ends_line (&line_iter) /* i.e. empty line */
+             || !gtk_text_iter_has_tag (&line_iter, get_tag (TAG_PRM))))
+    ;
+  if (gtk_text_iter_has_tag (&line_iter, get_tag (TAG_PRM))) {
+    gtk_text_buffer_place_cursor (buffer, &line_iter);
+    home_to_end_of_apl_prompt ();
+  }
 }
 
 static gboolean
@@ -229,6 +252,17 @@ key_press_event (GtkWidget *widget,
 
   if (key_event->keyval == GDK_KEY_Down) {
     handle_history_replacement(history_next());
+    return TRUE;
+  }
+
+  /* Advance by prompt through transcript */
+  if (key_event->keyval == GDK_KEY_Page_Up) {
+    advance_by_apl_prompt (FALSE);
+    return TRUE;
+  }
+
+  if (key_event->keyval == GDK_KEY_Page_Down) {
+    advance_by_apl_prompt (TRUE);
     return TRUE;
   }
 
