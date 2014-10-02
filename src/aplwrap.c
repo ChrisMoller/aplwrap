@@ -340,6 +340,7 @@ void
 update_status_line (gchar *text)
 {
   gtk_label_set_text (GTK_LABEL (status), text);
+  while (gtk_events_pending ()) gtk_main_iteration ();
 }
 
 int
