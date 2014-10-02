@@ -1,3 +1,50 @@
+2014-10-01  David Lamkins <david@lamkins.net>
+
+	No file details for 12 patches covering the following fixes:
+
+	1. [lamkins_prompt_cursor_home.patch] Generalize the
+	home-to-end-of-prompt behavior for all APL prompts; not just the
+	six-space prompt.
+
+	2. [lamkins_output_perror.patch] Correct a bug in error checking
+	for the four output routines and add a perror() call to each to
+	report unexpected errors.
+
+	3. [lamkins_row_count_tweak.patch] Reduce the view height by its
+	borders when calculating the number of full rows in the view.
+
+	4. [lamkins_static_quitting.patch] Scope issue: quitting should
+	have been static in apl.c.
+
+	5. [lamkins_io_rework.patch] Fixed handling of EAGAIN in the
+	various read() routines. Factored out the common read loops into a
+	new reader() routine.
+
+	6. [lamkins_empty_prompt.patch] Fixed an issue that caused an
+	empty quote-quad prompt to make APLwrap's input handling
+	misbehave.
+
+	7. [lamkins_empty_prompt_2.patch] Restore the second call, removed
+	by the previous patch, to mark_input().
+
+	8. [lamkins_completion_reset.patch] Reset the completion marks at
+	each prompt. This prevents the jump-to-end-of-completion key (ESC)
+	from jumping to the end of a previous completion if no completion
+	has been initiated at the current input.
+
+	9. [lamkins_move_by_prompt.patch] Bind Alt-PageUp and Alt-PageDown
+	to move backward and forward by APL prompt through the transcript.
+
+	10. [lamkins_completion_reset_2.patch] Check that completion marks
+	exist before attempting to move them.
+
+	11. [lamkins_move_by_prompt_2.patch] Don't let move-by-prompt get
+	blocked by zero-length lines.
+
+	12. [lamkins_status_draw.patch] Correct an issue in which the
+	transcript could be drawn improperly when the status line is
+	displayed.
+
 2014-09-14  Chris Moller  <moller@mollerware.com>
 
 	* aplio.c (update_pstat_strings): Force initial values into pstat
