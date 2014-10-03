@@ -125,14 +125,14 @@ settings_cb (GtkWidget *widget,
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (content), vbox);
 
-  ps_toggle = gtk_check_button_new_with_label (_ ("Enable pstat line."));
+  ps_toggle = gtk_check_button_new_with_mnemonic (_ ("Enable pstat _line."));
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (ps_toggle),
 				show_status);
   g_signal_connect (ps_toggle, "toggled",
 		    G_CALLBACK (ps_toggle_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
 
-  ps_button = gtk_button_new_with_label (_ ("Open pstat window."));
+  ps_button = gtk_button_new_with_mnemonic (_ ("Open pstat _window."));
   g_signal_connect (ps_button, "clicked",
 		    G_CALLBACK (ps_button_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_button, FALSE, FALSE, 2);
@@ -540,21 +540,21 @@ build_menubar (GtkWidget *vbox)
 
   menu = gtk_menu_new();
 
-  item = gtk_menu_item_new_with_label (_ ("File"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_File"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-  item = gtk_menu_item_new_with_label(_ ("New"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_New"));
   g_signal_connect (G_OBJECT (item), "activate",
                    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Open"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Open"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Import"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Import"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (import_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -562,7 +562,7 @@ build_menubar (GtkWidget *vbox)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Save Log"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("Save _Log"));
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (save_log), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
@@ -588,7 +588,7 @@ build_menubar (GtkWidget *vbox)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label(_ ("Settings"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Settings"));
   g_signal_connect (G_OBJECT (item), "activate",
                    G_CALLBACK (settings_cb), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);  
@@ -599,7 +599,7 @@ build_menubar (GtkWidget *vbox)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Quit"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Quit"));
   g_signal_connect (G_OBJECT (item), "activate",
                    G_CALLBACK (aplwrap_quit), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
@@ -608,11 +608,11 @@ build_menubar (GtkWidget *vbox)
   /********* help menu ********/
 
   menu = gtk_menu_new();
-  item = gtk_menu_item_new_with_label (_ ("Help"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Help"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Keymap"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Keymap"));
   g_signal_connect (G_OBJECT(item), "activate",
                     G_CALLBACK (show_keymap), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
@@ -620,7 +620,7 @@ build_menubar (GtkWidget *vbox)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("About"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_About"));
   g_signal_connect (G_OBJECT(item), "activate",
                     G_CALLBACK (show_about), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);

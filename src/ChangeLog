@@ -1,7 +1,11 @@
-2014-10-03  David B. Lamkins  <dlamkins@kolvir>
+2014-10-03  David B. Lamkins  <david@lamkins.net>
+
+	* menu.c (settings_cb, build_menubar): Add mnemonics to menus and
+	menu items.
 
 	* edit.c (trim_length, edit_function_cb): Strip trailing blanks
 	from function lines.
+	(build_edit_menubar): Add mnemonics to menus and menu items.
 
 2014-10-03  David B. Lamkins  <david@lamkins.net>
 

@@ -215,21 +215,21 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 
   menu = gtk_menu_new();
 
-  item = gtk_menu_item_new_with_label (_ ("File"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_File"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-  item = gtk_menu_item_new_with_label(_ ("New"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_New"));
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Open"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Open"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Clone"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Clone"));
   g_signal_connect(G_OBJECT (item), "activate",
   		   G_CALLBACK (clone_object), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -239,7 +239,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 		   G_CALLBACK (edit_save), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Export File"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Export File"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (save_log), tb->buffer);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -252,7 +252,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
-  item = gtk_menu_item_new_with_label (_ ("Close"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Close"));
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (edit_delete), tw);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
