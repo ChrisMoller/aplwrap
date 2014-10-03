@@ -1,5 +1,10 @@
 2014-10-03  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (open_object_cb): Fit edit object selector to width of
+	longest name.
+
+2014-10-03  David B. Lamkins  <david@lamkins.net>
+
 	* menu.c (settings_cb, build_menubar): Add mnemonics to menus and
 	menu items.
 

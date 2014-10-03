@@ -493,6 +493,9 @@ open_object_cb (gchar *text, void *tw)
   gtk_tree_view_append_column (GTK_TREE_VIEW (names_tree), column); 
 
   GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+                                  GTK_POLICY_NEVER,
+                                  GTK_POLICY_AUTOMATIC);
   gtk_widget_set_size_request (scroll, -1, 300);
   gtk_container_add (GTK_CONTAINER (scroll), names_tree);
   gtk_container_add (GTK_CONTAINER (content), scroll);
