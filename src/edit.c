@@ -215,7 +215,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 
   menu = gtk_menu_new();
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_File"));
+  item = gtk_menu_item_new_with_label (_ ("File"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
@@ -229,7 +229,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Clone"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
   g_signal_connect(G_OBJECT (item), "activate",
   		   G_CALLBACK (clone_object), tw);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);

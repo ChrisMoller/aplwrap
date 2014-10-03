@@ -540,7 +540,7 @@ build_menubar (GtkWidget *vbox)
 
   menu = gtk_menu_new();
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_File"));
+  item = gtk_menu_item_new_with_label (_ ("File"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
@@ -608,7 +608,7 @@ build_menubar (GtkWidget *vbox)
   /********* help menu ********/
 
   menu = gtk_menu_new();
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Help"));
+  item = gtk_menu_item_new_with_label (_ ("Help"));
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
