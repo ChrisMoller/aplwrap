@@ -17,12 +17,14 @@ static gint seq_nr = 1;
 static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
-  GtkTextIter line_iter;
+  GtkTextIter line_iter, end_iter;
   GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
   gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
   gint line_nr = gtk_text_iter_get_line (&line_iter);
   gint offset  = gtk_text_iter_get_line_offset (&line_iter);
-  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer);
+  gtk_text_buffer_get_end_iter (tb->buffer, &end_iter);
+  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer) -
+    (gtk_text_iter_get_line_offset (&end_iter) == 0);
   gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
   
   gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
@@ -290,6 +292,17 @@ edit_key_press_event (GtkWidget *widget,
   return rc;
 }
 
+static gint
+trim_length (const gchar *text) {
+  gint r = 0, i = 0;
+  while (text[i]) {
+    if (! g_ascii_isspace (text[i]))
+      r = i;
+    ++i;
+  }
+  return r + 1;
+}
+
 static void
 edit_function_cb (gchar *text, void *data)
 {
@@ -300,7 +313,9 @@ edit_function_cb (gchar *text, void *data)
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 1; lines[i]; i++) {
     if (!g_strcmp0 (lines[i], END_TAG)) break;
-    gtk_text_buffer_insert_at_cursor (tb->buffer, lines[i], -1);
+    gtk_text_buffer_insert_at_cursor (tb->buffer,
+                                      lines[i],
+                                      trim_length (lines[i]));
     gtk_text_buffer_insert_at_cursor (tb->buffer, "\n", -1);
   }
   g_strfreev (lines);

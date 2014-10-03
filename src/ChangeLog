@@ -1,3 +1,12 @@
+2014-10-03  David B. Lamkins  <dlamkins@kolvir>
+
+	* edit.c (trim_length, edit_function_cb): Strip trailing blanks
+	from function lines.
+
+2014-10-03  David B. Lamkins  <david@lamkins.net>
+
+	* edit.c (set_status_line): Correct line count in status line.
+
 2014-10-03  David B. Lamkins  <david@lamkins.net>
 
 	* edit.h (struct buffer_s): Removed modified member; we now rely
