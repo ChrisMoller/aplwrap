@@ -23,12 +23,22 @@ set_status_line (window_s *tw, buffer_s *tb)
   gint line_nr = gtk_text_iter_get_line (&line_iter);
   gint offset  = gtk_text_iter_get_line_offset (&line_iter);
   gint line_ct = gtk_text_buffer_get_line_count (tb->buffer);
+  gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
   
   gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
-			       tb->modified ? "**" : "  ",
-			       line_nr + 1, line_ct, offset + 1);
+			       modified ? "**" : "  ",
+			       line_nr, line_ct, offset);
   gtk_label_set_text (GTK_LABEL (status (tw)), st);
   g_free (st);
+}
+
+static void
+edit_mark_set_event (GtkTextBuffer *buffer, GtkTextIter *location,
+                     GtkTextMark *mark, gpointer data)
+{
+  window_s *tw = (window_s*)data;
+  buffer_s *tb = tw->buffer;
+  set_status_line (tw, tb);
 }
 
 static void
@@ -67,7 +77,6 @@ edit_save_cb (gchar *text, void *data)
   if (data) {
     window_s *tw = data;
     buffer_s *tb = buffer (tw);
-    tb->modified = FALSE;
     set_status_line (tw, tb);
   }
 #endif
@@ -134,7 +143,7 @@ edit_delete_real (GtkWidget *widget,
   window_s *tw = data;
 
   buffer_s *tb = buffer (tw);
-  if (tb->modified) {
+  if (gtk_text_buffer_get_modified (tb->buffer)) {
     GtkWidget *e_dialog;
     gint response;
     e_dialog = gtk_message_dialog_new (NULL,
@@ -268,10 +277,6 @@ edit_key_press_event (GtkWidget *widget,
   if (key_event->state & GDK_MOD1_MASK)
     res = handle_apl_characters (&bw, key_event);
 
-  if (res || g_ascii_isprint (key_event->keyval)) tb->modified = TRUE;
-
-  set_status_line (tw, tb);
-
   // if (!(key_event->state & GDK_MOD1_MASK)) return FALSE;
 
   if (res) {
@@ -279,6 +284,8 @@ edit_key_press_event (GtkWidget *widget,
     g_free (res);
     rc = TRUE;
   }
+
+  set_status_line (tw, tb);
 
   return rc;
 }
@@ -297,6 +304,10 @@ edit_function_cb (gchar *text, void *data)
     gtk_text_buffer_insert_at_cursor (tb->buffer, "\n", -1);
   }
   g_strfreev (lines);
+  gtk_text_buffer_set_modified (tb->buffer, FALSE);
+  GtkTextIter start_iter;
+  gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+  gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
 }
 
 static void
@@ -357,7 +368,6 @@ edit_object (gchar* name, gint nc)
   if (!this_buffer) {
     this_buffer = g_malloc (sizeof(buffer_s));
     this_buffer->buffer = gtk_text_buffer_new (NULL);
-    this_buffer->modified = FALSE;
     this_buffer->name = lname;
     this_buffer->ref_count = 1;
     this_buffer->nc = name ? nc : NC_FUNCTION; // fixme
@@ -394,6 +404,10 @@ edit_object (gchar* name, gint nc)
 
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (edit_key_press_event), this_window);
+
+  g_signal_connect_after (this_buffer->buffer, "mark-set",
+		    G_CALLBACK (edit_mark_set_event), this_window);
+
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);

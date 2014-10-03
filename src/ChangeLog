@@ -1,3 +1,15 @@
+2014-10-03  David B. Lamkins  <david@lamkins.net>
+
+	* edit.h (struct buffer_s): Removed modified member; we now rely
+	upon the GtkTextBuffer's modification query.
+
+	* edit.c (set_status_line, edit_mark_set_event, edit_save_cb)
+	(edit_delete_real, edit_key_press_event, edit_function_cb, )
+	(edit_object): Line and column numbers are now displayed in origin
+	0. Line and column numbers update in sync with cursor movement,
+	whether via keyboard or mouse. Edit window opens with cursor at
+	<0,0>.
+
 2014-10-01  David Lamkins <david@lamkins.net>
 
 	No file details for 12 patches covering the following fixes:

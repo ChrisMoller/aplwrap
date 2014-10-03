@@ -3,7 +3,6 @@
 
 typedef struct {
   GtkTextBuffer *buffer;
-  gboolean modified;
   gchar *name;
   gint ref_count;
   gint nc;
