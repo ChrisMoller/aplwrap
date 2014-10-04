@@ -221,8 +221,8 @@ show_about (GtkWidget *widget,
 
 }
 
-static gboolean
-import_object ()
+gboolean
+import_file ()
 {
   GtkWidget *dialog;
 
@@ -234,27 +234,27 @@ import_object ()
                                         NULL);
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
     gchar *lname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    g_print ("fn = %s\n", lname);
+    edit_file (lname);
   }
   gtk_widget_destroy (dialog);
   return TRUE;		/* handled */
 }
 
-static gboolean
-set_filename ()
+gboolean
+set_filename (const gchar *prompt, gchar **filename)
 {
   gboolean rc = FALSE;
   GtkWidget *dialog;
   gchar *lname = NULL;
   gchar * dirname;
 
-  dialog = gtk_file_chooser_dialog_new ("Save Log",
+  dialog = gtk_file_chooser_dialog_new (prompt,
                                         NULL,
                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Save"),   GTK_RESPONSE_ACCEPT,
                                         NULL);
-  if (filename) dirname = g_path_get_dirname (filename);
+  if (*filename) dirname = g_path_get_dirname (*filename);
   else dirname = g_strdup (".");
   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), dirname);
   g_free (dirname);
@@ -300,8 +300,8 @@ set_filename ()
     else run = FALSE;
   }
   if (lname) {
-    if (filename) g_free (filename);
-    filename = lname;
+    if (*filename) g_free (*filename);
+    *filename = lname;
     rc = TRUE;
   }
   gtk_widget_destroy (dialog);
@@ -350,7 +350,7 @@ save_log (GtkWidget *widget,
 	  gpointer   data)
 {
   GtkTextBuffer *lbuffer = data ? : buffer;
-  gboolean doit = filename ? TRUE : set_filename ();
+  gboolean doit = filename ? TRUE : set_filename ("Save Log", &filename);
   if (doit) save_log_fer_real (lbuffer);
 }
 
@@ -359,7 +359,7 @@ save_log_as (GtkWidget *widget,
 	     gpointer   data)
 {
   GtkTextBuffer *lbuffer = data ? : buffer;
-  gboolean doit = set_filename ();
+  gboolean doit = set_filename ("Save Log", &filename);
   if (doit) save_log_fer_real (lbuffer);
 }
 
@@ -552,14 +552,14 @@ build_menubar (GtkWidget *vbox)
                    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Open"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Open Object"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Import"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("Open F_ile"));
   g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (import_object), NULL);
+		   G_CALLBACK (import_file), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
   item = gtk_separator_menu_item_new();

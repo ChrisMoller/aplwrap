@@ -1,5 +1,19 @@
 2014-10-03  David B. Lamkins  <david@lamkins.net>
 
+	* menu.h (): Implemented file Open, Save and Save As.
+
+	* edit.h (): Implemented file Open, Save and Save As.
+
+	* menu.c (import_file, set_filename, save_log, save_log_as)
+	(build_menubar): Implemented file Open, Save and Save As.
+
+	* edit.c (set_status_line, edit_save_object_cb)
+	(edit_save_object, clone_file, edit_save_file, edit_save_file_as)
+	(edit_delete_real, edit_delete_event, build_edit_menubar)
+	(edit_object, edit_file): Implemented file Open, Save and Save As.
+
+2014-10-03  David B. Lamkins  <david@lamkins.net>
+
 	* menu.c (open_object_cb): Fit edit object selector to width of
 	longest name.
 

@@ -62,7 +62,7 @@ edit_close (GtkWidget *widget,
 }
 
 static void
-edit_save_cb (gchar *text, void *data)
+edit_save_object_cb (gchar *text, void *data)
 {
   set_send_cb (NULL, NULL);
   gchar **lines = g_strsplit (text, "\n", 0);
@@ -95,8 +95,8 @@ clone_object (GtkWidget *widget,
 }
 
 static void
-edit_save (GtkWidget *widget,
-	   gpointer  data)
+edit_save_object (GtkWidget *widget,
+                  gpointer  data)
 {
   window_s *tw = data;
   buffer_s *tb = buffer (tw);
@@ -114,7 +114,7 @@ edit_save (GtkWidget *widget,
 
   // widget is just serving as a flag as to whether the window is being closed
 #define DEF_CMD "def\n"
-  set_send_cb (edit_save_cb, (widget == NULL) ? NULL : tw);
+  set_send_cb (edit_save_object_cb, (widget == NULL) ? NULL : tw);
   send_apl (DEF_CMD, strlen (DEF_CMD));
 
   gchar *ptr     = text;
@@ -127,6 +127,56 @@ edit_save (GtkWidget *widget,
   }
   g_free (text);
   send_apl (END_TAGNL, strlen(END_TAGNL));
+}
+
+static void
+clone_file (GtkWidget *widget,
+	      gpointer  data)
+{
+  window_s *tw = data;
+
+  edit_file (path (tw));
+}
+
+static void
+edit_save_file (GtkWidget *widget,
+                gpointer  data)
+{
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+  if (path (tw) || set_filename("Save File", &(path (tw)))) {
+    GtkTextIter start_iter, end_iter;
+    gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+    gtk_text_buffer_get_end_iter (tb->buffer, &end_iter);
+    gchar *text =
+      gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
+    g_file_set_contents (path (tw), text, -1, NULL);
+    gtk_text_buffer_set_modified (tb->buffer, FALSE);
+    set_status_line (tw, tb);
+  }
+}
+
+static void
+edit_save_file_as (GtkWidget *widget,
+                   gpointer  data)
+{
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+  if (set_filename ("Save File", &(path (tw)))) {
+    GtkTextIter start_iter, end_iter;
+    gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+    gtk_text_buffer_get_end_iter (tb->buffer, &end_iter);
+    gchar *text =
+      gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
+    g_file_set_contents (path (tw), text, -1, NULL);
+    gtk_text_buffer_set_modified (tb->buffer, FALSE);
+    set_status_line (tw, tb);
+    gchar *lname = g_path_get_basename (path (tw));
+    gtk_window_set_title (GTK_WINDOW (window (tw)), lname);
+    g_hash_table_remove (buffers, tb->name);
+    tb->name = lname;
+    g_hash_table_insert (buffers, tb->name, tb);
+  }
 }
 
 static gboolean
@@ -143,7 +193,6 @@ edit_delete_real (GtkWidget *widget,
    * a "delete-event". */
   
   window_s *tw = data;
-
   buffer_s *tb = buffer (tw);
   if (gtk_text_buffer_get_modified (tb->buffer)) {
     GtkWidget *e_dialog;
@@ -171,7 +220,10 @@ edit_delete_real (GtkWidget *widget,
       return FALSE;			// close without saving
       break;
     case GTK_RESPONSE_YES:
-      edit_save (NULL, tw);
+      if (path (tw))
+        edit_save_file (NULL, tw);
+      else
+        edit_save_object (NULL, tw);
       return FALSE;			// close
       break;
     }
@@ -188,7 +240,9 @@ edit_delete_event (GtkWidget *widget,
 		   GdkEvent  *event,
 		   gpointer   data)
 {
-  return edit_delete_real (widget, data);
+  gboolean rc = edit_delete_real (widget, data);
+  if (!rc) edit_close (widget, data);
+  return rc;
 }
 
 /***
@@ -224,31 +278,56 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 		    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Open"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Open Object"));
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
+  item = gtk_menu_item_new_with_mnemonic (_ ("Open F_ile"));
   g_signal_connect(G_OBJECT (item), "activate",
-  		   G_CALLBACK (clone_object), tw);
+		   G_CALLBACK (import_file), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic ("_Save");
-  g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (edit_save), tw);
-  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+  if (!path (tw)) {
+    /* Menu items for object clone/save/export */
+    item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (clone_object), tw);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Export File"));
-  g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (save_log), tb->buffer);
-  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    item = gtk_menu_item_new_with_mnemonic ("_Save");
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (edit_save_object), tw);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
-  item = gtk_menu_item_new_with_label (_ ("Export File As"));
-  g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (save_log_as), tb->buffer);
-  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
-  
+    item = gtk_menu_item_new_with_mnemonic (_ ("_Export File"));
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (save_log), tb->buffer);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+    item = gtk_menu_item_new_with_label (_ ("Export File As"));
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (save_log_as), tb->buffer);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+  }
+  else {
+    /* Menu items for file clone/save */
+    item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (clone_file), tw);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+    item = gtk_menu_item_new_with_mnemonic ("_Save");
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (edit_save_file), tw);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+
+    item = gtk_menu_item_new_with_mnemonic ("Save As");
+    g_signal_connect(G_OBJECT (item), "activate",
+                     G_CALLBACK (edit_save_file_as), tw);
+    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+  }
+
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
@@ -358,7 +437,7 @@ edit_object (gchar* name, gint nc)
   gchar *lname =
     name ? g_strdup (name) : g_strdup_printf ("Unnamed_%d", seq_nr++);
 
-  this_window = g_malloc (sizeof(window_s));
+  this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   window (this_window) = window;
@@ -401,6 +480,100 @@ edit_object (gchar* name, gint nc)
 	send_apl (cmd, strlen(cmd));
 	g_free (cmd);
       }
+    }
+  }
+
+  buffer (this_window) = this_buffer;
+
+  build_edit_menubar (vbox, this_window);
+
+  g_signal_connect (window, "delete-event",
+		      G_CALLBACK (edit_delete_event), this_window);
+
+  g_signal_connect (window, "destroy",
+		    G_CALLBACK (edit_close), this_window);
+  
+  view = gtk_text_view_new_with_buffer (this_buffer->buffer);
+  gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
+
+  g_signal_connect (view, "key-press-event",
+		    G_CALLBACK (edit_key_press_event), this_window);
+
+  g_signal_connect_after (this_buffer->buffer, "mark-set",
+		    G_CALLBACK (edit_mark_set_event), this_window);
+
+  if (desc) gtk_widget_override_font (view, desc);
+  gtk_container_add (GTK_CONTAINER (scroll), view);
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
+  
+  status (this_window) = gtk_label_new ("status");
+  gtk_misc_set_alignment (GTK_MISC (status (this_window)), 0.0, 0.0);
+  set_status_line (this_window, this_buffer);
+
+  gtk_box_pack_start (GTK_BOX (vbox), status (this_window), FALSE, FALSE, 2);
+  
+  gtk_widget_show_all (window);
+}
+
+/* FIX: edit_file() started life as a copy of edit_object(). Factor
+   out the common code. */
+void
+edit_file (gchar *path)
+{
+  GtkWidget *vbox;
+  GtkWidget *scroll;
+  GtkWidget *view;
+  PangoFontDescription *desc = NULL;
+  window_s *this_window = NULL;
+  buffer_s *this_buffer = NULL;
+  GtkWidget *window;
+
+  if (!buffers) buffers = g_hash_table_new (g_str_hash, g_str_equal);
+
+  gchar *name = g_path_get_basename (path);
+  gchar *lname =
+    name ? g_strdup (name) : g_strdup_printf ("Unnamed_%d", seq_nr++);
+
+  this_window = g_malloc0 (sizeof(window_s));
+  
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  window (this_window) = window;
+  path (this_window) = path;
+  gtk_window_set_title (GTK_WINDOW (window), name ? : "Unnamed");
+  gtk_window_set_default_size (GTK_WINDOW (window), width, height);
+
+  gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
+  gtk_container_add (GTK_CONTAINER (window), vbox);
+  
+  desc =
+    pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
+  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
+
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+
+  if (g_hash_table_contains (buffers, lname)) {
+    this_buffer = g_hash_table_lookup (buffers, lname);
+    this_buffer->ref_count++;
+  }
+  
+  if (!this_buffer) {
+    this_buffer = g_malloc (sizeof(buffer_s));
+    this_buffer->buffer = gtk_text_buffer_new (NULL);
+    this_buffer->name = lname;
+    this_buffer->ref_count = 1;
+    g_hash_table_insert (buffers, this_buffer->name, this_buffer);
+
+    gchar *text;
+    if (g_file_get_contents (path, &text, NULL, NULL)) {
+      gtk_text_buffer_set_text (this_buffer->buffer, text, -1);
+      gtk_text_buffer_set_modified (this_buffer->buffer, FALSE);
+      GtkTextIter start_iter;
+      gtk_text_buffer_get_start_iter (this_buffer->buffer, &start_iter);
+      gtk_text_buffer_place_cursor (this_buffer->buffer, &start_iter);
+    }
+    else {
+      // FINISH: report error
     }
   }
 
