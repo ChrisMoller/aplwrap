@@ -221,6 +221,23 @@ show_about (GtkWidget *widget,
 
 }
 
+static GSList *shortcuts = NULL;
+
+static void
+remember_shortcut (char *path)
+{
+  if (!g_slist_find (shortcuts, path))
+    shortcuts = g_slist_prepend(shortcuts, path);
+}
+
+static void
+add_shortcut (gpointer data, gpointer user_data)
+{
+  gchar *path = data;
+  GtkFileChooser *chooser = user_data;
+  gtk_file_chooser_add_shortcut_folder (chooser, path, NULL);
+}
+
 gboolean
 import_file ()
 {
@@ -240,8 +257,10 @@ import_file ()
   gtk_file_filter_add_mime_type (filter_text, "text/*");
   gtk_file_filter_set_name (filter_text, "Text files");
   gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter_text);
+  g_slist_foreach (shortcuts, add_shortcut, dialog);
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
     gchar *lname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+    remember_shortcut (g_path_get_dirname (lname));
     edit_file (lname);
   }
   gtk_widget_destroy (dialog);

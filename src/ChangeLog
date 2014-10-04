@@ -1,5 +1,8 @@
 2014-10-04  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (remember_shortcut, add_shortcut, import_file): Remember
+	recently used folders as sidebar shortcuts in Open File dialog.
+
 	* edit.h (): Keep function editor window open upon syntax error.
 
 	* edit.c (edit_close, edit_save_object, edit_delete_real): Keep
