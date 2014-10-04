@@ -13,11 +13,15 @@ typedef struct {
   GtkWidget *status_line;
   buffer_s  *buffer;
   gchar     *path;
+  gboolean   error;
+  gboolean   cb_done;
 } window_s;
 #define window(w) (w)->window
 #define buffer(w) (w)->buffer
 #define status(w) (w)->status_line
 #define path(w)   (w)->path
+#define error(w)  (w)->error
+#define cb_done(w) (w)->cb_done
 
 void edit_object (gchar* name, gint nc);
 

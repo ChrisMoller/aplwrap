@@ -1,4 +1,9 @@
-2014-10-04  David B. Lamkins  <dlamkins@logrus>
+2014-10-04  David B. Lamkins  <david@lamkins.net>
+
+	* edit.h (): Keep function editor window open upon syntax error.
+
+	* edit.c (edit_close, edit_save_object, edit_delete_real): Keep
+	function editor window open upon syntax error.
 
 	* menu.c (import_file): Add filters to the Open File dialog.
 

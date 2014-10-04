@@ -48,7 +48,8 @@ edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
   window_s *tw = data;
-  if (!gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
+  // DBL - is error check useful here?
+  if (!error (tw) && !gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
     buffer_s *tb = buffer (tw);
     tb->ref_count--;
     if (0 == tb->ref_count) {
@@ -64,24 +65,58 @@ edit_close (GtkWidget *widget,
 static void
 edit_save_object_cb (gchar *text, void *data)
 {
+  window_s *tw = data;
   set_send_cb (NULL, NULL);
+  error (tw) = FALSE;
+  gchar *error_text = NULL;
   gchar **lines = g_strsplit (text, "\n", 0);
   for (int i = 0; lines[i]; i++) {
     if (!*lines[i]) continue;
+    if (!error (tw) && !g_ascii_strncasecmp (lines[i], "error", 5)) {
+      error (tw) = TRUE;
+      continue;
+    }
     if (!g_strcmp0 (lines[i], END_TAG)) break;
-    tagged_insert (lines[i], -1, TAG_EDM);
-    tagged_insert (" ", -1, TAG_EDM);
+    if (error (tw)) {
+      if (!error_text)
+        error_text = g_strdup (lines[i]);
+      else {
+        gchar *new_error_text =
+          g_strconcat (error_text, "\n", lines[i], NULL);
+        g_free (error_text);
+        error_text = new_error_text;
+      }
+    }
+    else {
+      tagged_insert (lines[i], -1, TAG_EDM);
+      tagged_insert (" ", -1, TAG_EDM);
+    }
   }
   g_strfreev (lines);
-  tagged_insert ("\n      ", -1, TAG_PRM);
-  mark_input ();
-#if 1
-  if (data) {
-    window_s *tw = data;
-    buffer_s *tb = buffer (tw);
+  if (error_text) {
+    GtkWidget *dialog =
+      gtk_message_dialog_new (NULL,
+                              GTK_DIALOG_MODAL,
+                              GTK_MESSAGE_WARNING,
+                              GTK_BUTTONS_CLOSE,
+                              "APL error while defining function");
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                              "%s",
+                                              error_text);
+    gtk_dialog_run (GTK_DIALOG(dialog));
+    gtk_widget_destroy (dialog);
+    g_free (error_text);
+  }
+  else {
+    tagged_insert ("\n      ", -1, TAG_PRM);
+    mark_input ();
+  }
+  buffer_s *tb = buffer (tw);
+  if (!error (tw)) {
+    gtk_text_buffer_set_modified (tb->buffer, FALSE);
     set_status_line (tw, tb);
   }
-#endif
+  cb_done (tw) = TRUE;
 }
 
 static void
@@ -112,9 +147,9 @@ edit_save_object (GtkWidget *widget,
       gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
   }
 
-  // widget is just serving as a flag as to whether the window is being closed
 #define DEF_CMD "def\n"
-  set_send_cb (edit_save_object_cb, (widget == NULL) ? NULL : tw);
+  cb_done (tw) = FALSE;
+  set_send_cb (edit_save_object_cb, tw);
   send_apl (DEF_CMD, strlen (DEF_CMD));
 
   gchar *ptr     = text;
@@ -194,7 +229,8 @@ edit_delete_real (GtkWidget *widget,
   
   window_s *tw = data;
   buffer_s *tb = buffer (tw);
-  if (gtk_text_buffer_get_modified (tb->buffer)) {
+  gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
+  if (modified) {
     GtkWidget *e_dialog;
     gint response;
     e_dialog = gtk_message_dialog_new (NULL,
@@ -222,8 +258,15 @@ edit_delete_real (GtkWidget *widget,
     case GTK_RESPONSE_YES:
       if (path (tw))
         edit_save_file (NULL, tw);
-      else
+      else {
+        cb_done (tw) = FALSE;
         edit_save_object (NULL, tw);
+        while (!cb_done (tw)) {
+          while (gtk_events_pending ()) gtk_main_iteration ();
+          g_usleep(10000);
+        }
+        if (error (tw)) return TRUE;	// abort close if APL error
+      }
       return FALSE;			// close
       break;
     }
