@@ -226,12 +226,20 @@ import_file ()
 {
   GtkWidget *dialog;
 
-  dialog = gtk_file_chooser_dialog_new ("Import File",
+  dialog = gtk_file_chooser_dialog_new ("Open File",
                                         NULL,
 					GTK_FILE_CHOOSER_ACTION_OPEN,
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Open"),   GTK_RESPONSE_ACCEPT,
                                         NULL);
+  GtkFileFilter *filter_apl = gtk_file_filter_new ();
+  gtk_file_filter_add_pattern (filter_apl, "*.apl");
+  gtk_file_filter_set_name (filter_apl, "APL files");
+  gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter_apl);
+  GtkFileFilter *filter_text = gtk_file_filter_new ();
+  gtk_file_filter_add_mime_type (filter_text, "text/*");
+  gtk_file_filter_set_name (filter_text, "Text files");
+  gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter_text);
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
     gchar *lname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     edit_file (lname);

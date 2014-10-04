@@ -1,3 +1,7 @@
+2014-10-04  David B. Lamkins  <dlamkins@logrus>
+
+	* menu.c (import_file): Add filters to the Open File dialog.
+
 2014-10-03  David B. Lamkins  <david@lamkins.net>
 
 	* menu.h (): Implemented file Open, Save and Save As.
