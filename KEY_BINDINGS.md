@@ -57,6 +57,26 @@ Alt-Up                      previous history entry
 Alt-Dn                      next history entry
 ```
 
+Menu Accelerators, main window
+------------------------------
+
+```
+Ctrl-N                      create a new APL object
+Ctrl-O                      open an APL object for editing
+Ctrl-I                      import a text file for editing
+Ctrl-K                      display the APL keyboard map
+```
+
+Menu Accelerators, edit window
+------------------------------
+
+```
+Ctrl-N                      create a new APL object
+Ctrl-O                      open an APL object for editing
+Ctrl-I                      import a text file for editing
+Ctrl-S                      save an edit window
+```
+
 APL
 ---
 

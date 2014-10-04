@@ -1,5 +1,14 @@
 2014-10-04  David B. Lamkins  <david@lamkins.net>
 
+	* aplwrap.c (key_press_event): Add keyboard accellerators for
+	commonly used menu items.
+
+	* menu.c (build_menubar): Add keyboard accellerators for commonly
+	used menu items.
+
+	* edit.c (build_edit_menubar): Add keyboard accellerators for
+	commonly used menu items.
+
 	* menu.c (remember_shortcut, add_shortcut, import_file): Remember
 	recently used folders as sidebar shortcuts in Open File dialog.
 

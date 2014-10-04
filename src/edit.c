@@ -308,6 +308,10 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   GtkWidget *item;
 
   buffer_s *tb = buffer (tw);
+
+  GtkAccelGroup *accel_group = gtk_accel_group_new ();
+  gtk_window_add_accel_group (GTK_WINDOW (window (tw)), accel_group);
+
   menubar = gtk_menu_bar_new();
 
   menu = gtk_menu_new();
@@ -317,16 +321,22 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
   item = gtk_menu_item_new_with_mnemonic (_ ("_New"));
+  gtk_widget_add_accelerator (item, "activate", accel_group,
+                              GDK_KEY_n, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   g_signal_connect (G_OBJECT (item), "activate",
 		    G_CALLBACK (new_object), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_mnemonic (_ ("_Open Object"));
+  gtk_widget_add_accelerator (item, "activate", accel_group,
+                              GDK_KEY_o, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (open_object), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
   item = gtk_menu_item_new_with_mnemonic (_ ("Open F_ile"));
+  gtk_widget_add_accelerator (item, "activate", accel_group,
+                              GDK_KEY_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   g_signal_connect(G_OBJECT (item), "activate",
 		   G_CALLBACK (import_file), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -339,6 +349,8 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
     gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
     item = gtk_menu_item_new_with_mnemonic ("_Save");
+    gtk_widget_add_accelerator (item, "activate", accel_group,
+                                GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     g_signal_connect(G_OBJECT (item), "activate",
                      G_CALLBACK (edit_save_object), tw);
     gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
@@ -361,6 +373,8 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
     gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
 
     item = gtk_menu_item_new_with_mnemonic ("_Save");
+    gtk_widget_add_accelerator (item, "activate", accel_group,
+                                GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     g_signal_connect(G_OBJECT (item), "activate",
                      G_CALLBACK (edit_save_file), tw);
     gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
