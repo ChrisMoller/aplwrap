@@ -10,6 +10,7 @@
 #include "txtbuf.h"
 #include "edit.h"
 #include "pstat.h"
+#include "options.h"
 
 #include "layout.h"
 
@@ -198,6 +199,45 @@ show_keymap (GtkWidget *widget,
   km = gtk_image_new_from_pixbuf (pb);
   gtk_container_add (GTK_CONTAINER (content), km);
   gtk_widget_show_all (dialog);
+}
+
+static void
+show_manuals (GtkWidget *widget,
+              gpointer   data)
+{
+  GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (window), _ ("Manuals"));
+  gtk_window_set_default_size (GTK_WINDOW (window), 500, 300);
+  GtkWidget *notebook = gtk_notebook_new ();
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
+  gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook));
+  gtk_container_add (GTK_CONTAINER (window), notebook);
+  PangoFontDescription *desc =
+    pango_font_description_from_string ("FreeMono");
+  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
+
+  GDir *dir = g_dir_open (MANUALS_PATH, 0, NULL);
+  const gchar *fname;
+  while ((fname = g_dir_read_name (dir))) {
+    gchar *path = g_build_filename (MANUALS_PATH, fname, NULL);
+    gchar *text;
+    if (g_file_get_contents (path, &text, NULL, NULL)) {
+      GtkTextBuffer *buffer = gtk_text_buffer_new (NULL);
+      gtk_text_buffer_set_text (buffer, text, -1);
+      g_free (text);
+      GtkWidget *view = gtk_text_view_new_with_buffer (buffer);
+      gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
+      gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
+      gtk_widget_override_font (view, desc);
+      GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
+      GtkWidget *label = gtk_label_new (g_path_get_basename (path));
+      gtk_container_add (GTK_CONTAINER (scroll), view);
+      gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scroll, label);
+    }
+  }
+  g_dir_close (dir);
+
+  gtk_widget_show_all (window);
 }
 
 static void
@@ -657,6 +697,13 @@ build_menubar (GtkWidget *vbox)
                               GDK_KEY_k, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
   g_signal_connect (G_OBJECT(item), "activate",
                     G_CALLBACK (show_keymap), NULL);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+
+  item = gtk_menu_item_new_with_mnemonic (_ ("_Manuals"));
+  gtk_widget_add_accelerator (item, "activate", accel_group,
+                              GDK_KEY_m, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect (G_OBJECT(item), "activate",
+                    G_CALLBACK (show_manuals), NULL);
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
   item = gtk_separator_menu_item_new();

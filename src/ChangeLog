@@ -1,5 +1,8 @@
 2014-10-04  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (show_manuals, build_menubar): Add tabbed notebook to
+	display APLwrap manuals.
+
 	* aplwrap.c (key_press_event): Add keyboard accellerators for
 	commonly used menu items.
 

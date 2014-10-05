@@ -7,6 +7,7 @@ aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
                   pstat.c pstat.h resources.c resources.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
+aplwrap_CPPFLAGS=-DMANUALS_PATH=\"$(docdir)\"
 
 aplwrap_LDADD = $(GTK_LIBS)
 

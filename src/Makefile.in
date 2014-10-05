@@ -260,6 +260,7 @@ aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
                   pstat.c pstat.h resources.c resources.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
+aplwrap_CPPFLAGS = -DMANUALS_PATH=\"$(docdir)\"
 aplwrap_LDADD = $(GTK_LIBS)
 all: all-am
 
@@ -375,158 +376,158 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 aplwrap-aplwrap.o: aplwrap.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplwrap.o -MD -MP -MF $(DEPDIR)/aplwrap-aplwrap.Tpo -c -o aplwrap-aplwrap.o `test -f 'aplwrap.c' || echo '$(srcdir)/'`aplwrap.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplwrap.o -MD -MP -MF $(DEPDIR)/aplwrap-aplwrap.Tpo -c -o aplwrap-aplwrap.o `test -f 'aplwrap.c' || echo '$(srcdir)/'`aplwrap.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-aplwrap.Tpo $(DEPDIR)/aplwrap-aplwrap.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aplwrap.c' object='aplwrap-aplwrap.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplwrap.o `test -f 'aplwrap.c' || echo '$(srcdir)/'`aplwrap.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplwrap.o `test -f 'aplwrap.c' || echo '$(srcdir)/'`aplwrap.c
 
 aplwrap-aplwrap.obj: aplwrap.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplwrap.obj -MD -MP -MF $(DEPDIR)/aplwrap-aplwrap.Tpo -c -o aplwrap-aplwrap.obj `if test -f 'aplwrap.c'; then $(CYGPATH_W) 'aplwrap.c'; else $(CYGPATH_W) '$(srcdir)/aplwrap.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplwrap.obj -MD -MP -MF $(DEPDIR)/aplwrap-aplwrap.Tpo -c -o aplwrap-aplwrap.obj `if test -f 'aplwrap.c'; then $(CYGPATH_W) 'aplwrap.c'; else $(CYGPATH_W) '$(srcdir)/aplwrap.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-aplwrap.Tpo $(DEPDIR)/aplwrap-aplwrap.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aplwrap.c' object='aplwrap-aplwrap.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplwrap.obj `if test -f 'aplwrap.c'; then $(CYGPATH_W) 'aplwrap.c'; else $(CYGPATH_W) '$(srcdir)/aplwrap.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplwrap.obj `if test -f 'aplwrap.c'; then $(CYGPATH_W) 'aplwrap.c'; else $(CYGPATH_W) '$(srcdir)/aplwrap.c'; fi`
 
 aplwrap-menu.o: menu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-menu.o -MD -MP -MF $(DEPDIR)/aplwrap-menu.Tpo -c -o aplwrap-menu.o `test -f 'menu.c' || echo '$(srcdir)/'`menu.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-menu.o -MD -MP -MF $(DEPDIR)/aplwrap-menu.Tpo -c -o aplwrap-menu.o `test -f 'menu.c' || echo '$(srcdir)/'`menu.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-menu.Tpo $(DEPDIR)/aplwrap-menu.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='menu.c' object='aplwrap-menu.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-menu.o `test -f 'menu.c' || echo '$(srcdir)/'`menu.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-menu.o `test -f 'menu.c' || echo '$(srcdir)/'`menu.c
 
 aplwrap-menu.obj: menu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-menu.obj -MD -MP -MF $(DEPDIR)/aplwrap-menu.Tpo -c -o aplwrap-menu.obj `if test -f 'menu.c'; then $(CYGPATH_W) 'menu.c'; else $(CYGPATH_W) '$(srcdir)/menu.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-menu.obj -MD -MP -MF $(DEPDIR)/aplwrap-menu.Tpo -c -o aplwrap-menu.obj `if test -f 'menu.c'; then $(CYGPATH_W) 'menu.c'; else $(CYGPATH_W) '$(srcdir)/menu.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-menu.Tpo $(DEPDIR)/aplwrap-menu.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='menu.c' object='aplwrap-menu.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-menu.obj `if test -f 'menu.c'; then $(CYGPATH_W) 'menu.c'; else $(CYGPATH_W) '$(srcdir)/menu.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-menu.obj `if test -f 'menu.c'; then $(CYGPATH_W) 'menu.c'; else $(CYGPATH_W) '$(srcdir)/menu.c'; fi`
 
 aplwrap-options.o: options.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-options.o -MD -MP -MF $(DEPDIR)/aplwrap-options.Tpo -c -o aplwrap-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-options.o -MD -MP -MF $(DEPDIR)/aplwrap-options.Tpo -c -o aplwrap-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-options.Tpo $(DEPDIR)/aplwrap-options.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='aplwrap-options.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
 
 aplwrap-options.obj: options.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-options.obj -MD -MP -MF $(DEPDIR)/aplwrap-options.Tpo -c -o aplwrap-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-options.obj -MD -MP -MF $(DEPDIR)/aplwrap-options.Tpo -c -o aplwrap-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-options.Tpo $(DEPDIR)/aplwrap-options.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='aplwrap-options.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
 
 aplwrap-apl.o: apl.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-apl.o -MD -MP -MF $(DEPDIR)/aplwrap-apl.Tpo -c -o aplwrap-apl.o `test -f 'apl.c' || echo '$(srcdir)/'`apl.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-apl.o -MD -MP -MF $(DEPDIR)/aplwrap-apl.Tpo -c -o aplwrap-apl.o `test -f 'apl.c' || echo '$(srcdir)/'`apl.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-apl.Tpo $(DEPDIR)/aplwrap-apl.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='apl.c' object='aplwrap-apl.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-apl.o `test -f 'apl.c' || echo '$(srcdir)/'`apl.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-apl.o `test -f 'apl.c' || echo '$(srcdir)/'`apl.c
 
 aplwrap-apl.obj: apl.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-apl.obj -MD -MP -MF $(DEPDIR)/aplwrap-apl.Tpo -c -o aplwrap-apl.obj `if test -f 'apl.c'; then $(CYGPATH_W) 'apl.c'; else $(CYGPATH_W) '$(srcdir)/apl.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-apl.obj -MD -MP -MF $(DEPDIR)/aplwrap-apl.Tpo -c -o aplwrap-apl.obj `if test -f 'apl.c'; then $(CYGPATH_W) 'apl.c'; else $(CYGPATH_W) '$(srcdir)/apl.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-apl.Tpo $(DEPDIR)/aplwrap-apl.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='apl.c' object='aplwrap-apl.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-apl.obj `if test -f 'apl.c'; then $(CYGPATH_W) 'apl.c'; else $(CYGPATH_W) '$(srcdir)/apl.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-apl.obj `if test -f 'apl.c'; then $(CYGPATH_W) 'apl.c'; else $(CYGPATH_W) '$(srcdir)/apl.c'; fi`
 
 aplwrap-aplio.o: aplio.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplio.o -MD -MP -MF $(DEPDIR)/aplwrap-aplio.Tpo -c -o aplwrap-aplio.o `test -f 'aplio.c' || echo '$(srcdir)/'`aplio.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplio.o -MD -MP -MF $(DEPDIR)/aplwrap-aplio.Tpo -c -o aplwrap-aplio.o `test -f 'aplio.c' || echo '$(srcdir)/'`aplio.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-aplio.Tpo $(DEPDIR)/aplwrap-aplio.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aplio.c' object='aplwrap-aplio.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplio.o `test -f 'aplio.c' || echo '$(srcdir)/'`aplio.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplio.o `test -f 'aplio.c' || echo '$(srcdir)/'`aplio.c
 
 aplwrap-aplio.obj: aplio.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplio.obj -MD -MP -MF $(DEPDIR)/aplwrap-aplio.Tpo -c -o aplwrap-aplio.obj `if test -f 'aplio.c'; then $(CYGPATH_W) 'aplio.c'; else $(CYGPATH_W) '$(srcdir)/aplio.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-aplio.obj -MD -MP -MF $(DEPDIR)/aplwrap-aplio.Tpo -c -o aplwrap-aplio.obj `if test -f 'aplio.c'; then $(CYGPATH_W) 'aplio.c'; else $(CYGPATH_W) '$(srcdir)/aplio.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-aplio.Tpo $(DEPDIR)/aplwrap-aplio.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='aplio.c' object='aplwrap-aplio.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplio.obj `if test -f 'aplio.c'; then $(CYGPATH_W) 'aplio.c'; else $(CYGPATH_W) '$(srcdir)/aplio.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-aplio.obj `if test -f 'aplio.c'; then $(CYGPATH_W) 'aplio.c'; else $(CYGPATH_W) '$(srcdir)/aplio.c'; fi`
 
 aplwrap-history.o: history.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-history.o -MD -MP -MF $(DEPDIR)/aplwrap-history.Tpo -c -o aplwrap-history.o `test -f 'history.c' || echo '$(srcdir)/'`history.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-history.o -MD -MP -MF $(DEPDIR)/aplwrap-history.Tpo -c -o aplwrap-history.o `test -f 'history.c' || echo '$(srcdir)/'`history.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-history.Tpo $(DEPDIR)/aplwrap-history.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='history.c' object='aplwrap-history.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-history.o `test -f 'history.c' || echo '$(srcdir)/'`history.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-history.o `test -f 'history.c' || echo '$(srcdir)/'`history.c
 
 aplwrap-history.obj: history.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-history.obj -MD -MP -MF $(DEPDIR)/aplwrap-history.Tpo -c -o aplwrap-history.obj `if test -f 'history.c'; then $(CYGPATH_W) 'history.c'; else $(CYGPATH_W) '$(srcdir)/history.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-history.obj -MD -MP -MF $(DEPDIR)/aplwrap-history.Tpo -c -o aplwrap-history.obj `if test -f 'history.c'; then $(CYGPATH_W) 'history.c'; else $(CYGPATH_W) '$(srcdir)/history.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-history.Tpo $(DEPDIR)/aplwrap-history.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='history.c' object='aplwrap-history.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-history.obj `if test -f 'history.c'; then $(CYGPATH_W) 'history.c'; else $(CYGPATH_W) '$(srcdir)/history.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-history.obj `if test -f 'history.c'; then $(CYGPATH_W) 'history.c'; else $(CYGPATH_W) '$(srcdir)/history.c'; fi`
 
 aplwrap-txtbuf.o: txtbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-txtbuf.o -MD -MP -MF $(DEPDIR)/aplwrap-txtbuf.Tpo -c -o aplwrap-txtbuf.o `test -f 'txtbuf.c' || echo '$(srcdir)/'`txtbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-txtbuf.o -MD -MP -MF $(DEPDIR)/aplwrap-txtbuf.Tpo -c -o aplwrap-txtbuf.o `test -f 'txtbuf.c' || echo '$(srcdir)/'`txtbuf.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-txtbuf.Tpo $(DEPDIR)/aplwrap-txtbuf.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='txtbuf.c' object='aplwrap-txtbuf.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-txtbuf.o `test -f 'txtbuf.c' || echo '$(srcdir)/'`txtbuf.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-txtbuf.o `test -f 'txtbuf.c' || echo '$(srcdir)/'`txtbuf.c
 
 aplwrap-txtbuf.obj: txtbuf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-txtbuf.obj -MD -MP -MF $(DEPDIR)/aplwrap-txtbuf.Tpo -c -o aplwrap-txtbuf.obj `if test -f 'txtbuf.c'; then $(CYGPATH_W) 'txtbuf.c'; else $(CYGPATH_W) '$(srcdir)/txtbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-txtbuf.obj -MD -MP -MF $(DEPDIR)/aplwrap-txtbuf.Tpo -c -o aplwrap-txtbuf.obj `if test -f 'txtbuf.c'; then $(CYGPATH_W) 'txtbuf.c'; else $(CYGPATH_W) '$(srcdir)/txtbuf.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-txtbuf.Tpo $(DEPDIR)/aplwrap-txtbuf.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='txtbuf.c' object='aplwrap-txtbuf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-txtbuf.obj `if test -f 'txtbuf.c'; then $(CYGPATH_W) 'txtbuf.c'; else $(CYGPATH_W) '$(srcdir)/txtbuf.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-txtbuf.obj `if test -f 'txtbuf.c'; then $(CYGPATH_W) 'txtbuf.c'; else $(CYGPATH_W) '$(srcdir)/txtbuf.c'; fi`
 
 aplwrap-edit.o: edit.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.o -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.o -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-edit.Tpo $(DEPDIR)/aplwrap-edit.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='edit.c' object='aplwrap-edit.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.o `test -f 'edit.c' || echo '$(srcdir)/'`edit.c
 
 aplwrap-edit.obj: edit.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.obj -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-edit.obj -MD -MP -MF $(DEPDIR)/aplwrap-edit.Tpo -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-edit.Tpo $(DEPDIR)/aplwrap-edit.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='edit.c' object='aplwrap-edit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-edit.obj `if test -f 'edit.c'; then $(CYGPATH_W) 'edit.c'; else $(CYGPATH_W) '$(srcdir)/edit.c'; fi`
 
 aplwrap-complete.o: complete.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-complete.o -MD -MP -MF $(DEPDIR)/aplwrap-complete.Tpo -c -o aplwrap-complete.o `test -f 'complete.c' || echo '$(srcdir)/'`complete.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-complete.o -MD -MP -MF $(DEPDIR)/aplwrap-complete.Tpo -c -o aplwrap-complete.o `test -f 'complete.c' || echo '$(srcdir)/'`complete.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-complete.Tpo $(DEPDIR)/aplwrap-complete.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='complete.c' object='aplwrap-complete.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-complete.o `test -f 'complete.c' || echo '$(srcdir)/'`complete.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-complete.o `test -f 'complete.c' || echo '$(srcdir)/'`complete.c
 
 aplwrap-complete.obj: complete.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-complete.obj -MD -MP -MF $(DEPDIR)/aplwrap-complete.Tpo -c -o aplwrap-complete.obj `if test -f 'complete.c'; then $(CYGPATH_W) 'complete.c'; else $(CYGPATH_W) '$(srcdir)/complete.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-complete.obj -MD -MP -MF $(DEPDIR)/aplwrap-complete.Tpo -c -o aplwrap-complete.obj `if test -f 'complete.c'; then $(CYGPATH_W) 'complete.c'; else $(CYGPATH_W) '$(srcdir)/complete.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-complete.Tpo $(DEPDIR)/aplwrap-complete.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='complete.c' object='aplwrap-complete.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-complete.obj `if test -f 'complete.c'; then $(CYGPATH_W) 'complete.c'; else $(CYGPATH_W) '$(srcdir)/complete.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-complete.obj `if test -f 'complete.c'; then $(CYGPATH_W) 'complete.c'; else $(CYGPATH_W) '$(srcdir)/complete.c'; fi`
 
 aplwrap-pstat.o: pstat.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-pstat.o -MD -MP -MF $(DEPDIR)/aplwrap-pstat.Tpo -c -o aplwrap-pstat.o `test -f 'pstat.c' || echo '$(srcdir)/'`pstat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-pstat.o -MD -MP -MF $(DEPDIR)/aplwrap-pstat.Tpo -c -o aplwrap-pstat.o `test -f 'pstat.c' || echo '$(srcdir)/'`pstat.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-pstat.Tpo $(DEPDIR)/aplwrap-pstat.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pstat.c' object='aplwrap-pstat.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-pstat.o `test -f 'pstat.c' || echo '$(srcdir)/'`pstat.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-pstat.o `test -f 'pstat.c' || echo '$(srcdir)/'`pstat.c
 
 aplwrap-pstat.obj: pstat.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-pstat.obj -MD -MP -MF $(DEPDIR)/aplwrap-pstat.Tpo -c -o aplwrap-pstat.obj `if test -f 'pstat.c'; then $(CYGPATH_W) 'pstat.c'; else $(CYGPATH_W) '$(srcdir)/pstat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-pstat.obj -MD -MP -MF $(DEPDIR)/aplwrap-pstat.Tpo -c -o aplwrap-pstat.obj `if test -f 'pstat.c'; then $(CYGPATH_W) 'pstat.c'; else $(CYGPATH_W) '$(srcdir)/pstat.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-pstat.Tpo $(DEPDIR)/aplwrap-pstat.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pstat.c' object='aplwrap-pstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-pstat.obj `if test -f 'pstat.c'; then $(CYGPATH_W) 'pstat.c'; else $(CYGPATH_W) '$(srcdir)/pstat.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-pstat.obj `if test -f 'pstat.c'; then $(CYGPATH_W) 'pstat.c'; else $(CYGPATH_W) '$(srcdir)/pstat.c'; fi`
 
 aplwrap-resources.o: resources.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.o -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.o -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-resources.Tpo $(DEPDIR)/aplwrap-resources.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='resources.c' object='aplwrap-resources.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.o `test -f 'resources.c' || echo '$(srcdir)/'`resources.c
 
 aplwrap-resources.obj: resources.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.obj -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-resources.obj -MD -MP -MF $(DEPDIR)/aplwrap-resources.Tpo -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-resources.Tpo $(DEPDIR)/aplwrap-resources.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='resources.c' object='aplwrap-resources.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-resources.obj `if test -f 'resources.c'; then $(CYGPATH_W) 'resources.c'; else $(CYGPATH_W) '$(srcdir)/resources.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

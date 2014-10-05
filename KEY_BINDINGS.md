@@ -65,6 +65,7 @@ Ctrl-N                      create a new APL object
 Ctrl-O                      open an APL object for editing
 Ctrl-I                      import a text file for editing
 Ctrl-K                      display the APL keyboard map
+Ctrl-M                      display APLwrap manuals
 ```
 
 Menu Accelerators, edit window
