@@ -31,5 +31,11 @@ void save_log (GtkWidget *widget, gpointer   data);
 void save_log_as (GtkWidget *widget, gpointer   data);
 gboolean set_filename (const gchar *prompt, gchar **filename);
 gboolean import_file ();
+void add_menu_item (gchar         *name,
+                    gint           accel_key,
+                    GtkAccelGroup *accel_group,
+                    GCallback      callback,
+                    gpointer       data,
+                    GtkWidget     *menu);
 
 #endif

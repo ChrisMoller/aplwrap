@@ -320,78 +320,46 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_New"));
-  gtk_widget_add_accelerator (item, "activate", accel_group,
-                              GDK_KEY_n, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  g_signal_connect (G_OBJECT (item), "activate",
-		    G_CALLBACK (new_object), NULL);
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  add_menu_item (_ ("_New"), GDK_KEY_n, accel_group,
+                 G_CALLBACK (new_object), NULL, menu);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Open Object"));
-  gtk_widget_add_accelerator (item, "activate", accel_group,
-                              GDK_KEY_o, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (open_object), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+  add_menu_item (_ ("_Open Object"), GDK_KEY_o, accel_group,
+                 G_CALLBACK (open_object), NULL, menu);
 
-  item = gtk_menu_item_new_with_mnemonic (_ ("Open F_ile"));
-  gtk_widget_add_accelerator (item, "activate", accel_group,
-                              GDK_KEY_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-  g_signal_connect(G_OBJECT (item), "activate",
-		   G_CALLBACK (import_file), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+  add_menu_item (_ ("Open F_ile"), GDK_KEY_i, accel_group,
+                 G_CALLBACK (import_file), NULL, menu);
 
   if (!path (tw)) {
     /* Menu items for object clone/save/export */
-    item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (clone_object), tw);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("C_lone"), -1, NULL,
+                   G_CALLBACK (clone_object), tw, menu);
 
-    item = gtk_menu_item_new_with_mnemonic ("_Save");
-    gtk_widget_add_accelerator (item, "activate", accel_group,
-                                GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (edit_save_object), tw);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("_Save"), GDK_KEY_s, accel_group,
+                   G_CALLBACK (edit_save_object), tw, menu);
 
-    item = gtk_menu_item_new_with_mnemonic (_ ("_Export File"));
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (save_log), tb->buffer);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("_Export File"), -1, NULL,
+                   G_CALLBACK (save_log), tb->buffer, menu);
 
-    item = gtk_menu_item_new_with_label (_ ("Export File As"));
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (save_log_as), tb->buffer);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("Export File As"), -1, NULL,
+                   G_CALLBACK (save_log_as), tb->buffer, menu);
   }
   else {
     /* Menu items for file clone/save */
-    item = gtk_menu_item_new_with_mnemonic (_ ("C_lone"));
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (clone_file), tw);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("C_lone"), -1, NULL,
+                   G_CALLBACK (clone_file), tw, menu);
 
-    item = gtk_menu_item_new_with_mnemonic ("_Save");
-    gtk_widget_add_accelerator (item, "activate", accel_group,
-                                GDK_KEY_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (edit_save_file), tw);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("_Save"), GDK_KEY_s, accel_group,
+                   G_CALLBACK (edit_save_file), tw, menu);
 
-    item = gtk_menu_item_new_with_mnemonic ("Save As");
-    g_signal_connect(G_OBJECT (item), "activate",
-                     G_CALLBACK (edit_save_file_as), tw);
-    gtk_menu_shell_append(GTK_MENU_SHELL (menu), item);
+    add_menu_item (_ ("Save As"), -1, NULL,
+                   G_CALLBACK (edit_save_file_as), tw, menu);
   }
 
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
-  item = gtk_menu_item_new_with_mnemonic (_ ("_Close"));
-  g_signal_connect (G_OBJECT (item), "activate",
-		    G_CALLBACK (edit_delete), tw);
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  add_menu_item (_ ("_Close"), -1, NULL,
+                 G_CALLBACK (edit_delete), tw, menu);
 
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
 }

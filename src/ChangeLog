@@ -1,3 +1,12 @@
+2014-10-05  David B. Lamkins  <david@lamkins.net>
+
+	* menu.h (): Factor menu-item creation code.
+
+	* menu.c (add_menu_item, build_menubar): Factor menu-item creation
+	code.
+
+	* edit.c (build_edit_menubar): Factor menu-item creation code.
+
 2014-10-04  David B. Lamkins  <david@lamkins.net>
 
 	* menu.c (show_manuals): Inset notebook view. Start with slightly
