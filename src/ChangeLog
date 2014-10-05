@@ -3,13 +3,13 @@
 	* menu.c (show_manuals, build_menubar): Add tabbed notebook to
 	display APLwrap manuals.
 
-	* aplwrap.c (key_press_event): Add keyboard accellerators for
+	* aplwrap.c (key_press_event): Add keyboard accelerators for
 	commonly used menu items.
 
-	* menu.c (build_menubar): Add keyboard accellerators for commonly
+	* menu.c (build_menubar): Add keyboard accelerators for commonly
 	used menu items.
 
-	* edit.c (build_edit_menubar): Add keyboard accellerators for
+	* edit.c (build_edit_menubar): Add keyboard accelerators for
 	commonly used menu items.
 
 	* menu.c (remember_shortcut, add_shortcut, import_file): Remember
