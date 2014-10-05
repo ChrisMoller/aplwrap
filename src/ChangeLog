@@ -1,5 +1,8 @@
 2014-10-04  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (show_manuals): Inset notebook view. Start with slightly
+	larger notebook window.
+
 	* menu.c (show_manuals): Allow notebook tabs to be reordered.
 
 	* menu.c (show_manuals, build_menubar): Add tabbed notebook to

@@ -207,7 +207,7 @@ show_manuals (GtkWidget *widget,
 {
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), _ ("Manuals"));
-  gtk_window_set_default_size (GTK_WINDOW (window), 500, 300);
+  gtk_window_set_default_size (GTK_WINDOW (window), 600, 400);
   GtkWidget *notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
   gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook));
@@ -226,6 +226,7 @@ show_manuals (GtkWidget *widget,
       gtk_text_buffer_set_text (buffer, text, -1);
       g_free (text);
       GtkWidget *view = gtk_text_view_new_with_buffer (buffer);
+      gtk_container_set_border_width (GTK_CONTAINER (view), 4);
       gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
       gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
       gtk_widget_override_font (view, desc);
