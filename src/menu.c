@@ -233,6 +233,7 @@ show_manuals (GtkWidget *widget,
       GtkWidget *label = gtk_label_new (g_path_get_basename (path));
       gtk_container_add (GTK_CONTAINER (scroll), view);
       gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scroll, label);
+      gtk_notebook_set_tab_reorderable (GTK_NOTEBOOK (notebook), scroll, TRUE);
     }
   }
   g_dir_close (dir);
