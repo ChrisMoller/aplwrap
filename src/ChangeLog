@@ -1,5 +1,8 @@
 2014-10-05  David B. Lamkins  <david@lamkins.net>
 
+	* edit.c (message_dialog, edit_save_object_cb, edit_file): Report
+	file import error.
+
 	* aplwrap.c (key_press_event): Don't need to explicitly handle
 	accelerator keys.
 

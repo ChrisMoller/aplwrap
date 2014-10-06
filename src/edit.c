@@ -62,6 +62,20 @@ edit_close (GtkWidget *widget,
 }
 
 static void
+message_dialog (GtkMessageType type,
+                gchar         *message,
+                gchar         *secondary)
+{
+  GtkWidget *dialog =
+    gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, type, GTK_BUTTONS_CLOSE,
+                            message);
+  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                            "%s", secondary);
+  gtk_dialog_run (GTK_DIALOG(dialog));
+  gtk_widget_destroy (dialog);
+}
+
+static void
 edit_save_object_cb (gchar *text, void *data)
 {
   window_s *tw = data;
@@ -93,17 +107,9 @@ edit_save_object_cb (gchar *text, void *data)
   }
   g_strfreev (lines);
   if (error_text) {
-    GtkWidget *dialog =
-      gtk_message_dialog_new (NULL,
-                              GTK_DIALOG_MODAL,
-                              GTK_MESSAGE_WARNING,
-                              GTK_BUTTONS_CLOSE,
-                              "APL error while defining function");
-    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                              "%s",
-                                              error_text);
-    gtk_dialog_run (GTK_DIALOG(dialog));
-    gtk_widget_destroy (dialog);
+    message_dialog (GTK_MESSAGE_WARNING,
+                    _ ("APL error while defining function"),
+                    error_text);
     g_free (error_text);
   }
   else {
@@ -589,7 +595,8 @@ edit_file (gchar *path)
     g_hash_table_insert (buffers, this_buffer->name, this_buffer);
 
     gchar *text;
-    if (g_file_get_contents (path, &text, NULL, NULL)) {
+    GError *error = NULL;
+    if (g_file_get_contents (path, &text, NULL, &error)) {
       gtk_text_buffer_set_text (this_buffer->buffer, text, -1);
       g_free (text);
       gtk_text_buffer_set_modified (this_buffer->buffer, FALSE);
@@ -598,7 +605,15 @@ edit_file (gchar *path)
       gtk_text_buffer_place_cursor (this_buffer->buffer, &start_iter);
     }
     else {
-      // FINISH: report error
+      message_dialog (GTK_MESSAGE_WARNING, _ ("File error"), error->message);
+      g_error_free (error);
+      g_free (name);
+      g_free (lname);
+      g_free (this_window);
+      gtk_widget_destroy (window);
+      pango_font_description_free (desc);
+      gtk_widget_destroy (scroll);
+      return;
     }
   }
 
