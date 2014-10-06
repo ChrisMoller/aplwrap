@@ -48,8 +48,7 @@ edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
   window_s *tw = data;
-  // DBL - is error check useful here?
-  if (!error (tw) && !gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
+  if (!gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
     buffer_s *tb = buffer (tw);
     tb->ref_count--;
     if (0 == tb->ref_count) {
@@ -592,6 +591,7 @@ edit_file (gchar *path)
     gchar *text;
     if (g_file_get_contents (path, &text, NULL, NULL)) {
       gtk_text_buffer_set_text (this_buffer->buffer, text, -1);
+      g_free (text);
       gtk_text_buffer_set_modified (this_buffer->buffer, FALSE);
       GtkTextIter start_iter;
       gtk_text_buffer_get_start_iter (this_buffer->buffer, &start_iter);

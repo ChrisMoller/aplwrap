@@ -1,5 +1,9 @@
 2014-10-05  David B. Lamkins  <david@lamkins.net>
 
+	* edit.c (edit_close, edit_file): Minor code cleanup.
+
+2014-10-05  David B. Lamkins  <david@lamkins.net>
+
 	* menu.h (): Factor menu-item creation code.
 
 	* menu.c (add_menu_item, build_menubar): Factor menu-item creation
