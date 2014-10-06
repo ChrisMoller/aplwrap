@@ -2,6 +2,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
+#include <stdlib.h>
 
 #include "apl.h"
 #include "aplio.h"
@@ -94,7 +95,19 @@ edit_save_object_cb (gchar *text, void *data)
       if (!error_text)
         error_text = g_strdup (lines[i]);
       else {
-        gchar *new_error_text =
+        gchar *new_error_text;
+        if (i == 3) {
+          /* Adjust the line number to origin-0. */
+          /* While we're at it, we may as well add a label. */
+          gchar *end;
+          gint line = (gint)strtol (lines[i], &end, 10);
+          if (*end == '\0') {
+            char *adjusted = g_strdup_printf ("line %d", line-1);
+            g_free (lines[i]);
+            lines[i] = adjusted;
+          }
+        }
+        new_error_text =
           g_strconcat (error_text, "\n", lines[i], NULL);
         g_free (error_text);
         error_text = new_error_text;

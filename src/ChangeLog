@@ -1,3 +1,8 @@
+2014-10-06  David B. Lamkins  <david@lamkins.net>
+
+	* edit.c (edit_save_object_cb): Reformat the line number report on
+	function definition errors.
+
 2014-10-05  David B. Lamkins  <david@lamkins.net>
 
 	* edit.c (message_dialog, edit_save_object_cb, edit_file): Report
