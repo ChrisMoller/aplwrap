@@ -1,5 +1,8 @@
 2014-10-05  David B. Lamkins  <david@lamkins.net>
 
+	* aplwrap.c (key_press_event): Don't need to explicitly handle
+	accelerator keys.
+
 	* menu.c (ps_dialog_cb, set_pstat_value, ps_button_cb)
 	(ps_toggle_cb): Consolidate most pstat code into one file.
 

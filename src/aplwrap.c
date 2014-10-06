@@ -189,12 +189,6 @@ key_press_event (GtkWidget *widget,
   GdkEventKey *key_event = (GdkEventKey *)event;
   GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
 
-  /* Run menu accelerators */
-  if (gtk_accel_groups_activate (G_OBJECT(window),
-                                 key_event->keyval,
-                                 key_event->state))
-    return TRUE;
-
   /* Tab key runs completion */
   if (key_event->keyval == GDK_KEY_Tab) {
     complete();
