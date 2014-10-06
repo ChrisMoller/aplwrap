@@ -1,8 +1,14 @@
 2014-10-05  David B. Lamkins  <david@lamkins.net>
 
-	* edit.c (edit_close, edit_file): Minor code cleanup.
+	* menu.c (ps_dialog_cb, set_pstat_value, ps_button_cb)
+	(ps_toggle_cb): Consolidate most pstat code into one file.
 
-2014-10-05  David B. Lamkins  <david@lamkins.net>
+	* pstat.h (): Consolidate most pstat code into one file.
+
+	* pstat.c (ps_dialog_cb, set_pstat_value, ps_button_cb)
+	(ps_toggle_cb): Consolidate most pstat code into one file.
+
+	* edit.c (edit_close, edit_file): Minor code cleanup.
 
 	* menu.h (): Factor menu-item creation code.
 

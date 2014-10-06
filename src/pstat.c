@@ -1,11 +1,107 @@
+#include "../config.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
 
+#include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
+
 #include "pstat.h"
 #include "menu.h"
+#include "aplio.h"
+#include "aplwrap.h"
 
+static GtkWidget *pstat_grid = NULL;
+
+typedef struct {
+  const gchar *label;
+  GtkWidget   *value;
+} pstat_ety_s;
+
+pstat_ety_s pstat_etys[] = {
+  {"# sequence",	NULL},
+  {"∆ elapsed time",	NULL},
+  {"∆ user time",	NULL},
+  {"∆ system time",	NULL},
+  {"∆ virtual size",	NULL},
+  {"∆ resident size",	NULL},
+  {"∆ minor faults",	NULL},
+  {"∆ major faults",	NULL},
+  {"∆ block io wait",	NULL},
+  {"∆ read chars",	NULL},
+  {"∆ write chars",	NULL},
+  {"∆ read bytes",	NULL},
+  {"∆ write bytes",	NULL},
+  {"∆ syscalls read",	NULL},
+  {"∆ syscalls write",	NULL},
+  {"∆ canceled bytes",	NULL},
+};
+
+void
+ps_dialog_cb (GtkDialog *dialog,
+	      gint       response_id,
+	      gpointer   user_data)
+{
+  gtk_widget_destroy (GTK_WIDGET (dialog));
+  pstat_grid = NULL;
+}
+
+void
+set_pstat_value (gint idx, const gchar *val)
+{
+  if (idx >= 0 && idx < PSTAT_MAX && pstat_etys[idx].value) 
+    gtk_label_set_text (GTK_LABEL (pstat_etys[idx].value), val);
+}
+
+void
+ps_button_cb (GtkToggleButton *togglebutton,
+	      gpointer         user_data)
+{
+  GtkWidget *dialog;
+  GtkWidget *content;
+  GtkWidget *vbox;
+
+  if (pstat_grid) return;
+
+  dialog =  gtk_dialog_new_with_buttons (_ ("Pstat"),
+                                         NULL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT,
+                                         _ ("_Close"), GTK_RESPONSE_ACCEPT,
+                                         NULL);
+  g_signal_connect_swapped (dialog, "response",
+                          G_CALLBACK (ps_dialog_cb),
+                          dialog);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
+  gtk_container_add (GTK_CONTAINER (content), vbox);
+  pstat_grid = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 8);
+
+  for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
+    GtkWidget *lbl = gtk_label_new (pstat_etys[i].label);
+    gtk_misc_set_alignment (GTK_MISC (lbl), 1.0, 0.0);
+    GtkWidget *val = gtk_label_new ("");
+    gtk_misc_set_alignment (GTK_MISC (val), 1.0, 0.0);
+    pstat_etys[i].value = val;
+    gtk_grid_attach (GTK_GRID (pstat_grid), lbl, 0, i, 1, 1);
+    gtk_grid_attach (GTK_GRID (pstat_grid), val, 1, i, 1, 1);
+  }
+  update_pstat_strings ();
+  
+  gtk_box_pack_start (GTK_BOX (vbox), pstat_grid, FALSE, FALSE, 2);
+  gtk_widget_show_all (dialog);
+}
+
+void
+ps_toggle_cb (GtkToggleButton *togglebutton,
+	      gpointer         user_data)
+{
+  show_status = gtk_toggle_button_get_active (togglebutton);
+  set_status_visibility (show_status);
+}
+  
 /*
   Get user time, system time, virtual size, resident set size, minor
   faults count, major faults count and aggregate block I/O delay time
