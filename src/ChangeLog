@@ -1,3 +1,7 @@
+2014-10-07  David B. Lamkins  <david@lamkins.net>
+
+	* edit.c (message_dialog): Fix compiler warning.
+
 2014-10-06  David B. Lamkins  <david@lamkins.net>
 
 	* edit.c (edit_save_object_cb): Reformat the line number report on

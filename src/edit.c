@@ -69,7 +69,7 @@ message_dialog (GtkMessageType type,
 {
   GtkWidget *dialog =
     gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, type, GTK_BUTTONS_CLOSE,
-                            message);
+                            "%s", message);
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                             "%s", secondary);
   gtk_dialog_run (GTK_DIALOG(dialog));
