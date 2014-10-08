@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
+#define PGM_TITLE "APLwrap"
+
 gchar *plot_pipe_name;
 gint   plot_pipe_fd;
 

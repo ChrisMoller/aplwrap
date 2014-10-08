@@ -16,6 +16,23 @@ static GHashTable *buffers = NULL;
 static gint seq_nr = 1;
 
 static void
+check_modified (gpointer key, gpointer value, gpointer data)
+{
+  buffer_s *tb = value;
+  gboolean *modified = data;
+  *modified |= gtk_text_buffer_get_modified (tb->buffer);
+}
+
+gboolean
+dirty_edit_buffers ()
+{
+  gboolean modified = FALSE;
+  if (buffers)
+    g_hash_table_foreach (buffers, check_modified, &modified);
+  return modified;
+}
+
+static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
   if (!closing(tw)) {
@@ -65,7 +82,7 @@ edit_close (GtkWidget *widget,
   }
 }
 
-static void
+void
 message_dialog (GtkMessageType type,
                 gchar         *message,
                 gchar         *secondary)

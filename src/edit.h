@@ -29,4 +29,10 @@ void edit_object (gchar* name, gint nc);
 
 void edit_file (gchar *path);
 
+gboolean dirty_edit_buffers ();
+
+void message_dialog (GtkMessageType type,
+                       gchar         *message,
+                       gchar         *secondary);
+
 #endif  /* EDIT_H */

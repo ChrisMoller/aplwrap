@@ -3,6 +3,7 @@
 #include "../config.h"
 
 #include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
 #include <glib-unix.h>
 #include <string.h>
 #include <strings.h>
@@ -12,6 +13,7 @@
 #include "aplio.h"
 #include "options.h"
 #include "resources.h"
+#include "edit.h"
 
 #include <sys/types.h>
 #include <signal.h>
@@ -34,6 +36,13 @@ void
 aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
+  if (dirty_edit_buffers ()) {
+    message_dialog (GTK_MESSAGE_INFO,
+                    _ ("Some edit windows are unsaved"),
+                    _ ("Close edit windows to finish quitting " PGM_TITLE "."));
+    return;
+  }
+
   quitting = TRUE;
 
   save_resources ();

@@ -1,5 +1,19 @@
 2014-10-07  David B. Lamkins  <david@lamkins.net>
 
+	* edit.h (): Don't lose unsaved edit windows when closing transcript.
+
+	* aplwrap.h (): Don't lose unsaved edit windows when closing
+	transcript.
+
+	* edit.c (check_modified, message_dialog): Don't lose unsaved edit
+	windows when closing transcript.
+
+	* aplwrap.c (main): Don't lose unsaved edit windows when closing
+	transcript.
+
+	* apl.c (aplwrap_quit): Don't lose unsaved edit windows when
+	closing transcript.
+
 	* complete.c (is_extra_break_char, lookup_callback, complete):
 	Allow additional break characters interior to completion
 	identifiers.
