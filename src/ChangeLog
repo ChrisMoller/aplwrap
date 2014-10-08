@@ -1,5 +1,9 @@
 2014-10-07  David B. Lamkins  <david@lamkins.net>
 
+	* complete.c (is_extra_break_char, lookup_callback, complete):
+	Allow additional break characters interior to completion
+	identifiers.
+
 	* edit.h (): Fix crash that may occur while closing an edit window.
 
 	* edit.c (edit_close, set_status_line): Fix crash that may occur

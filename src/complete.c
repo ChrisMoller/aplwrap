@@ -43,6 +43,18 @@ is_ident_char (gunichar uch)
   return 0;
 }
 
+static int
+is_extra_break_char (gunichar uch)
+{
+  if (uch == L'.') return 1;
+  if (uch == L'-') return 1;
+  if (uch == L'$') return 1;
+  if (uch == L'@') return 1;
+  if (uch == L'!') return 1;
+
+  return 0;
+}
+
 #define PSIZE 8
 
 typedef struct _state {
@@ -139,7 +151,8 @@ lookup_callback (gchar *result, size_t idx, void *state)
     while (p < lim && !is_ident_char (g_utf8_get_char (p)))
       p = g_utf8_next_char (p);
     b = p - result;
-    while (p < lim &&  is_ident_char (g_utf8_get_char (p)))
+    while (p < lim && (is_ident_char (g_utf8_get_char (p)) ||
+                       is_extra_break_char (g_utf8_get_char (p))))
       p = g_utf8_next_char (p);
     e = p - result;
     /* Update the completion. */
@@ -284,7 +297,8 @@ void complete ()
     do {
       gtk_text_iter_backward_char (&prefix_iter);
       ++prefix_chars;
-    } while (is_ident_char (gtk_text_iter_get_char (&prefix_iter)));
+    } while (is_ident_char (gtk_text_iter_get_char (&prefix_iter)) ||
+             is_extra_break_char (gtk_text_iter_get_char (&prefix_iter)));
 
     if (gtk_text_iter_equal (&cursor_iter, &prefix_iter)) return;
 
@@ -292,7 +306,8 @@ void complete ()
     --prefix_chars;
     state.prefix_chars = prefix_chars;
 
-    while (is_ident_char (gtk_text_iter_get_char (&end_iter)))
+    while (is_ident_char (gtk_text_iter_get_char (&end_iter)) ||
+           is_extra_break_char (gtk_text_iter_get_char (&end_iter)))
       gtk_text_iter_forward_char (&end_iter);
 
     /* Set marks around the identifier to be replaced by
