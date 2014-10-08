@@ -471,11 +471,6 @@ open_object_cb (gchar *text, void *tw)
 						     OBJECT_NAME,
 						     NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (names_tree), column); 
-  GtkTreePath *path = gtk_tree_path_new_first ();
-  gtk_tree_view_row_activated (GTK_TREE_VIEW (names_tree),
-                               path,
-                               column);
-  gtk_tree_path_free (path);
 
   GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
@@ -486,6 +481,10 @@ open_object_cb (gchar *text, void *tw)
   gtk_container_add (GTK_CONTAINER (content), scroll);
   gtk_widget_show_all (dialog);
   response = gtk_dialog_run (GTK_DIALOG (dialog));
+  GtkTreePath *path;
+  gtk_tree_view_get_cursor (GTK_TREE_VIEW (names_tree), &path, &column);
+  gtk_tree_view_row_activated (GTK_TREE_VIEW (names_tree), path, column);
+  gtk_tree_path_free (path);
   gtk_widget_destroy (dialog);
   if (response == GTK_RESPONSE_ACCEPT) {
     if (sd.name) {
