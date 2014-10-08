@@ -18,21 +18,23 @@ static gint seq_nr = 1;
 static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
-  GtkTextIter line_iter, end_iter;
-  GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
-  gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
-  gint line_nr = gtk_text_iter_get_line (&line_iter);
-  gint offset  = gtk_text_iter_get_line_offset (&line_iter);
-  gtk_text_buffer_get_end_iter (tb->buffer, &end_iter);
-  gint line_ct = gtk_text_buffer_get_line_count (tb->buffer) -
-    (gtk_text_iter_get_line_offset (&end_iter) == 0);
-  gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
-  
-  gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
-			       modified ? "**" : "  ",
-			       line_nr, line_ct, offset);
-  gtk_label_set_text (GTK_LABEL (status (tw)), st);
-  g_free (st);
+  if (!closing(tw)) {
+    GtkTextIter line_iter, end_iter;
+    GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
+    gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
+    gint line_nr = gtk_text_iter_get_line (&line_iter);
+    gint offset  = gtk_text_iter_get_line_offset (&line_iter);
+    gtk_text_buffer_get_end_iter (tb->buffer, &end_iter);
+    gint line_ct = gtk_text_buffer_get_line_count (tb->buffer) -
+      (gtk_text_iter_get_line_offset (&end_iter) == 0);
+    gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
+      
+    gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
+                                 modified ? "**" : "  ",
+                                 line_nr, line_ct, offset);
+    gtk_label_set_text (GTK_LABEL (status (tw)), st);
+    g_free (st);
+  }
 }
 
 static void
@@ -49,6 +51,7 @@ edit_close (GtkWidget *widget,
 	    gpointer  data)
 {
   window_s *tw = data;
+  closing (tw) = TRUE;
   if (!gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
     buffer_s *tb = buffer (tw);
     tb->ref_count--;

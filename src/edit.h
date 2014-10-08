@@ -15,6 +15,7 @@ typedef struct {
   gchar     *path;
   gboolean   error;
   gboolean   cb_done;
+  gboolean   closing;
 } window_s;
 #define window(w) (w)->window
 #define buffer(w) (w)->buffer
@@ -22,6 +23,7 @@ typedef struct {
 #define path(w)   (w)->path
 #define error(w)  (w)->error
 #define cb_done(w) (w)->cb_done
+#define closing(w) (w)->closing
 
 void edit_object (gchar* name, gint nc);
 

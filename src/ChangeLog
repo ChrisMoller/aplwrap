@@ -1,5 +1,10 @@
 2014-10-07  David B. Lamkins  <david@lamkins.net>
 
+	* edit.h (): Fix crash that may occur while closing an edit window.
+
+	* edit.c (edit_close, set_status_line): Fix crash that may occur
+	while closing an edit window.
+
 	* edit.c (message_dialog): Fix compiler warning.
 
 2014-10-06  David B. Lamkins  <david@lamkins.net>
