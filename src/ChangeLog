@@ -1,5 +1,8 @@
 2014-10-08  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (open_object_cb): Preselect first item in Open Object
+	dialog so OK button will work.
+
 	* edit.c (trim_length): Fix console warnings emitted if a function
 	opened for editing contains empty lines.
 
