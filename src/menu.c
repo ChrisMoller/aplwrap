@@ -485,8 +485,10 @@ open_object_cb (gchar *text, void *tw)
   gtk_tree_view_get_cursor (GTK_TREE_VIEW (names_tree), &path, &column);
   gtk_tree_view_row_activated (GTK_TREE_VIEW (names_tree), path, column);
   gtk_tree_path_free (path);
+  gboolean have_selection =
+    gtk_tree_selection_get_selected (selection, NULL, NULL);
   gtk_widget_destroy (dialog);
-  if (response == GTK_RESPONSE_ACCEPT) {
+  if (have_selection && response == GTK_RESPONSE_ACCEPT) {
     if (sd.name) {
       edit_object (sd.name, sd.nc);
       g_free (sd.name);

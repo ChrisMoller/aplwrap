@@ -1,5 +1,8 @@
 2014-10-08  David B. Lamkins  <david@lamkins.net>
 
+	* menu.c (open_object_cb): Handle deactivated selection in Open
+	Object dialog.
+
 	* menu.c (open_object_cb): Previous patch was wrong. This one
 	captures current selection in Open Object dialog.
 
