@@ -439,10 +439,10 @@ trim_length (const gchar *text) {
   gint r = 0, i = 0;
   while (text[i]) {
     if (! g_ascii_isspace (text[i]))
-      r = i;
+      r = i + 1;
     ++i;
   }
-  return r + 1;
+  return r;
 }
 
 static void

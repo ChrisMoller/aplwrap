@@ -1,3 +1,8 @@
+2014-10-08  David B. Lamkins  <david@lamkins.net>
+
+	* edit.c (trim_length): Fix console warnings emitted if a function
+	opened for editing contains empty lines.
+
 2014-10-07  David B. Lamkins  <david@lamkins.net>
 
 	* edit.h (): Don't lose unsaved edit windows when closing transcript.
