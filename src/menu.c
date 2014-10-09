@@ -267,6 +267,21 @@ file_button_press_cb (GtkWidget      *widget,
   else return FALSE;
 }
 
+static gboolean
+names_search (GtkTreeModel *model,
+              gint          column,
+              const gchar  *key,
+              GtkTreeIter  *iter,
+              gpointer      search_data)
+{
+  gchar *name;
+  gtk_tree_model_get(model, iter,
+                     OBJECT_RAW_NAME, &name,
+                     -1);
+  gboolean rv = !strstr(name, key);
+  g_free (name);
+  return rv;
+}
 
 static void
 open_object_cb (gchar *text, void *tw)
@@ -332,6 +347,10 @@ open_object_cb (gchar *text, void *tw)
 		    G_CALLBACK (file_button_press_cb), dialog);
   selection =  gtk_tree_view_get_selection (GTK_TREE_VIEW (names_tree));
   gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+  gtk_tree_view_set_search_equal_func (GTK_TREE_VIEW(names_tree),
+                                       names_search, NULL, NULL);
+  gtk_tree_view_set_search_column (GTK_TREE_VIEW(names_tree), 1);
+  gtk_tree_view_set_enable_search (GTK_TREE_VIEW(names_tree), TRUE);
   GValue val = G_VALUE_INIT;
   g_value_init (&val, G_TYPE_BOOLEAN);
   g_value_set_boolean (&val, TRUE);
