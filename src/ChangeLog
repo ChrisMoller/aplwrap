@@ -1,5 +1,14 @@
 2014-10-08  David B. Lamkins  <david@lamkins.net>
 
+	* help.h (): Factor out help menu.
+
+	* help.c (): Factor out help menu.
+
+	* menu.c (build_menubar): Factor out help menu.
+
+	* edit.c (build_edit_menubar): Add Ctrl-W accelerator key to
+	close edit window. Add help menu to edit window.
+
 	* menu.c (open_object_cb): Handle deactivated selection in Open
 	Object dialog.
 

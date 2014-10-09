@@ -7,6 +7,7 @@
 #include "apl.h"
 #include "aplio.h"
 #include "menu.h"
+#include "help.h"
 #include "aplwrap.h"
 #include "txtbuf.h"
 #include "options.h"
@@ -396,8 +397,10 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
   
-  add_menu_item (_ ("_Close"), -1, NULL,
+  add_menu_item (_ ("_Close"), GDK_KEY_w, accel_group,
                  G_CALLBACK (edit_delete), tw, menu);
+
+  help_menu (vbox, accel_group, menubar);
 
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (menubar), FALSE, FALSE, 2);
 }
