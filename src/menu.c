@@ -350,7 +350,7 @@ open_object_cb (gchar *text, void *tw)
   gtk_tree_view_set_search_equal_func (GTK_TREE_VIEW(names_tree),
                                        names_search, NULL, NULL);
   gtk_tree_view_set_search_column (GTK_TREE_VIEW(names_tree), 1);
-  gtk_tree_view_set_enable_search (GTK_TREE_VIEW(names_tree), TRUE);
+  gtk_tree_view_set_enable_search (GTK_TREE_VIEW(names_tree), FALSE);
   GValue val = G_VALUE_INIT;
   g_value_init (&val, G_TYPE_BOOLEAN);
   g_value_set_boolean (&val, TRUE);

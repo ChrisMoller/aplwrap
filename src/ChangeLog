@@ -1,3 +1,8 @@
+2014-10-09  David B. Lamkins  <dlamkins@morganthe>
+
+	* menu.c (open_object_cb): Disable typeahead search in Open Object
+	dialog. Document search keys.
+
 2014-10-09  David B. Lamkins  <david@lamkins.net>
 
 	* menu.c (names_search, open_object_cb): Implement substring

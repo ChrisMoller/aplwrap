@@ -81,6 +81,16 @@ Ctrl-K                      display the APL keyboard map
 Ctrl-M                      display APLwrap manuals
 ```
 
+Open Object Dialog
+------------------
+
+```
+Ctrl-F                      begin substring search
+Ctrl-G                      search next forward
+Shift-Ctrl-G                search next backward
+Alt-O                       open selected object
+```
+
 APL
 ---
 
