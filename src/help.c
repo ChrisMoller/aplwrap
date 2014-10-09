@@ -6,6 +6,8 @@
 #include "menu.h"
 #include "help.h"
 #include "options.h"
+#include "aplwrap.h"
+#include "build.h"
 
 #include "layout.h"
 
@@ -113,15 +115,23 @@ show_about (GtkWidget *widget,
             gpointer   data)
 {
   gchar *authors[] = {"C. H. L. Moller", "David B. Lamkins", NULL};
-  gchar *comments = _("aplwrap is a GTK+-based front-end for GNU APL.");
+  gchar *comments = _(PGM_TITLE " is a GTK+-based front-end for GNU APL.");
 
   gtk_show_about_dialog (NULL,
-                         "program-name", "aplwrap",
-                         "title", _("aplwrap"),
-                         "version", "1.0",
+                         "program-name", _ (PGM_TITLE),
+                         "title", _ ("About " PGM_TITLE),
+                         "version", VERSION
+                         #ifdef BUILD
+                         " (build: " BUILD
+                         #ifdef DIRTY
+                         " [dirty]"
+                         #endif
+                         ")"
+                         #endif
+                         ,
                          "license-type", GTK_LICENSE_GPL_3_0,
                          "copyright", "Copyright 2014",
-                         "website", "http://moller@mollerware.com",
+                         "website", "mailto:moller@mollerware.com",
                          "website-label", "moller@mollerware.com",
                          "authors", authors,
                          "comments", comments,

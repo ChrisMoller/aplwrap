@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if which git >/dev/null 2>&1; then
+    git branch -v | \
+        awk '/\*/ { print "#define BUILD \"" $2 " " $3 "\"" }'
+    git diff-index --quiet HEAD || echo "#define DIRTY"
+else
+    echo "// no git"
+fi
