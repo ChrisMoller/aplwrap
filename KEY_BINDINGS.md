@@ -24,6 +24,15 @@ Ctrl-A                      select all
 Shift-Ctlr-A                select none
 ```
 
+Search Transcript
+-----------------
+
+```
+Ctrl-F                      toggle search bar
+Ctrl-G                      repeat search forward
+Shift-Ctrl-G                repeat search backward
+```
+
 Editing
 -------
 
