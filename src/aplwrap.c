@@ -148,15 +148,17 @@ maybe_copy_selected_text_without_tags ()
 }
 
 static void
-home_to_end_of_apl_prompt ()
+home_to_end_of_apl_prompt (gboolean select)
 {
-  GtkTextIter line_iter;
+  GtkTextIter line_iter, start_iter;
   GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
   gtk_text_buffer_get_iter_at_mark (buffer, &line_iter, insert);
+  start_iter = line_iter;
   gtk_text_iter_set_line_offset (&line_iter, 0);
   while (gtk_text_iter_has_tag (&line_iter, get_tag (TAG_PRM)))
     gtk_text_iter_forward_char (&line_iter);
   gtk_text_buffer_place_cursor (buffer, &line_iter);
+  if (select) gtk_text_buffer_select_range (buffer, &line_iter, &start_iter);
   scroll_to_cursor ();
 }
 
@@ -175,7 +177,7 @@ advance_by_apl_prompt (gboolean forward)
     ;
   if (gtk_text_iter_has_tag (&line_iter, get_tag (TAG_PRM))) {
     gtk_text_buffer_place_cursor (buffer, &line_iter);
-    home_to_end_of_apl_prompt ();
+    home_to_end_of_apl_prompt (FALSE);
   }
 }
 
@@ -220,8 +222,8 @@ key_press_event (GtkWidget *widget,
   /* Special handling of Home key in input area */
   if (cursor_in_input_area ()) {
     if (key_event->keyval == GDK_KEY_Home &&
-        !(key_event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK|GDK_MOD1_MASK))) {
-      home_to_end_of_apl_prompt ();
+        !(key_event->state & (GDK_CONTROL_MASK|GDK_MOD1_MASK))) {
+      home_to_end_of_apl_prompt (!!key_event->state & GDK_SHIFT_MASK);
       return TRUE;
     }
   }

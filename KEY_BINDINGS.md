@@ -7,7 +7,7 @@ Navigation
 ```
 PageUp, PageDown            backward/forward by page height
 Ctrl-PageUp, Ctrl-PageDown  backward/forward by page width
-Home, End                   beginning/end of line
+Home, End                   beginning/end of line (Home stops at prompt)
 Ctrl-Home, Ctrl-End         beginning/end of buffer
 Up, Down, Left, Right       move by line/character
 Ctrl-Up, Ctrl-Down          beginning/end of previous/next line
@@ -19,7 +19,7 @@ Selection
 ---------
 
 ```
-Shift + navigation key(s)   extend selection
+Shift + navigation key(s)   extend selection (except b/f by APL prompt)
 Ctrl-A                      select all
 Shift-Ctlr-A                select none
 ```

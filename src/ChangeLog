@@ -1,5 +1,9 @@
 2014-10-09  David B. Lamkins  <david@lamkins.net>
 
+	* aplwrap.c (home_to_end_of_apl_prompt, advance_by_apl_prompt)
+	(key_press_event): Allow home_to_end_of_apl_prompt() to extend
+	selection. Clarify KEY_BINDINGS.md.
+
 	* apl.c (make_env): Add APLWRAP_BUILD environment variable.
 
 	* help.c (show_about): Put build info on its own line in the About
