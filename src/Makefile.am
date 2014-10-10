@@ -12,6 +12,10 @@ aplwrap_CPPFLAGS=-DMANUALS_PATH=\"$(docdir)\"
 
 aplwrap_LDADD = $(GTK_LIBS)
 
-.PHONY: build.h
-build.h:
-	./buildinfo > $@
+build.h: build.h-new
+	diff $^ $@ 2>/dev/null || mv $^ $@
+	rm -f $^
+
+.PHONY: build.h-new
+build.h-new:
+	./buildinfo > $(@)

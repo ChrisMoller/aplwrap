@@ -766,9 +766,13 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-binPROGRAMS
 
 
-.PHONY: build.h
-build.h:
-	./buildinfo > $@
+build.h: build.h-new
+	diff $^ $@ 2>/dev/null || mv $^ $@
+	rm -f $^
+
+.PHONY: build.h-new
+build.h-new:
+	./buildinfo > $(@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
