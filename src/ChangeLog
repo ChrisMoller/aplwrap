@@ -1,5 +1,19 @@
 2014-10-10  David B. Lamkins  <david@lamkins.net>
 
+	* search.h (): Implement search in edit windows.
+
+	* edit.h (): Implement search in edit windows.
+
+	* search.c (new_search_context, do_search)
+	(search_key_press_event, search_changed_event): Implement search
+	in edit windows.
+
+	* edit.c (edit_key_press_event, edit_object, edit_file): Implement
+	search in edit windows.
+
+	* aplwrap.c (key_press_event, main): Implement search in edit
+	windows.
+
 	* aplwrap.c (do_search, search_key_press_event, search_changed)
 	(key_press_event, main): Implement search in transcript.
 

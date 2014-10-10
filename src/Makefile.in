@@ -95,7 +95,8 @@ am_aplwrap_OBJECTS = aplwrap-aplwrap.$(OBJEXT) aplwrap-menu.$(OBJEXT) \
 	aplwrap-aplio.$(OBJEXT) aplwrap-history.$(OBJEXT) \
 	aplwrap-txtbuf.$(OBJEXT) aplwrap-edit.$(OBJEXT) \
 	aplwrap-complete.$(OBJEXT) aplwrap-pstat.$(OBJEXT) \
-	aplwrap-resources.$(OBJEXT) aplwrap-help.$(OBJEXT)
+	aplwrap-resources.$(OBJEXT) aplwrap-help.$(OBJEXT) \
+	aplwrap-search.$(OBJEXT)
 aplwrap_OBJECTS = $(am_aplwrap_OBJECTS)
 am__DEPENDENCIES_1 =
 aplwrap_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -258,7 +259,7 @@ aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
                   history.c history.h txtbuf.c txtbuf.h \
                   edit.c edit.h complete.c complete.h \
                   pstat.c pstat.h resources.c resources.h \
-		  help.c help.h build.h
+		  help.c help.h build.h search.c search.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
 aplwrap_CPPFLAGS = -DMANUALS_PATH=\"$(docdir)\"
@@ -361,6 +362,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-pstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-resources.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-search.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aplwrap-txtbuf.Po@am__quote@
 
 .c.o:
@@ -544,6 +546,20 @@ aplwrap-help.obj: help.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='help.c' object='aplwrap-help.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-help.obj `if test -f 'help.c'; then $(CYGPATH_W) 'help.c'; else $(CYGPATH_W) '$(srcdir)/help.c'; fi`
+
+aplwrap-search.o: search.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-search.o -MD -MP -MF $(DEPDIR)/aplwrap-search.Tpo -c -o aplwrap-search.o `test -f 'search.c' || echo '$(srcdir)/'`search.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-search.Tpo $(DEPDIR)/aplwrap-search.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='search.c' object='aplwrap-search.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-search.o `test -f 'search.c' || echo '$(srcdir)/'`search.c
+
+aplwrap-search.obj: search.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -MT aplwrap-search.obj -MD -MP -MF $(DEPDIR)/aplwrap-search.Tpo -c -o aplwrap-search.obj `if test -f 'search.c'; then $(CYGPATH_W) 'search.c'; else $(CYGPATH_W) '$(srcdir)/search.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/aplwrap-search.Tpo $(DEPDIR)/aplwrap-search.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='search.c' object='aplwrap-search.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aplwrap_CPPFLAGS) $(CPPFLAGS) $(aplwrap_CFLAGS) $(CFLAGS) -c -o aplwrap-search.obj `if test -f 'search.c'; then $(CYGPATH_W) 'search.c'; else $(CYGPATH_W) '$(srcdir)/search.c'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

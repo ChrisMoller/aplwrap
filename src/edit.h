@@ -1,6 +1,10 @@
 #ifndef EDIT_H
 #define EDIT_H
 
+#include <gtk/gtk.h>
+
+#include "search.h"
+
 typedef struct {
   GtkTextBuffer *buffer;
   gchar *name;
@@ -16,6 +20,7 @@ typedef struct {
   gboolean   error;
   gboolean   cb_done;
   gboolean   closing;
+  search_context_t *search;
 } window_s;
 #define window(w) (w)->window
 #define buffer(w) (w)->buffer
@@ -24,6 +29,7 @@ typedef struct {
 #define error(w)  (w)->error
 #define cb_done(w) (w)->cb_done
 #define closing(w) (w)->closing
+#define search(w) (w)->search
 
 void edit_object (gchar* name, gint nc);
 

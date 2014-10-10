@@ -12,6 +12,7 @@
 #include "txtbuf.h"
 #include "options.h"
 #include "edit.h"
+#include "search.h"
 
 static GHashTable *buffers = NULL;
 static gint seq_nr = 1;
@@ -415,9 +416,18 @@ edit_key_press_event (GtkWidget *widget,
   
   window_s *tw = user_data;
   buffer_s *tb = buffer (tw);
+  search_context_t *cxt = search (tw);
 
   GdkEventKey *key_event = (GdkEventKey *)event;
+  GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
   
+  /* Control-F enables search mode */
+  if (key_event->keyval == GDK_KEY_f &&
+      (key_event->state & mod_mask) == GDK_CONTROL_MASK) {
+    gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (cxt->search_bar), TRUE);
+    return TRUE;
+  }
+
   gsize bw;
   gchar *res = NULL;
   
@@ -562,6 +572,19 @@ edit_object (gchar* name, gint nc)
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
+  GtkWidget *search_bar = gtk_search_bar_new ();
+  gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
+  search_context_t *search_cxt = new_search_context (search_bar, view,
+                                                     this_buffer->buffer);
+  GtkWidget *search_entry = gtk_search_entry_new ();
+  g_signal_connect (search_entry, "search-changed",
+                    G_CALLBACK (search_changed_event), search_cxt);
+  gtk_container_add (GTK_CONTAINER (search_bar), search_entry );
+  gtk_box_pack_start (GTK_BOX (vbox), search_bar, FALSE, FALSE, 0);
+  g_signal_connect (search_entry, "key-press-event",
+                    G_CALLBACK (search_key_press_event), search_cxt);
+  search (this_window) = search_cxt;
+
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (edit_key_press_event), this_window);
 
@@ -665,6 +688,19 @@ edit_file (gchar *path)
   
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
+
+  GtkWidget *search_bar = gtk_search_bar_new ();
+  gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
+  search_context_t *search_cxt = new_search_context (search_bar, view,
+                                                     this_buffer->buffer);
+  GtkWidget *search_entry = gtk_search_entry_new ();
+  g_signal_connect (search_entry, "search-changed",
+                    G_CALLBACK (search_changed_event), search_cxt);
+  gtk_container_add (GTK_CONTAINER (search_bar), search_entry );
+  gtk_box_pack_start (GTK_BOX (vbox), search_bar, FALSE, FALSE, 0);
+  g_signal_connect (search_entry, "key-press-event",
+                    G_CALLBACK (search_key_press_event), search_cxt);
+  search (this_window) = search_cxt;
 
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (edit_key_press_event), this_window);

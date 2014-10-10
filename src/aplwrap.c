@@ -20,6 +20,7 @@
 #include "menu.h"
 #include "complete.h"
 #include "resources.h"
+#include "search.h"
 
 static GtkWidget *window;
 static GtkWidget *scroll;
@@ -181,92 +182,6 @@ advance_by_apl_prompt (gboolean forward)
   }
 }
 
-typedef enum {
-  SEARCH_FORWARD,
-  SEARCH_BACKWARD
-} search_direction_t;
-
-static GtkWidget *search_bar;
-static GtkTextIter search_start, match_start, match_end;
-const gchar *search_text;
-
-static void
-do_search (search_direction_t direction)
-{
-  gboolean found;
-  switch (direction) {
-  case SEARCH_FORWARD:
-    found = gtk_text_iter_forward_search (&search_start, search_text,
-                                          GTK_TEXT_SEARCH_CASE_INSENSITIVE,
-                                          &match_start, &match_end, NULL);
-    break;
-  case SEARCH_BACKWARD:
-    found = gtk_text_iter_backward_search (&search_start, search_text,
-                                           GTK_TEXT_SEARCH_CASE_INSENSITIVE,
-                                           &match_start, &match_end, NULL);
-    break;
-  }
-  if (found) {
-    gtk_text_buffer_select_range (buffer, &match_start, &match_end);
-    gtk_text_view_scroll_to_iter (GTK_TEXT_VIEW (view), &match_start,
-                                  0.0, FALSE, 0.0, 0.0);
-  }
-}
-
-static gboolean
-search_key_press_event (GtkWidget *widget,
-                        GdkEvent  *event,
-                        gpointer   user_data)
-{
-  GdkEventKey *key_event = (GdkEventKey *)event;
-  GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
-
-  /* If the search bar is hidden but still has focus (as can happen if
-     the search bar is hidden using the Escape key or the close box),
-     force the focus back to the transcript. Note that the key event
-     is consumed. */
-  if (!gtk_search_bar_get_search_mode (GTK_SEARCH_BAR (search_bar))) {
-    gtk_widget_grab_focus (view);
-    return FALSE;
-  }
-
-  /* Control-F disables search mode */
-  if (key_event->keyval == GDK_KEY_f &&
-      (key_event->state & mod_mask) == GDK_CONTROL_MASK) {
-    gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (search_bar), FALSE);
-    gtk_widget_grab_focus (view);
-    return TRUE;
-  }
-
-  /* Control-G repeats search forward */
-  if (key_event->keyval == GDK_KEY_g &&
-      (key_event->state & mod_mask) == GDK_CONTROL_MASK) {
-    search_start = match_end;
-    do_search (SEARCH_FORWARD);
-    return TRUE;
-  }
-
-  /* Shift-Control-G repeats search backward */
-  if (key_event->keyval == GDK_KEY_G &&
-      (key_event->state & mod_mask) == (GDK_SHIFT_MASK|GDK_CONTROL_MASK)) {
-    search_start = match_start;
-    do_search (SEARCH_BACKWARD);
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-static void
-search_changed (GtkSearchEntry *entry,
-                gpointer        user_data)
-{
-  search_text = gtk_entry_get_text (GTK_ENTRY (entry));
-  if (search_text[0] == '\0') return;
-  gtk_text_buffer_get_start_iter (buffer, &search_start);
-  do_search(SEARCH_FORWARD);
-}
-
 static gboolean
 key_press_event (GtkWidget *widget,
                  GdkEvent  *event,
@@ -276,11 +191,12 @@ key_press_event (GtkWidget *widget,
 
   GdkEventKey *key_event = (GdkEventKey *)event;
   GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
+  search_context_t *cxt = user_data;
 
   /* Control-F enables search mode */
   if (key_event->keyval == GDK_KEY_f &&
       (key_event->state & mod_mask) == GDK_CONTROL_MASK) {
-    gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (search_bar), TRUE);
+    gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (cxt->search_bar), TRUE);
     return TRUE;
   }
 
@@ -491,17 +407,6 @@ main (int   argc,
 
   build_menubar (vbox);
 
-  search_bar = gtk_search_bar_new ();
-  GtkWidget *search_entry = gtk_search_entry_new ();
-  g_signal_connect (search_entry, "search-changed",
-                    G_CALLBACK (search_changed), NULL);
-  gtk_container_add (GTK_CONTAINER (search_bar), search_entry );
-  gtk_box_pack_start (GTK_BOX (vbox), search_bar, FALSE, FALSE, 0);
-  gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
-
-  g_signal_connect (search_entry, "key-press-event",
-                    G_CALLBACK (search_key_press_event), NULL);
-
   desc =
     pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
   pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
@@ -510,14 +415,27 @@ main (int   argc,
   view = gtk_text_view_new ();
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-  g_signal_connect (view, "key-press-event",
-		    G_CALLBACK (key_press_event), NULL);
   g_signal_connect (view, "button-press-event",
 		    G_CALLBACK (button_press_event), NULL);
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
+  GtkWidget *search_bar = gtk_search_bar_new ();
+  gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
+  search_context_t *search_cxt = new_search_context (search_bar, view, buffer);
+  GtkWidget *search_entry = gtk_search_entry_new ();
+  g_signal_connect (search_entry, "search-changed",
+                    G_CALLBACK (search_changed_event), search_cxt);
+  gtk_container_add (GTK_CONTAINER (search_bar), search_entry );
+  gtk_box_pack_start (GTK_BOX (vbox), search_bar, FALSE, FALSE, 0);
+  g_signal_connect (search_entry, "key-press-event",
+                    G_CALLBACK (search_key_press_event), search_cxt);
+
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
+
+  g_signal_connect (view, "key-press-event",
+		    G_CALLBACK (key_press_event), search_cxt);
+
   status = gtk_label_new ("status");
   gtk_label_set_ellipsize (GTK_LABEL(status), PANGO_ELLIPSIZE_END);
   gtk_label_set_selectable (GTK_LABEL(status), TRUE);

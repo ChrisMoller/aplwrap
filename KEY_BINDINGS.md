@@ -24,8 +24,8 @@ Ctrl-A                      select all
 Shift-Ctlr-A                select none
 ```
 
-Search Transcript
------------------
+Search
+------
 
 ```
 Ctrl-F                      toggle search bar
