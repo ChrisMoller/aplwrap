@@ -1,5 +1,10 @@
 2014-10-09  David B. Lamkins  <david@lamkins.net>
 
+	* apl.c (make_env): Add APLWRAP_BUILD environment variable.
+
+	* help.c (show_about): Put build info on its own line in the About
+	dialog.
+
 	* help.c (show_about): Tweak About dialog: Pull title from
 	aplwrap.h; fix Chris' email link; add build version information.
 

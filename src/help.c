@@ -122,11 +122,10 @@ show_about (GtkWidget *widget,
                          "title", _ ("About " PGM_TITLE),
                          "version", VERSION
                          #ifdef BUILD
-                         " (build: " BUILD
+                         "\nbuild: " BUILD
                          #ifdef DIRTY
                          " [dirty]"
                          #endif
-                         ")"
                          #endif
                          ,
                          "license-type", GTK_LICENSE_GPL_3_0,

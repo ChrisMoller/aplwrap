@@ -14,6 +14,7 @@
 #include "options.h"
 #include "resources.h"
 #include "edit.h"
+#include "build.h"
 
 #include <sys/types.h>
 #include <signal.h>
@@ -93,9 +94,17 @@ make_env ()
   gchar **env = environ;
 
   while (*env++) ++envc;
-  env = g_try_malloc((3 + envc) * sizeof(gchar*));
-  env[envc+2] = NULL;
-  env[envc+1] = g_strdup_printf ("APLPLOT=%s",plot_pipe_name);
+  env = g_try_malloc((4 + envc) * sizeof(gchar*));
+  env[envc+3] = NULL;
+  env[envc+2] = g_strdup_printf ("APLPLOT=%s",plot_pipe_name);
+  env[envc+1] = "APLWRAP_BUILD="
+    #ifdef BUILD
+    BUILD
+    #ifdef DIRTY
+    " [dirty]"
+    #endif
+    #endif
+    ;
   env[envc+0] = "APLWRAP=" VERSION;
   while (envc--) {
     if (!strncmp(environ[envc], "TERM=", 5))
