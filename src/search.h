@@ -3,6 +3,9 @@
 
 #include <gtk/gtk.h>
 
+#define ENABLE_SEARCH GTK_CHECK_VERSION(3,10,0)
+
+#if ENABLE_SEARCH
 typedef struct {
   GtkWidget *search_bar;
   GtkTextIter search_start, match_start, match_end;
@@ -21,5 +24,6 @@ gboolean search_key_press_event (GtkWidget *widget,
 
 void search_changed_event (GtkSearchEntry *entry,
                            gpointer        user_data);
+#endif
 
 #endif

@@ -1,5 +1,9 @@
 2014-10-10  David B. Lamkins  <david@lamkins.net>
 
+	* aplwrap.c, edit.c, edit.h, search.c, search.h: Enable search
+	only for versions of GTK+ (3.10 or later) which support
+	GtkSearchBar.
+
 	* search.h (): Implement search in edit windows.
 
 	* edit.h (): Implement search in edit windows.

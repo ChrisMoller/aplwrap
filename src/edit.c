@@ -416,9 +416,12 @@ edit_key_press_event (GtkWidget *widget,
   
   window_s *tw = user_data;
   buffer_s *tb = buffer (tw);
+#if ENABLE_SEARCH
   search_context_t *cxt = search (tw);
+#endif
 
   GdkEventKey *key_event = (GdkEventKey *)event;
+#if ENABLE_SEARCH
   GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
   
   /* Control-F enables search mode */
@@ -427,6 +430,7 @@ edit_key_press_event (GtkWidget *widget,
     gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (cxt->search_bar), TRUE);
     return TRUE;
   }
+#endif
 
   gsize bw;
   gchar *res = NULL;
@@ -572,6 +576,7 @@ edit_object (gchar* name, gint nc)
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
+#if ENABLE_SEARCH
   GtkWidget *search_bar = gtk_search_bar_new ();
   gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
   search_context_t *search_cxt = new_search_context (search_bar, view,
@@ -584,6 +589,7 @@ edit_object (gchar* name, gint nc)
   g_signal_connect (search_entry, "key-press-event",
                     G_CALLBACK (search_key_press_event), search_cxt);
   search (this_window) = search_cxt;
+#endif
 
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (edit_key_press_event), this_window);
@@ -689,6 +695,7 @@ edit_file (gchar *path)
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
+#if ENABLE_SEARCH
   GtkWidget *search_bar = gtk_search_bar_new ();
   gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
   search_context_t *search_cxt = new_search_context (search_bar, view,
@@ -701,6 +708,7 @@ edit_file (gchar *path)
   g_signal_connect (search_entry, "key-press-event",
                     G_CALLBACK (search_key_press_event), search_cxt);
   search (this_window) = search_cxt;
+#endif
 
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (edit_key_press_event), this_window);

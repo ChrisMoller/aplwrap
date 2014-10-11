@@ -191,6 +191,7 @@ key_press_event (GtkWidget *widget,
 
   GdkEventKey *key_event = (GdkEventKey *)event;
   GdkModifierType mod_mask = gtk_accelerator_get_default_mod_mask ();
+#if ENABLE_SEARCH
   search_context_t *cxt = user_data;
 
   /* Control-F enables search mode */
@@ -199,6 +200,7 @@ key_press_event (GtkWidget *widget,
     gtk_search_bar_set_search_mode (GTK_SEARCH_BAR (cxt->search_bar), TRUE);
     return TRUE;
   }
+#endif
 
   /* Tab key runs completion */
   if (key_event->keyval == GDK_KEY_Tab) {
@@ -420,6 +422,7 @@ main (int   argc,
   if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   
+#if ENABLE_SEARCH
   GtkWidget *search_bar = gtk_search_bar_new ();
   gtk_search_bar_set_show_close_button (GTK_SEARCH_BAR (search_bar), TRUE);
   search_context_t *search_cxt = new_search_context (search_bar, view, buffer);
@@ -428,13 +431,17 @@ main (int   argc,
                     G_CALLBACK (search_changed_event), search_cxt);
   gtk_container_add (GTK_CONTAINER (search_bar), search_entry );
   gtk_box_pack_start (GTK_BOX (vbox), search_bar, FALSE, FALSE, 0);
+
   g_signal_connect (search_entry, "key-press-event",
                     G_CALLBACK (search_key_press_event), search_cxt);
-
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
-
   g_signal_connect (view, "key-press-event",
 		    G_CALLBACK (key_press_event), search_cxt);
+#else
+  g_signal_connect (view, "key-press-event",
+		    G_CALLBACK (key_press_event), NULL);
+#endif
+
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
 
   status = gtk_label_new ("status");
   gtk_label_set_ellipsize (GTK_LABEL(status), PANGO_ELLIPSIZE_END);

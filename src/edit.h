@@ -20,7 +20,9 @@ typedef struct {
   gboolean   error;
   gboolean   cb_done;
   gboolean   closing;
+#if ENABLE_SEARCH
   search_context_t *search;
+#endif
 } window_s;
 #define window(w) (w)->window
 #define buffer(w) (w)->buffer
@@ -29,7 +31,9 @@ typedef struct {
 #define error(w)  (w)->error
 #define cb_done(w) (w)->cb_done
 #define closing(w) (w)->closing
+#if ENABLE_SEARCH
 #define search(w) (w)->search
+#endif
 
 void edit_object (gchar* name, gint nc);
 

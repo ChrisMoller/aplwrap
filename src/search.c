@@ -4,6 +4,7 @@
 
 #include "search.h"
 
+#if ENABLE_SEARCH
 typedef enum {
   SEARCH_FORWARD,
   SEARCH_BACKWARD
@@ -102,3 +103,5 @@ search_changed_event (GtkSearchEntry *entry,
   gtk_text_buffer_get_start_iter (cxt->buffer, &cxt->search_start);
   do_search(SEARCH_FORWARD, cxt);
 }
+
+#endif /* ENABLE_SEARCH */
