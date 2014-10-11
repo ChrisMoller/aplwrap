@@ -41,8 +41,9 @@ void edit_file (gchar *path);
 
 gboolean dirty_edit_buffers ();
 
-void message_dialog (GtkMessageType type,
-                       gchar         *message,
-                       gchar         *secondary);
+gint message_dialog (GtkMessageType type,
+                     GtkButtonsType buttons,
+                     gchar         *message,
+                     gchar         *secondary);
 
 #endif  /* EDIT_H */

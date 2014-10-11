@@ -84,6 +84,7 @@ Menu Accelerators, edit window
 Ctrl-N                      create a new APL object
 Ctrl-O                      open an APL object for editing
 Ctrl-I                      import a text file for editing
+Ctrl-R                      revert the edit window
 Ctrl-S                      save the edit window
 Ctrl-W                      close the edit window
 Ctrl-K                      display the APL keyboard map

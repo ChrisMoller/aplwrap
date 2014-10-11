@@ -1,3 +1,14 @@
+2014-10-11  David B. Lamkins  <david@lamkins.net>
+
+	* apl.c (aplwrap_quit): Implement Revert for edit window.
+
+	* edit.h (): Implement Revert for edit window.
+
+	* edit.c (message_dialog, edit_save_object_cb)
+	(build_edit_menubar, edit_file, clear_buffer, edit_revert)
+	(edit_revert_function_cb, edit_revert_variable_cb): Implement
+	Revert for edit window.
+
 2014-10-10  David B. Lamkins  <david@lamkins.net>
 
 	* aplwrap.c, edit.c, edit.h, search.c, search.h: Enable search

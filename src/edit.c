@@ -84,18 +84,21 @@ edit_close (GtkWidget *widget,
   }
 }
 
-void
+gint
 message_dialog (GtkMessageType type,
+                GtkButtonsType buttons,
                 gchar         *message,
                 gchar         *secondary)
 {
   GtkWidget *dialog =
-    gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, type, GTK_BUTTONS_CLOSE,
+    gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, type, buttons,
                             "%s", message);
-  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                            "%s", secondary);
-  gtk_dialog_run (GTK_DIALOG(dialog));
+  if (secondary)
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                              "%s", secondary);
+  gint rc = gtk_dialog_run (GTK_DIALOG(dialog));
   gtk_widget_destroy (dialog);
+  return rc;
 }
 
 static void
@@ -142,7 +145,7 @@ edit_save_object_cb (gchar *text, void *data)
   }
   g_strfreev (lines);
   if (error_text) {
-    message_dialog (GTK_MESSAGE_WARNING,
+    message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
                     _ ("APL error while defining function"),
                     error_text);
     g_free (error_text);
@@ -341,6 +344,123 @@ edit_delete (GtkWidget *widget,
 }
 
 static void
+clear_buffer (GtkTextBuffer *buffer)
+{
+  GtkTextIter start, end;
+  gtk_text_buffer_get_start_iter (buffer, &start);
+  gtk_text_buffer_get_end_iter (buffer, &end);
+  gtk_text_buffer_delete (buffer, &start, &end);
+}
+
+static gint
+trim_length (const gchar *text) {
+  gint r = 0, i = 0;
+  while (text[i]) {
+    if (! g_ascii_isspace (text[i]))
+      r = i + 1;
+    ++i;
+  }
+  return r;
+}
+
+static void
+edit_revert_function_cb (gchar *text, void *data)
+{
+  set_send_cb (NULL, NULL);
+
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+  gchar **lines = g_strsplit (text, "\n", 0);
+  clear_buffer (tb->buffer);
+  for (int i = 1; lines[i]; i++) {
+    if (!g_strcmp0 (lines[i], END_TAG)) break;
+    gtk_text_buffer_insert_at_cursor (tb->buffer,
+                                      lines[i],
+                                      trim_length (lines[i]));
+    gtk_text_buffer_insert_at_cursor (tb->buffer, "\n", -1);
+  }
+  g_strfreev (lines);
+  gtk_text_buffer_set_modified (tb->buffer, FALSE);
+  error (tw) = FALSE;
+  set_status_line (tw, tb);
+  GtkTextIter start_iter;
+  gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+  gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+}
+
+static void
+edit_revert_variable_cb (gchar *text, void *data)
+{
+  set_send_cb (NULL, NULL);
+  g_print ("vbl: %s\n", text);
+#if 0
+  window_s *tw = data;
+  gchar **lines = g_strsplit (text, "\n", 0);
+  clear_buffer (tb->buffer);
+  for (int i = 1; lines[i]; i++) {
+    if (!g_strcmp0 (lines[i], END_TAG)) break;
+    gtk_text_buffer_insert_at_cursor (edit_buffer, lines[i], -1);
+    gtk_text_buffer_insert_at_cursor (edit_buffer, "\n", -1);
+  }
+  g_strfreev (lines);
+  gtk_text_buffer_set_modified (tb->buffer, FALSE);
+  error (tw) = FALSE;
+  set_status_line (tw, tb);
+  GtkTextIter start_iter;
+  gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+  gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+#endif
+}
+
+static void
+edit_revert (GtkWidget *widget,
+             gpointer   data)
+{
+  window_s *tw = data;
+  buffer_s *tb = buffer (tw);
+  gchar *name = tb->name;
+  gint   nc   = tb->nc;
+  gchar *path = path (tw);
+
+  if (message_dialog (GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+                      _ ("Revert buffer?"), name) == GTK_RESPONSE_YES) {
+    if (path) {
+      /* Revert file */
+      gchar *text;
+      GError *error = NULL;
+      if (!g_file_get_contents (path, &text, NULL, &error)) {
+        message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+                        _ ("File error"), error->message);
+        g_error_free (error);
+        return;
+      }
+      gtk_text_buffer_set_text (tb->buffer, text, -1);
+      g_free (text);
+      gtk_text_buffer_set_modified (tb->buffer, FALSE);
+      error (tw) = FALSE;
+      set_status_line (tw, tb);
+      GtkTextIter start_iter;
+      gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
+      gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+    }
+    else if (nc == NC_FUNCTION) {
+      /* Revert function */
+      set_send_cb (edit_revert_function_cb, tw);
+      gchar *cmd = g_strdup_printf ("fn:%s\n", name);
+      send_apl (cmd, strlen(cmd));
+      g_free (cmd);
+    }
+    else {
+      /* Revert variable */
+      set_send_cb (edit_revert_variable_cb, tw);
+      gchar *cmd = g_strdup_printf ("getvar:%s\n", name);
+      send_apl (cmd, strlen(cmd));
+      g_free (cmd);
+    }
+  }
+}
+
+static void
 build_edit_menubar (GtkWidget *vbox, window_s *tw)
 {
   GtkWidget *menubar;
@@ -369,6 +489,9 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   add_menu_item (_ ("Open F_ile"), GDK_KEY_i, accel_group,
                  G_CALLBACK (import_file), NULL, menu);
 
+  add_menu_item (_ ("_Revert"), GDK_KEY_r, accel_group,
+                 G_CALLBACK (edit_revert), tw, menu);
+
   if (!path (tw)) {
     /* Menu items for object clone/save/export */
     add_menu_item (_ ("C_lone"), -1, NULL,
@@ -384,7 +507,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
                    G_CALLBACK (save_log_as), tb->buffer, menu);
   }
   else {
-    /* Menu items for file clone/save */
+    /* Menu items for file clone/revert/save */
     add_menu_item (_ ("C_lone"), -1, NULL,
                    G_CALLBACK (clone_file), tw, menu);
 
@@ -449,17 +572,6 @@ edit_key_press_event (GtkWidget *widget,
   set_status_line (tw, tb);
 
   return rc;
-}
-
-static gint
-trim_length (const gchar *text) {
-  gint r = 0, i = 0;
-  while (text[i]) {
-    if (! g_ascii_isspace (text[i]))
-      r = i + 1;
-    ++i;
-  }
-  return r;
 }
 
 static void
@@ -670,7 +782,8 @@ edit_file (gchar *path)
       gtk_text_buffer_place_cursor (this_buffer->buffer, &start_iter);
     }
     else {
-      message_dialog (GTK_MESSAGE_WARNING, _ ("File error"), error->message);
+      message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+                      _ ("File error"), error->message);
       g_error_free (error);
       g_free (name);
       g_free (lname);
