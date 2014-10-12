@@ -143,12 +143,6 @@ edit_save_object_cb (gchar *text, void *data)
       tagged_insert (" ", -1, TAG_EDM);
     }
   }
-  if (!g_ascii_strncasecmp(lines[0], "function defined", 16)) {
-    buffer_s *tb = buffer (tw);
-    g_free (tb->name);
-    tb->name = g_strdup (lines[1]);
-    gtk_window_set_title (GTK_WINDOW(window (tw)), tb->name);
-  }
   g_strfreev (lines);
   if (error_text) {
     message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,

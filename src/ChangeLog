@@ -1,3 +1,8 @@
+2014-10-12  David B. Lamkins  <dlamkins@morganthe>
+
+	* edit.c (edit_save_object_cb): Back out window title sync.
+	Cloning needs rework.
+
 2014-10-11  David B. Lamkins  <david@lamkins.net>
 
 	* edit.c (edit_save_object_cb): Update editor window title upon
