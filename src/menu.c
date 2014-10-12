@@ -14,6 +14,7 @@
 
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
+
 static void
 settings_cb (GtkWidget *widget,
 	     gpointer   data)
@@ -247,7 +248,7 @@ names_cb (GtkTreeView *tree_view,
   sym_def_s *sd = user_data;
   
   model = gtk_tree_view_get_model(tree_view);
-  if (gtk_tree_model_get_iter (model, &iter, path)) {
+  if (path && gtk_tree_model_get_iter (model, &iter, path)) {
     gtk_tree_model_get(model, &iter,
                        OBJECT_RAW_NAME, &sd->name,
                        OBJECT_NC,       &sd->nc,

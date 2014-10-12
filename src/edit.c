@@ -14,6 +14,8 @@
 #include "edit.h"
 #include "search.h"
 
+/* buffer_s structures are kept in this table, keyed by object name or
+   file path. */
 static GHashTable *buffers = NULL;
 static gint seq_nr = 1;
 
@@ -47,7 +49,7 @@ set_status_line (window_s *tw, buffer_s *tb)
     gint line_ct = gtk_text_buffer_get_line_count (tb->buffer) -
       (gtk_text_iter_get_line_offset (&end_iter) == 0);
     gboolean modified = gtk_text_buffer_get_modified (tb->buffer);
-      
+
     gchar *st = g_strdup_printf ("%s %d / %d, %d\n",
                                  modified ? "**" : "  ",
                                  line_nr, line_ct, offset);
@@ -57,12 +59,38 @@ set_status_line (window_s *tw, buffer_s *tb)
 }
 
 static void
+update_status (buffer_s *tb)
+{
+  GSList *wl = tb->windows;
+  while (wl) {
+    window_s *tw = wl->data;
+    set_status_line (tw, tb);
+    wl = g_slist_next (wl);
+  }
+}
+
+static void
+update_name (buffer_s *tb, gchar *name)
+{
+  g_hash_table_remove (buffers, tb->name);
+  g_free (tb->name);
+  tb->name = g_strdup (name);
+  g_hash_table_insert (buffers, tb->name, tb);
+  GSList *wl = tb->windows;
+  while (wl) {
+    window_s *tw = wl->data;
+    gtk_window_set_title (GTK_WINDOW(window (tw)), tb->name);
+    wl = g_slist_next (wl);
+  }
+}
+
+static void
 edit_mark_set_event (GtkTextBuffer *buffer, GtkTextIter *location,
                      GtkTextMark *mark, gpointer data)
 {
   window_s *tw = (window_s*)data;
   buffer_s *tb = tw->buffer;
-  set_status_line (tw, tb);
+  update_status (tb);
 }
 
 static void
@@ -73,6 +101,7 @@ edit_close (GtkWidget *widget,
   closing (tw) = TRUE;
   if (!gtk_widget_in_destruction (GTK_WIDGET (window (tw)))) {
     buffer_s *tb = buffer (tw);
+    tb->windows = g_slist_remove (tb->windows, tw);
     tb->ref_count--;
     if (0 == tb->ref_count) {
       g_hash_table_remove (buffers, tb->name);
@@ -143,6 +172,12 @@ edit_save_object_cb (gchar *text, void *data)
       tagged_insert (" ", -1, TAG_EDM);
     }
   }
+  if (!g_ascii_strncasecmp(lines[0], "function defined", 16)) {
+    buffer_s *tb = buffer (tw);
+    gtk_text_buffer_set_modified (tb->buffer, FALSE);
+    update_name (tb, lines[1]);
+    update_status (tb);
+  }
   g_strfreev (lines);
   if (error_text) {
     message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
@@ -153,11 +188,6 @@ edit_save_object_cb (gchar *text, void *data)
   else {
     tagged_insert ("\n      ", -1, TAG_PRM);
     mark_input ();
-  }
-  buffer_s *tb = buffer (tw);
-  if (!error (tw)) {
-    gtk_text_buffer_set_modified (tb->buffer, FALSE);
-    set_status_line (tw, tb);
   }
   cb_done (tw) = TRUE;
 }
@@ -230,7 +260,7 @@ edit_save_file (GtkWidget *widget,
       gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
     g_file_set_contents (path (tw), text, -1, NULL);
     gtk_text_buffer_set_modified (tb->buffer, FALSE);
-    set_status_line (tw, tb);
+    update_status (tb);
   }
 }
 
@@ -248,12 +278,10 @@ edit_save_file_as (GtkWidget *widget,
       gtk_text_buffer_get_text (tb->buffer, &start_iter, &end_iter, FALSE);
     g_file_set_contents (path (tw), text, -1, NULL);
     gtk_text_buffer_set_modified (tb->buffer, FALSE);
-    set_status_line (tw, tb);
     gchar *lname = g_path_get_basename (path (tw));
-    gtk_window_set_title (GTK_WINDOW (window (tw)), lname);
-    g_hash_table_remove (buffers, tb->name);
-    tb->name = lname;
-    g_hash_table_insert (buffers, tb->name, tb);
+    update_name (tb, lname);
+    g_free (lname);
+    update_status (tb);
   }
 }
 
@@ -382,10 +410,10 @@ edit_revert_function_cb (gchar *text, void *data)
   g_strfreev (lines);
   gtk_text_buffer_set_modified (tb->buffer, FALSE);
   error (tw) = FALSE;
-  set_status_line (tw, tb);
   GtkTextIter start_iter;
   gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
   gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+  update_status (tb);
 }
 
 static void
@@ -405,10 +433,10 @@ edit_revert_variable_cb (gchar *text, void *data)
   g_strfreev (lines);
   gtk_text_buffer_set_modified (tb->buffer, FALSE);
   error (tw) = FALSE;
-  set_status_line (tw, tb);
   GtkTextIter start_iter;
   gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
   gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+  update_status (tb);
 #endif
 }
 
@@ -438,10 +466,10 @@ edit_revert (GtkWidget *widget,
       g_free (text);
       gtk_text_buffer_set_modified (tb->buffer, FALSE);
       error (tw) = FALSE;
-      set_status_line (tw, tb);
       GtkTextIter start_iter;
       gtk_text_buffer_get_start_iter (tb->buffer, &start_iter);
       gtk_text_buffer_place_cursor (tb->buffer, &start_iter);
+      update_status (tb);
     }
     else if (nc == NC_FUNCTION) {
       /* Revert function */
@@ -494,7 +522,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
 
   if (!path (tw)) {
     /* Menu items for object clone/save/export */
-    add_menu_item (_ ("C_lone"), -1, NULL,
+    add_menu_item (_ ("C_lone"), GDK_KEY_l, accel_group,
                    G_CALLBACK (clone_object), tw, menu);
 
     add_menu_item (_ ("_Save"), GDK_KEY_s, accel_group,
@@ -508,7 +536,7 @@ build_edit_menubar (GtkWidget *vbox, window_s *tw)
   }
   else {
     /* Menu items for file clone/revert/save */
-    add_menu_item (_ ("C_lone"), -1, NULL,
+    add_menu_item (_ ("C_lone"), GDK_KEY_l, accel_group,
                    G_CALLBACK (clone_file), tw, menu);
 
     add_menu_item (_ ("_Save"), GDK_KEY_s, accel_group,
@@ -569,7 +597,7 @@ edit_key_press_event (GtkWidget *widget,
     rc = TRUE;
   }
 
-  set_status_line (tw, tb);
+  update_status (tb);
 
   return rc;
 }
@@ -633,7 +661,7 @@ edit_object (gchar* name, gint nc)
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   window (this_window) = window;
-  gtk_window_set_title (GTK_WINDOW (window), name ? : "Unnamed");
+  gtk_window_set_title (GTK_WINDOW (window), lname);
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
@@ -652,7 +680,7 @@ edit_object (gchar* name, gint nc)
   }
   
   if (!this_buffer) {
-    this_buffer = g_malloc (sizeof(buffer_s));
+    this_buffer = g_malloc0 (sizeof(buffer_s));
     this_buffer->buffer = gtk_text_buffer_new (NULL);
     this_buffer->name = lname;
     this_buffer->ref_count = 1;
@@ -675,6 +703,7 @@ edit_object (gchar* name, gint nc)
     }
   }
 
+  this_buffer->windows = g_slist_prepend (this_buffer->windows, this_window);
   buffer (this_window) = this_buffer;
 
   build_edit_menubar (vbox, this_window);
@@ -740,13 +769,14 @@ edit_file (gchar *path)
   gchar *name = g_path_get_basename (path);
   gchar *lname =
     name ? g_strdup (name) : g_strdup_printf ("Unnamed_%d", seq_nr++);
+  g_free (name);
 
   this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   window (this_window) = window;
   path (this_window) = path;
-  gtk_window_set_title (GTK_WINDOW (window), name ? : "Unnamed");
+  gtk_window_set_title (GTK_WINDOW (window), lname);
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
@@ -765,7 +795,7 @@ edit_file (gchar *path)
   }
   
   if (!this_buffer) {
-    this_buffer = g_malloc (sizeof(buffer_s));
+    this_buffer = g_malloc0 (sizeof(buffer_s));
     this_buffer->buffer = gtk_text_buffer_new (NULL);
     this_buffer->name = lname;
     this_buffer->ref_count = 1;
@@ -785,7 +815,6 @@ edit_file (gchar *path)
       message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
                       _ ("File error"), error->message);
       g_error_free (error);
-      g_free (name);
       g_free (lname);
       g_free (this_window);
       gtk_widget_destroy (window);
@@ -795,6 +824,7 @@ edit_file (gchar *path)
     }
   }
 
+  this_buffer->windows = g_slist_prepend (this_buffer->windows, this_window);
   buffer (this_window) = this_buffer;
 
   build_edit_menubar (vbox, this_window);

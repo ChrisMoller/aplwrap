@@ -5,13 +5,16 @@
 
 #include "search.h"
 
+/* One per edit buffer. A buffer may be displayed in multiple windows. */
 typedef struct {
   GtkTextBuffer *buffer;
   gchar *name;
   gint ref_count;
   gint nc;
+  GSList *windows; /* list of window_s* */
 } buffer_s;
 
+/* One per edit window. */
 typedef struct {
   GtkWidget *window;
   GtkWidget *status_line;
