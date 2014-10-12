@@ -1,5 +1,8 @@
 2014-10-11  David B. Lamkins  <david@lamkins.net>
 
+	* edit.c (edit_save_object_cb): Update editor window title upon
+	saving function.
+
 	* apl.c (aplwrap_quit): Implement Revert for edit window.
 
 	* edit.h (): Implement Revert for edit window.
