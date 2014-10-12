@@ -5,17 +5,21 @@ aplwrap_SOURCES = aplwrap.c Avec.h keymap.h layout.h \
                   history.c history.h txtbuf.c txtbuf.h \
                   edit.c edit.h complete.c complete.h \
                   pstat.c pstat.h resources.c resources.h \
-		  help.c help.h build.h search.c search.h
+		  help.c help.h search.c search.h
 
 aplwrap_CFLAGS = -std=c99 -Wall -Werror $(GTK_CFLAGS) -I$(APL_SOURCES) 
 aplwrap_CPPFLAGS=-DMANUALS_PATH=\"$(docdir)\"
 
 aplwrap_LDADD = $(GTK_LIBS)
 
+BUILT_SOURCES = build.h
+
 build.h: build.h-new
-	diff $^ $@ 2>/dev/null || mv $^ $@
+	diff $@ $^ 2>/dev/null || mv $^ $@
 	rm -f $^
 
-.PHONY: build.h-new
 build.h-new:
-	./buildinfo > $(@)
+	./buildinfo > $@
+
+clean-local:
+	rm -f build.h
