@@ -11,8 +11,8 @@ edit window. Create an APL function with the header on the first line.
 When you are done, use the `File > Save` command to define the
 function in the APL session.
 
-To edit an existing function, use the `File > Open` command to select
-from a list of functions and operators in the workspace.
+To edit an existing function, use the `File > Open Object` command to
+select from a list of functions and operators in the workspace.
 
 The Open Object dialog may be searched; use the Ctrl-F key to initiate
 a search. The active search may be repeated in a forward direction
@@ -22,16 +22,16 @@ Files
 -----
 
 The aplwrap editor may be used to edit existing text files, including
-plain-text APL files. Import an existing file with the `File > Import`
-command. When you are done, save the file using the `File > Save`
+plain-text APL files. The `File > Open File` command opens an
+existing. When you are done, save the file using the `File > Save`
 command.
 
 Exports
 -------
 
-An editor window may be exported using the `File > Export` command.
-This does not turn the editor into a file editor; the saved file may
-be imported as described above.
+You can export the content of an object editor window to a text file.
+Use the `File > Export` command. This does not turn the editor into a
+file editor; the saved file may be imported as described above.
 
 Clones
 ------
