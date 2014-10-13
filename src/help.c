@@ -75,7 +75,7 @@ show_manuals (GtkWidget *widget,
 {
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), _ ("Manuals"));
-  gtk_window_set_default_size (GTK_WINDOW (window), 600, 400);
+  gtk_window_set_default_size (GTK_WINDOW (window), width, height);
   GtkWidget *notebook = gtk_notebook_new ();
   gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
   gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook));

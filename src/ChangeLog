@@ -1,4 +1,7 @@
-2014-10-13  David B. Lamkins  <dlamkins@morganthe>
+2014-10-13  David B. Lamkins  <david@lamkins.net>
+
+	* help.c (show_manuals): Manuals window is the same size as other
+	APLwrap windows.
 
 	* edit.h (): Offer to save dirty file edit buffers while quitting.
 
