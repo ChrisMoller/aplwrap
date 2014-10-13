@@ -37,12 +37,15 @@ void
 aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
+#if 0
+  /* FIX: Something funky happens here... */
   if (dirty_edit_buffers ()) {
     message_dialog (GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
                     _ ("Some edit windows are unsaved"),
                     _ ("Close edit windows to finish quitting " PGM_TITLE "."));
     return;
   }
+#endif
 
   quitting = TRUE;
 

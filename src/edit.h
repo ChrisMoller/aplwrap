@@ -18,6 +18,7 @@ typedef struct {
 typedef struct {
   GtkWidget *window;
   GtkWidget *status_line;
+  GtkWidget *view;
   buffer_s  *buffer;
   gchar     *path;
   gboolean   error;
@@ -28,8 +29,9 @@ typedef struct {
 #endif
 } window_s;
 #define window(w) (w)->window
-#define buffer(w) (w)->buffer
 #define status(w) (w)->status_line
+#define view(w)   (w)->view
+#define buffer(w) (w)->buffer
 #define path(w)   (w)->path
 #define error(w)  (w)->error
 #define cb_done(w) (w)->cb_done

@@ -39,7 +39,7 @@ dirty_edit_buffers ()
 static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
-  if (!closing(tw)) {
+  if (status (tw) && tb->buffer && !closing (tw)) {
     GtkTextIter line_iter, end_iter;
     GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
     gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
@@ -70,18 +70,53 @@ update_status (buffer_s *tb)
 }
 
 static void
-update_name (buffer_s *tb, gchar *name)
+update_name_and_status (buffer_s *tb, gchar *name)
 {
-  g_hash_table_remove (buffers, tb->name);
-  g_free (tb->name);
-  tb->name = g_strdup (name);
-  g_hash_table_insert (buffers, tb->name, tb);
+  buffer_s *existing = g_hash_table_lookup (buffers, name);
+  if (existing) {
+    if (tb != existing) {
+      /* Mutate tb to adopt windows which already have the given name.
+         Those windows adopt tb's buffer. */
+      g_assert_cmpstr(name, ==, existing->name);
+      g_assert_cmpstr(tb->name, !=, existing->name);
+      GSList *wl = existing->windows;
+      g_object_ref (tb->buffer);
+      while (wl) {
+        window_s *tw = wl->data;
+        gtk_text_view_set_buffer (GTK_TEXT_VIEW (view (tw)), tb->buffer);
+        buffer (tw) = tb;
+        tb->ref_count++;
+        tb->windows = g_slist_prepend (tb->windows, tw);
+        wl = g_slist_next (wl);
+      }
+      g_object_unref (tb->buffer);
+      /* Everything except `name` is now in `tb` */
+      g_hash_table_remove (buffers, name); /* This'll remove `existing` */
+      g_slist_free (existing->windows);
+      g_free (existing->name);
+      g_free (existing);
+      g_free (tb->name); /* Now give `tb` the correct name */
+      tb->name = g_strdup (name);
+    }
+  }
+  else {
+    /* Simply update tb's name */
+    g_hash_table_remove (buffers, tb->name);
+    g_free (tb->name);
+    tb->name = g_strdup (name);
+    g_hash_table_insert (buffers, tb->name, tb);
+  }
+
+  /* Update all window titles */
   GSList *wl = tb->windows;
   while (wl) {
     window_s *tw = wl->data;
-    gtk_window_set_title (GTK_WINDOW(window (tw)), tb->name);
+    gtk_window_set_title (GTK_WINDOW(window (tw)), name);
     wl = g_slist_next (wl);
   }
+
+  /* Update all status bars */
+  update_status (tb);
 }
 
 static void
@@ -175,8 +210,7 @@ edit_save_object_cb (gchar *text, void *data)
   if (!g_ascii_strncasecmp(lines[0], "function defined", 16)) {
     buffer_s *tb = buffer (tw);
     gtk_text_buffer_set_modified (tb->buffer, FALSE);
-    update_name (tb, lines[1]);
-    update_status (tb);
+    update_name_and_status (tb, lines[1]);
   }
   g_strfreev (lines);
   if (error_text) {
@@ -279,9 +313,8 @@ edit_save_file_as (GtkWidget *widget,
     g_file_set_contents (path (tw), text, -1, NULL);
     gtk_text_buffer_set_modified (tb->buffer, FALSE);
     gchar *lname = g_path_get_basename (path (tw));
-    update_name (tb, lname);
+    update_name_and_status (tb, lname);
     g_free (lname);
-    update_status (tb);
   }
 }
 
@@ -715,6 +748,7 @@ edit_object (gchar* name, gint nc)
 		    G_CALLBACK (edit_close), this_window);
   
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
+  view (this_window) = view;
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
 #if ENABLE_SEARCH
@@ -836,6 +870,7 @@ edit_file (gchar *path)
 		    G_CALLBACK (edit_close), this_window);
   
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
+  view (this_window) = view;
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
 #if ENABLE_SEARCH

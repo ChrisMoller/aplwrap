@@ -1,4 +1,19 @@
-2014-10-12  David B. Lamkins  <dlamkins@morganthe>
+2014-10-12  David B. Lamkins  <david@lamkins.net>
+
+	* edit.h (): When saving a buffer under a different name, existing
+	buffers with that name adopt the new content.
+
+	* edit.c (set_status_line, update_name_and_status)
+	(edit_save_object_cb, edit_save_file_as, edit_object, edit_file):
+	When saving a buffer under a different name, existing buffers with
+	that name adopt the new content.
+
+	* apl.c (aplwrap_quit): For now, disable the dirty-buffer check on
+	exit.
+
+	* edit.c (update_name, edit_object, edit_file): Update edit
+	windows with new content upon renaming another edit window to a
+	matching name or path.
 
 	* menu.c (names_cb): Fix failed assertion upon closing empty Open
 	Object window.
