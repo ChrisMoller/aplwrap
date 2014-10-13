@@ -144,8 +144,8 @@ edit_close (GtkWidget *widget,
       g_hash_table_remove (buffers, tb->name);
       g_free (tb->name);
       g_free (tb);
-      buffer (tw) = NULL;
     }
+    buffer (tw) = NULL;
     gtk_widget_destroy(window (tw));
     g_free (tw);
   }
