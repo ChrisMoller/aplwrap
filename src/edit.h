@@ -51,4 +51,6 @@ gint message_dialog (GtkMessageType type,
                      gchar         *message,
                      gchar         *secondary);
 
+void save_dirty_edit_buffers ();
+
 #endif  /* EDIT_H */

@@ -33,21 +33,18 @@ static guint plot_source = 0;
 
 static gboolean quitting = FALSE;
 
+gboolean is_quitting ()
+{
+  return quitting;
+}
+
 void
 aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
-#if 0
-  /* FIX: Something funky happens here... */
-  if (dirty_edit_buffers ()) {
-    message_dialog (GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-                    _ ("Some edit windows are unsaved"),
-                    _ ("Close edit windows to finish quitting " PGM_TITLE "."));
-    return;
-  }
-#endif
-
   quitting = TRUE;
+
+  save_dirty_edit_buffers ();
 
   save_resources ();
 

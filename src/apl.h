@@ -13,4 +13,6 @@ void aplwrap_quit (GtkWidget *widget,
 
 void apl_interrupt ();
 
+gboolean is_quitting ();
+
 #endif

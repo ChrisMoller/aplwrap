@@ -1,3 +1,16 @@
+2014-10-13  David B. Lamkins  <dlamkins@morganthe>
+
+	* edit.h (): Offer to save dirty file edit buffers while quitting.
+
+	* apl.h (): Offer to save dirty file edit buffers while quitting.
+
+	* edit.c (edit_delete_real, check_modified_and_save)
+	(save_dirty_edit_buffers): Offer to save dirty file edit buffers
+	while quitting.
+
+	* apl.c (is_quitting, aplwrap_quit): Offer to save dirty file edit
+	buffers while quitting.
+
 2014-10-12  David B. Lamkins  <david@lamkins.net>
 
 	* edit.c (update_status, set_status_line, edit_close): Fix crash

@@ -20,23 +20,6 @@ static GHashTable *buffers = NULL;
 static gint seq_nr = 1;
 
 static void
-check_modified (gpointer key, gpointer value, gpointer data)
-{
-  buffer_s *tb = value;
-  gboolean *modified = data;
-  *modified |= gtk_text_buffer_get_modified (tb->buffer);
-}
-
-gboolean
-dirty_edit_buffers ()
-{
-  gboolean modified = FALSE;
-  if (buffers)
-    g_hash_table_foreach (buffers, check_modified, &modified);
-  return modified;
-}
-
-static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
   if (!closing (tw) && status (tw) && tb->buffer) {
@@ -346,11 +329,17 @@ edit_delete_real (GtkWidget *widget,
 				       GTK_BUTTONS_NONE,
 				       _ ("Buffer %s modified.  Save it?"),
 				       tb->name);
-    gtk_dialog_add_buttons (GTK_DIALOG (e_dialog),
-			    _("Yes"),    GTK_RESPONSE_YES,
-			    _("No"),     GTK_RESPONSE_NO,
-			    _("Cancel"), GTK_RESPONSE_CANCEL,
-			    NULL);
+    if (is_quitting ())
+      gtk_dialog_add_buttons (GTK_DIALOG (e_dialog),
+                              _("Yes"),    GTK_RESPONSE_YES,
+                              _("No"),     GTK_RESPONSE_NO,
+                              NULL);
+    else
+      gtk_dialog_add_buttons (GTK_DIALOG (e_dialog),
+                              _("Yes"),    GTK_RESPONSE_YES,
+                              _("No"),     GTK_RESPONSE_NO,
+                              _("Cancel"), GTK_RESPONSE_CANCEL,
+                              NULL);
     gtk_window_set_keep_above (GTK_WINDOW (e_dialog), TRUE);
     gtk_window_set_position (GTK_WINDOW (e_dialog), GTK_WIN_POS_MOUSE);
     response = gtk_dialog_run (GTK_DIALOG (e_dialog));
@@ -405,6 +394,28 @@ edit_delete (GtkWidget *widget,
 {
   gboolean rc = edit_delete_real (widget, data);
   if (!rc) edit_close (widget, data);
+}
+
+static void
+check_modified_and_save (gpointer key, gpointer value, gpointer data)
+{
+  buffer_s *tb = value;
+  if (gtk_text_buffer_get_modified (tb->buffer)) {
+    GSList *wl = tb->windows;
+    while (wl) {
+      window_s *tw = wl->data;
+      if (path (tw)) edit_delete_real (NULL, tw);
+      wl = g_slist_next (wl);
+    }
+    
+  }
+}
+
+void
+save_dirty_edit_buffers ()
+{
+  if (buffers)
+    g_hash_table_foreach (buffers, check_modified_and_save, NULL);
 }
 
 static void
