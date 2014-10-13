@@ -1,5 +1,8 @@
 2014-10-12  David B. Lamkins  <david@lamkins.net>
 
+	* edit.c (update_status, set_status_line, edit_close): Fix crash
+	when closing edit window.
+
 	* edit.h (): When saving a buffer under a different name, existing
 	buffers with that name adopt the new content.
 

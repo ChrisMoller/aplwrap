@@ -39,7 +39,7 @@ dirty_edit_buffers ()
 static void
 set_status_line (window_s *tw, buffer_s *tb)
 {
-  if (status (tw) && tb->buffer && !closing (tw)) {
+  if (!closing (tw) && status (tw) && tb->buffer) {
     GtkTextIter line_iter, end_iter;
     GtkTextMark *insert = gtk_text_buffer_get_insert (tb->buffer);
     gtk_text_buffer_get_iter_at_mark (tb->buffer, &line_iter, insert);
@@ -61,11 +61,13 @@ set_status_line (window_s *tw, buffer_s *tb)
 static void
 update_status (buffer_s *tb)
 {
-  GSList *wl = tb->windows;
-  while (wl) {
-    window_s *tw = wl->data;
-    set_status_line (tw, tb);
-    wl = g_slist_next (wl);
+  if (tb) {
+    GSList *wl = tb->windows;
+    while (wl) {
+      window_s *tw = wl->data;
+      set_status_line (tw, tb);
+      wl = g_slist_next (wl);
+    }
   }
 }
 
@@ -142,6 +144,7 @@ edit_close (GtkWidget *widget,
       g_hash_table_remove (buffers, tb->name);
       g_free (tb->name);
       g_free (tb);
+      buffer (tw) = NULL;
     }
     gtk_widget_destroy(window (tw));
     g_free (tw);
