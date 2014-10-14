@@ -43,6 +43,7 @@ Ctrl-Backspace              delete word to left
 Ctrl-Delete                 delete word to right
 Shift-Ctrl-Backspace        delete to end of line
 Shift-Ctrl-Delete           delete to beginning of line
+Alt-Delete                  delete uncommitted input
 Ctrl-Return, Ctrl-Enter     insert a line break
 Insert                      toggle insert/overwrite
 Tab                         completion (see COMPLETION.md)

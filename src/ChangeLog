@@ -1,3 +1,8 @@
+2014-10-14  David B. Lamkins  <david@lamkins.net>
+
+	* aplwrap.c (delete_uncommitted_input, key_press_event): Bind
+	Alt-Delete to delete uncommitted input.
+
 2014-10-13  David B. Lamkins  <david@lamkins.net>
 
 	* help.c (show_manuals): Manuals window is the same size as other

@@ -182,6 +182,24 @@ advance_by_apl_prompt (gboolean forward)
   }
 }
 
+static void
+delete_uncommitted_input ()
+{
+  if (is_at_prompt () &&
+      cursor_in_input_area ()) {
+    GtkTextIter start_iter, end_iter;
+    GtkTextMark *insert = gtk_text_buffer_get_insert (buffer);
+    gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, insert);
+    gtk_text_iter_set_line_offset (&start_iter, 0);
+    while (gtk_text_iter_has_tag (&start_iter, get_tag (TAG_PRM)))
+      gtk_text_iter_forward_char (&start_iter);
+    gtk_text_buffer_place_cursor (buffer, &start_iter);
+    gtk_text_buffer_get_end_iter (buffer, &end_iter);
+    gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
+  }
+}
+
+
 static gboolean
 key_press_event (GtkWidget *widget,
                  GdkEvent  *event,
@@ -276,6 +294,12 @@ key_press_event (GtkWidget *widget,
 
   if (key_event->keyval == GDK_KEY_Page_Down) {
     advance_by_apl_prompt (TRUE);
+    return TRUE;
+  }
+
+  /* Delete uncommitted input */
+  if (key_event->keyval == GDK_KEY_Delete) {
+    delete_uncommitted_input ();
     return TRUE;
   }
 
