@@ -1,3 +1,17 @@
+2014-10-15  David B. Lamkins  <dlamkins@logrus>
+
+	* pstat.h (): Pstat window is now accessed via Help menu and
+	retains appearance when not in front.
+
+	* menu.c (settings_cb): Pstat window is now accessed via Help menu
+	and retains appearance when not in front.
+
+	* help.c (help_menu): Pstat window is now accessed via Help menu
+	and retains appearance when not in front.
+
+	* pstat.c (pstat_destroy, show_pstat): Pstat window is now
+	accessed via Help menu and retains appearance when not in front.
+
 2014-10-14  David B. Lamkins  <david@lamkins.net>
 
 	* aplwrap.c (delete_uncommitted_input, key_press_event): Bind

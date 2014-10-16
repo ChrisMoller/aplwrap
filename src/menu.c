@@ -23,7 +23,6 @@ settings_cb (GtkWidget *widget,
   GtkWidget *content;
   GtkWidget *vbox;
   GtkWidget *ps_toggle;
-  GtkWidget *ps_button;
   
   dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
                                          NULL,
@@ -42,11 +41,6 @@ settings_cb (GtkWidget *widget,
   g_signal_connect (ps_toggle, "toggled",
 		    G_CALLBACK (ps_toggle_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
-
-  ps_button = gtk_button_new_with_mnemonic (_ ("Open pstat _window."));
-  g_signal_connect (ps_button, "clicked",
-		    G_CALLBACK (ps_button_cb), NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), ps_button, FALSE, FALSE, 2);
 
   gtk_widget_show_all (dialog);
   gtk_dialog_run (GTK_DIALOG (dialog));

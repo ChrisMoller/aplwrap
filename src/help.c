@@ -8,6 +8,7 @@
 #include "options.h"
 #include "aplwrap.h"
 #include "build.h"
+#include "pstat.h"
 
 #include "layout.h"
 
@@ -155,6 +156,9 @@ help_menu (GtkWidget     *vbox,
 
   add_menu_item (_ ("_Manuals"), GDK_KEY_m, accel_group,
                  G_CALLBACK (show_manuals), NULL, menu);
+
+  add_menu_item (_ ("Psta_t"), GDK_KEY_t, accel_group,
+                 G_CALLBACK (show_pstat), NULL, menu);
 
   item = gtk_separator_menu_item_new();
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);

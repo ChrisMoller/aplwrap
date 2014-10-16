@@ -38,7 +38,7 @@ char* format_pstat (pstat *stats);
 void ps_toggle_cb (GtkToggleButton *togglebutton,
                    gpointer         user_data);
 
-void ps_button_cb (GtkToggleButton *togglebutton,
-                   gpointer         user_data);
+void show_pstat (GtkWidget *widget,
+                 gpointer   user_data);
 
 #endif

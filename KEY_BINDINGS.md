@@ -76,6 +76,7 @@ Ctrl-O                      open an APL object for editing
 Ctrl-I                      import a text file for editing
 Ctrl-K                      display the APL keyboard map
 Ctrl-M                      display APLwrap manuals
+Ctrl-T                      display pstat window
 ```
 
 Menu Accelerators, edit window
@@ -90,6 +91,7 @@ Ctrl-S                      save the edit window
 Ctrl-W                      close the edit window
 Ctrl-K                      display the APL keyboard map
 Ctrl-M                      display APLwrap manuals
+Ctrl-T                      display pstat window
 ```
 
 Open Object Dialog

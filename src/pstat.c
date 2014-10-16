@@ -40,11 +40,10 @@ pstat_ety_s pstat_etys[] = {
 };
 
 void
-ps_dialog_cb (GtkDialog *dialog,
-	      gint       response_id,
-	      gpointer   user_data)
+pstat_destroy (GtkWidget *widget,
+               gpointer   user_data)
 {
-  gtk_widget_destroy (GTK_WIDGET (dialog));
+  gtk_widget_destroy (GTK_WIDGET (widget));
   pstat_grid = NULL;
 }
 
@@ -56,42 +55,43 @@ set_pstat_value (gint idx, const gchar *val)
 }
 
 void
-ps_button_cb (GtkToggleButton *togglebutton,
-	      gpointer         user_data)
+show_pstat (GtkWidget *widget,
+            gpointer   user_data)
 {
-  GtkWidget *dialog;
-  GtkWidget *content;
+  GtkWidget *window;
   GtkWidget *vbox;
+  GdkRGBA    color;
 
   if (pstat_grid) return;
 
-  dialog =  gtk_dialog_new_with_buttons (_ ("Pstat"),
-                                         NULL,
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         _ ("_Close"), GTK_RESPONSE_ACCEPT,
-                                         NULL);
-  g_signal_connect_swapped (dialog, "response",
-                          G_CALLBACK (ps_dialog_cb),
-                          dialog);
-  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  window =  gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (window), _ ("Pstat"));
+  gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  gdk_rgba_parse (&color, "white");
+  gtk_widget_override_background_color (window, GTK_STATE_FLAG_NORMAL, &color);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
-  gtk_container_add (GTK_CONTAINER (content), vbox);
+  gtk_container_add (GTK_CONTAINER (window), vbox);
   pstat_grid = gtk_grid_new ();
-  gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 8);
+  gdk_rgba_parse (&color, "black");
+  gtk_widget_override_color (window, GTK_STATE_FLAG_NORMAL, &color);
+  gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 12);
 
   for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
     GtkWidget *lbl = gtk_label_new (pstat_etys[i].label);
-    gtk_misc_set_alignment (GTK_MISC (lbl), 1.0, 0.0);
+    gtk_widget_set_halign (lbl, GTK_ALIGN_END);
     GtkWidget *val = gtk_label_new ("");
-    gtk_misc_set_alignment (GTK_MISC (val), 1.0, 0.0);
+    gtk_widget_set_halign (val, GTK_ALIGN_START);
     pstat_etys[i].value = val;
     gtk_grid_attach (GTK_GRID (pstat_grid), lbl, 0, i, 1, 1);
     gtk_grid_attach (GTK_GRID (pstat_grid), val, 1, i, 1, 1);
   }
   update_pstat_strings ();
   
+  g_signal_connect (window, "destroy",
+		    G_CALLBACK (pstat_destroy), NULL);
+
   gtk_box_pack_start (GTK_BOX (vbox), pstat_grid, FALSE, FALSE, 2);
-  gtk_widget_show_all (dialog);
+  gtk_widget_show_all (window);
 }
 
 void
