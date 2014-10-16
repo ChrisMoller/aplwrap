@@ -21,8 +21,11 @@ static gchar* aplfx="⎕fx 'z←i ___ p;m'"
   " '→0'"
   " 'D: _←⎕nl 2 3 4 5 6'"
   " '→0'"
-  " 'F: m←((⎕io=,1↑[⎕io+1]p⍷_)⌿_)⍪'' '''"
-  " 'z←((↑⍴m)|i+1) (('' ''≠z)/z←m[((⎕io-1)+↑⍴m)⌊⎕io⌈⎕io+i;])'";
+  " 'F: →(0=⍴_)/E'"
+  " 'm←((⎕io=,1↑[⎕io+1]p⍷_)⌿_)⍪'' '''"
+  " 'z←((↑⍴m)|i+1) (('' ''≠z)/z←m[((⎕io-1)+↑⍴m)⌊⎕io⌈⎕io+i;])'"
+  " '→0'"
+  " 'E: z←'''''";
 
 /* Evaluate this expression in APL to determine the presence of the
    ___ function; 1 = yes, 0 = no. */

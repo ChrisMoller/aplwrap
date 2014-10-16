@@ -1,4 +1,8 @@
-2014-10-15  David B. Lamkins  <dlamkins@logrus>
+2014-10-16  David B. Lamkins  <david@lamkins.net>
+
+	* complete.c: Completion function handles empty completion list.
+
+2014-10-15  David B. Lamkins  <david@lamkins.net>
 
 	* pstat.h (): Pstat window is now accessed via Help menu and
 	retains appearance when not in front.
