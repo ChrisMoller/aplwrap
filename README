@@ -17,6 +17,7 @@ Application Options:
   -x, --xeq                Path to the GNU APL executable [string]
   --LX                     APL startup command or expression [string]
   --rows-var               APL variable name for display row count [string]
+  --shortcuts              file chooser directory shortcuts file [path]
   -f, --file               APL script file [path]
   --version                Print version and exit
   --display=DISPLAY        X display to use

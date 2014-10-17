@@ -11,6 +11,7 @@ extern gboolean     vwidth;
 extern gboolean     nocolour;
 extern gchar       *new_fn;
 extern gchar       *opt_lx;
+extern gchar       *shortcuts_file;
 extern gchar       *script;
 extern gchar       *rows_v;
 extern GOptionEntry entries[];

@@ -37,5 +37,6 @@ void add_menu_item (gchar         *name,
                     GCallback      callback,
                     gpointer       data,
                     GtkWidget     *menu);
+void init_shortcuts ();
 
 #endif

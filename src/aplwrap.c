@@ -475,6 +475,7 @@ main (int   argc,
   gtk_box_pack_start (GTK_BOX (vbox), status, FALSE, FALSE, 2);
 
   define_tags ();
+  init_shortcuts ();
 
   gtk_widget_show_all (window);
   set_status_visibility (show_status);

@@ -11,6 +11,7 @@
 #include "txtbuf.h"
 #include "edit.h"
 #include "pstat.h"
+#include "options.h"
 
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
@@ -54,6 +55,23 @@ remember_shortcut (char *path)
 {
   if (!g_slist_find (shortcuts, path))
     shortcuts = g_slist_prepend(shortcuts, path);
+}
+
+void
+init_shortcuts ()
+{
+  gchar *contents;
+  if (shortcuts_file && g_file_get_contents (shortcuts_file, &contents,
+                                             NULL, NULL)) {
+    gchar **lines = g_strsplit (contents, "\n", -1);
+    for (int i = g_strv_length (lines)-1; i >= 0; --i) {
+      gchar *path = g_strstrip (lines[i]);
+      if (path[0] != '#' && path[0] != ';' && path[0] != '\0' &&
+          g_file_test (path, G_FILE_TEST_IS_DIR))
+        remember_shortcut (g_strdup (path));
+    }
+    g_strfreev(lines);
+  }
 }
 
 static void
