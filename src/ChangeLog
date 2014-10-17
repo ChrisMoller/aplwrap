@@ -1,5 +1,8 @@
 2014-10-16  David B. Lamkins  <david@lamkins.net>
 
+	* complete.c: Improve completion function's wraparound logic. Fix
+	completion function's origin-dependence.
+
 	* complete.c: Completion function handles empty completion list.
 
 2014-10-15  David B. Lamkins  <david@lamkins.net>
