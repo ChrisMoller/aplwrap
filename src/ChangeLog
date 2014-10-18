@@ -1,3 +1,7 @@
+2014-10-18  David B. Lamkins  <david@lamkins.net>
+
+	* pstat.c (show_pstat): Create Pstat window under mouse pointer.
+
 2014-10-17  David B. Lamkins  <david@lamkins.net>
 
 	* menu.h: Support explicit creation of a new file editor, rather

@@ -65,6 +65,7 @@ show_pstat (GtkWidget *widget,
   if (pstat_grid) return;
 
   window =  gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
   gtk_window_set_title (GTK_WINDOW (window), _ ("Pstat"));
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   gdk_rgba_parse (&color, "white");
