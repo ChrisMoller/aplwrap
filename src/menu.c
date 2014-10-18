@@ -125,8 +125,8 @@ set_filename (const gchar *prompt, gchar **filename)
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Save"),   GTK_RESPONSE_ACCEPT,
                                         NULL);
-  if (*filename) dirname = g_path_get_dirname (*filename);
-  else dirname = g_strdup (".");
+  dirname = *filename && *filename != NEW_FILE
+    ? g_path_get_dirname (*filename) : g_strdup (".");
   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), dirname);
   g_free (dirname);
   gtk_file_chooser_set_create_folders (GTK_FILE_CHOOSER (dialog), TRUE);
@@ -171,7 +171,7 @@ set_filename (const gchar *prompt, gchar **filename)
     else run = FALSE;
   }
   if (lname) {
-    if (*filename) g_free (*filename);
+    if (*filename && *filename != NEW_FILE) g_free (*filename);
     *filename = lname;
     rc = TRUE;
   }
@@ -427,6 +427,13 @@ new_object (GtkWidget *widget,
 }
 
 void
+new_file (GtkWidget *widget,
+          gpointer   data)
+{
+  edit_file (NULL);
+}
+
+void
 add_menu_item (gchar         *name,
                gint           accel_key,
                GtkAccelGroup *accel_group,
@@ -463,8 +470,11 @@ build_menubar (GtkWidget *vbox)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
   gtk_menu_shell_append (GTK_MENU_SHELL (menubar), item);
 
-  add_menu_item (_ ("_New"), GDK_KEY_n, accel_group,
+  add_menu_item (_ ("_New Object"), GDK_KEY_n, accel_group,
                  G_CALLBACK (new_object), NULL, menu);
+
+  add_menu_item (_ ("New Fil_e"), GDK_KEY_e, accel_group,
+                 G_CALLBACK (new_file), NULL, menu);
 
   add_menu_item (_ ("_Open Object"), GDK_KEY_o, accel_group,
                  G_CALLBACK (open_object), NULL, menu);

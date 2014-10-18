@@ -27,8 +27,7 @@ void set_pstat_value (gint idx, const gchar *val);
 void build_menubar (GtkWidget *vbox);
 void open_object (GtkWidget *widget, gpointer   data);
 void new_object (GtkWidget *widget, gpointer   data);
-void save_log (GtkWidget *widget, gpointer   data);
-void save_log_as (GtkWidget *widget, gpointer   data);
+void new_file (GtkWidget *widget, gpointer   data);
 gboolean set_filename (const gchar *prompt, gchar **filename);
 gboolean import_file ();
 void add_menu_item (gchar         *name,

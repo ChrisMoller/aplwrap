@@ -5,6 +5,8 @@
 
 #include "search.h"
 
+#define NEW_FILE ((gchar*)-1)
+
 /* One per edit buffer. A buffer may be displayed in multiple windows. */
 typedef struct {
   GtkTextBuffer *buffer;

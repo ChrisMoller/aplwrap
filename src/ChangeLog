@@ -1,3 +1,22 @@
+2014-10-17  David B. Lamkins  <david@lamkins.net>
+
+	* menu.h: Support explicit creation of a new file editor, rather
+	than having to go through export followed by import. Remove export
+	commands.
+
+	* edit.h: Support explicit creation of a new file editor, rather
+	than having to go through export followed by import. Remove export
+	commands.
+
+	* menu.c (set_filename, new_file, build_menubar): Support explicit
+	creation of a new file editor, rather than having to go through
+	export followed by import. Remove export commands.
+
+	* edit.c (edit_save_file, edit_delete_real, build_edit_menubar)
+	(edit_object, edit_file): Support explicit creation of a new file
+	editor, rather than having to go through export followed by
+	import. Remove export commands.
+
 2014-10-16  David B. Lamkins  <david@lamkins.net>
 
 	* options.h: Add --shortcuts command-line option.
