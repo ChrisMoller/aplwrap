@@ -306,6 +306,18 @@ apl_read_err (gint         fd,
     text_idx = 0;
   }
 
+  // The use of g_usleep() is an ugly yet helpful hack. GNU APL's
+  // output protocol duplicates prompt output on stdout and stderr;
+  // the latter appears second to overwrite the first. APLwrap uses
+  // the stderr output to tag prompts. If the prompt is not fully
+  // received, as might happen if the OS scheduler intervenes in the
+  // middle of the stderr prompt, as might happen after a long-ish
+  // )HELP or ]OWNERS output, then the prompt will not be properly
+  // recognized or formatted by APLwrap. A short sleep here gives GNU
+  // APL a chance to get ahead of APLwrap's reader, reducing the
+  // likelihood that an incomplete prompt will be seen by APLwrap.
+  g_usleep(100);
+
   text = NULL;
   text_idx = 0;
   return TRUE;

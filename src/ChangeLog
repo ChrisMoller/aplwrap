@@ -1,3 +1,9 @@
+2014-10-19  David B. Lamkins  <david@lamkins.net>
+
+	* aplio.c (apl_read_err): Add 100us sleep to reduce the likelihood
+	of APLwrap failing to recognize a prompt. See explanation in the
+	code comments.
+
 2014-10-18  David B. Lamkins  <david@lamkins.net>
 
 	* pstat.c (show_pstat): Create Pstat window under mouse pointer.
