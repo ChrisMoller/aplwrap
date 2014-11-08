@@ -1,0 +1,70 @@
+Changes from APLwrap version 2.1 to 2.2
+---------------------------------------
+
+- Improve reliability of prompt recognition.
+
+- Support explicit creation of a new file editor, rather than having
+  to go through export followed by import.
+
+- Remove export commands.
+
+- Add --shortcuts command-line option.
+
+- Improve completion function's wraparound logic.
+
+- Fix completion function's origin-dependence.
+
+- Completion function handles empty completion list.
+
+- Bind Alt-Delete to delete uncommitted input.
+
+- When saving a buffer under a different name, existing buffers with
+  that name adopt the new content.
+
+- Implement Revert for edit window.
+
+- Implement search in transcript and edit windows.
+  (APL characters not yet supported. Requires GTK+ 3.10 or later.)
+
+- Implement substring search in Open Object dialog.
+  (APL characters not yet supported.)
+
+- Add help menu to edit window.
+
+- Don't lose unsaved edit windows when closing transcript.
+
+- Fix crash that may occur while closing an edit window.
+
+- Add tabbed notebook to display APLwrap manuals.
+
+- Add keyboard accelerators for	commonly used menu items.
+
+- Remember recently used folders as sidebar shortcuts in Open File dialog.
+
+- Keep function editor window open upon syntax error.
+
+- Implemented file Open, Save and Save As.
+
+- Fit Open Object selector to width of longest name.
+
+- Add mnemonics to menus and menu items.
+
+- Editor line and column numbers are now displayed in origin 0.
+
+- Editor line and column numbers update in sync with cursor movement,
+  whether via keyboard or mouse.
+
+- Edit window opens with cursor at <0,0>.
+
+- Bind Alt-PageUp and Alt-PageDown to move backward and forward by APL
+  prompt through the transcript.
+
+- Add a pstat window.
+
+- Implement mouse-2 paste in transcript.
+
+- APL prompts are now highlighted with a light-blue background.
+
+- Save and restore settings.
+
+- Add a toggle for the pstat line.
