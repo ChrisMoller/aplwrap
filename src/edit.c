@@ -791,7 +791,7 @@ edit_object (gchar* name, gint nc)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   status (this_window) = gtk_label_new ("status");
-  gtk_misc_set_alignment (GTK_MISC (status (this_window)), 0.0, 0.0);
+  gtk_widget_set_halign (status (this_window), GTK_ALIGN_START);
   set_status_line (this_window, this_buffer);
 
   gtk_box_pack_start (GTK_BOX (vbox), status (this_window), FALSE, FALSE, 2);
@@ -915,7 +915,7 @@ edit_file (gchar *path)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
   status (this_window) = gtk_label_new ("status");
-  gtk_misc_set_alignment (GTK_MISC (status (this_window)), 0.0, 0.0);
+  gtk_widget_set_halign (status (this_window), GTK_ALIGN_START);
   set_status_line (this_window, this_buffer);
 
   gtk_box_pack_start (GTK_BOX (vbox), status (this_window), FALSE, FALSE, 2);

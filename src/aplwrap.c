@@ -470,7 +470,7 @@ main (int   argc,
   status = gtk_label_new ("status");
   gtk_label_set_ellipsize (GTK_LABEL(status), PANGO_ELLIPSIZE_END);
   gtk_label_set_selectable (GTK_LABEL(status), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (status), 0.0, 0.0);
+  gtk_widget_set_halign (status, GTK_ALIGN_START);
   update_status_line ("Starting…");
   gtk_box_pack_start (GTK_BOX (vbox), status, FALSE, FALSE, 2);
 
