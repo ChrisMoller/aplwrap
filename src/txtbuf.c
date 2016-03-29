@@ -195,7 +195,11 @@ handle_copy_down ()
       gchar *ztext = g_try_malloc (sz+1-6);
       if (ztext) {
         memcpy(ztext, text+6, sz-6);
+#if 1	// bug reported by Christian Robert
+	ztext[sz-6] = '\0';
+#else
         ztext[sz] = '\0';
+#endif
         handle_history_replacement (ztext);
         g_free (ztext);
       }
