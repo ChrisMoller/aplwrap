@@ -93,6 +93,7 @@ replace_completion (gchar *text, size_t length, state_t *state)
   gtk_text_buffer_get_iter_at_mark (buffer, &start, completion_begin);
   gtk_text_buffer_get_iter_at_mark (buffer, &end, completion_end);
   gtk_text_buffer_delete (buffer, &start, &end);
+  set_font (buffer);
   gtk_text_buffer_get_iter_at_mark (buffer, &start, completion_begin);
   gtk_text_buffer_insert (buffer, &start, text, length);
   gtk_text_buffer_get_iter_at_mark (buffer, &cursor, completion_begin);

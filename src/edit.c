@@ -429,6 +429,7 @@ clear_buffer (GtkTextBuffer *buffer)
   gtk_text_buffer_get_start_iter (buffer, &start);
   gtk_text_buffer_get_end_iter (buffer, &end);
   gtk_text_buffer_delete (buffer, &start, &end);
+  set_font (buffer);
 }
 
 static gint

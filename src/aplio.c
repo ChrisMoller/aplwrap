@@ -274,6 +274,7 @@ apl_read_err (gint         fd,
         gtk_text_iter_set_line_offset (&line_iter, 0);
         gtk_text_buffer_place_cursor (buffer, &line_iter);
         gtk_text_buffer_delete (buffer, &line_iter, &end_iter);
+	set_font (buffer);
       }
 
       at_prompt = !strncmp("      ", text+text_idx-6, 6);

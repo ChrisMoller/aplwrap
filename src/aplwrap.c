@@ -37,6 +37,14 @@ static gint rows_old = 0, rows_new;
 void
 set_font (GtkTextBuffer *buffer)
 {
+
+  /***
+			"[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
+ https://developer.gnome.org/gtk3/stable/GtkTextTag.html
+
+      
+   ***/
+
   GtkTextTag *font_tag =
     gtk_text_buffer_create_tag (buffer, NULL,
 				"font", vwidth ? "UnifontMedium" : "FreeMono",
@@ -220,6 +228,7 @@ delete_uncommitted_input ()
     gtk_text_buffer_place_cursor (buffer, &start_iter);
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
+    set_font (buffer);
   }
 }
 
@@ -456,13 +465,6 @@ main (int   argc,
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
   build_menubar (vbox);
-
-  /***
-			"[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
- https://developer.gnome.org/gtk3/stable/GtkTextTag.html
-
-      
-   ***/
   
   scroll = gtk_scrolled_window_new (NULL, NULL);
   view = gtk_text_view_new ();

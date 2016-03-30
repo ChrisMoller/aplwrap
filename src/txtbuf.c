@@ -142,6 +142,7 @@ handle_history_replacement (gchar *text)
 
     // delete
     gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
+    set_font (buffer);
 
     // insert
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
@@ -239,6 +240,7 @@ get_input_text (gint *sz)
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_iter_set_line_offset (&input_iter, 6);
     gtk_text_buffer_delete (buffer, &input_iter, &end_iter);
+    set_font (buffer);
     gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
     beep ();
   }
