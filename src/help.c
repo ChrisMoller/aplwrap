@@ -52,7 +52,7 @@ show_keymap (GtkWidget *widget,
   }
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Keymap"),
-                                         NULL,
+                                         get_top_window (),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          _ ("_OK"), GTK_RESPONSE_ACCEPT,
                                          NULL);
@@ -81,9 +81,6 @@ show_manuals (GtkWidget *widget,
   gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
   gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook));
   gtk_container_add (GTK_CONTAINER (window), notebook);
-  PangoFontDescription *desc =
-    pango_font_description_from_string ("FreeMono");
-  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   GDir *dir = g_dir_open (MANUALS_PATH, 0, NULL);
   const gchar *fname;
@@ -98,7 +95,7 @@ show_manuals (GtkWidget *widget,
       gtk_container_set_border_width (GTK_CONTAINER (view), 4);
       gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
       gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
-      gtk_widget_override_font (view, desc);
+      set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
       GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
       GtkWidget *label = gtk_label_new (g_path_get_basename (path));
       gtk_container_add (GTK_CONTAINER (scroll), view);
@@ -118,7 +115,7 @@ show_about (GtkWidget *widget,
   gchar *authors[] = {"C. H. L. Moller", "David B. Lamkins", NULL};
   gchar *comments = _(PGM_TITLE " is a GTK+-based front-end for GNU APL.");
 
-  gtk_show_about_dialog (NULL,
+  gtk_show_about_dialog (get_top_window (),
                          "program-name", _ (PGM_TITLE),
                          "title", _ ("About " PGM_TITLE),
                          "version", VERSION

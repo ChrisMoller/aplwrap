@@ -26,7 +26,7 @@ settings_cb (GtkWidget *widget,
   GtkWidget *ps_toggle;
   
   dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
-                                         NULL,
+                                         get_top_window (),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          _ ("_OK"), GTK_RESPONSE_ACCEPT,
                                          NULL);
@@ -88,7 +88,7 @@ import_file ()
   GtkWidget *dialog;
 
   dialog = gtk_file_chooser_dialog_new ("Open File",
-                                        NULL,
+					get_top_window (),
 					GTK_FILE_CHOOSER_ACTION_OPEN,
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Open"),   GTK_RESPONSE_ACCEPT,
@@ -120,7 +120,7 @@ set_filename (const gchar *prompt, gchar **filename)
   gchar * dirname;
 
   dialog = gtk_file_chooser_dialog_new (prompt,
-                                        NULL,
+					get_top_window (),
                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Save"),   GTK_RESPONSE_ACCEPT,
@@ -139,7 +139,7 @@ set_filename (const gchar *prompt, gchar **filename)
       if (g_file_test (lname, G_FILE_TEST_EXISTS)) {
 	GtkWidget *e_dialog;
 	gint response;
-	e_dialog = gtk_message_dialog_new (NULL,
+	e_dialog = gtk_message_dialog_new (get_top_window (),
 					   GTK_DIALOG_DESTROY_WITH_PARENT,
 					   GTK_MESSAGE_QUESTION,
 					   GTK_BUTTONS_NONE,
@@ -204,7 +204,7 @@ save_log_fer_real (GtkTextBuffer *buffer)
   }
   if (!written) {
     GtkWidget *e_dialog;
-    e_dialog = gtk_message_dialog_new (NULL,
+    e_dialog = gtk_message_dialog_new (get_top_window (),
 				       GTK_DIALOG_DESTROY_WITH_PARENT,
 				       GTK_MESSAGE_ERROR,
 				       GTK_BUTTONS_OK,
@@ -311,7 +311,7 @@ open_object_cb (gchar *text, void *tw)
   set_send_cb (NULL, NULL);
 
   dialog =  gtk_dialog_new_with_buttons (_ ("Open Object"),
-                                         NULL,
+                                         get_top_window (),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
                                          _ ("_Cancel"), GTK_RESPONSE_CANCEL,
                                          _ ("_OK"), GTK_RESPONSE_ACCEPT,

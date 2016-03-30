@@ -694,7 +694,6 @@ edit_object (gchar* name, gint nc)
   GtkWidget *vbox;
   GtkWidget *scroll;
   GtkWidget *view;
-  PangoFontDescription *desc = NULL;
   window_s *this_window = NULL;
   buffer_s *this_buffer = NULL;
   GtkWidget *window;
@@ -714,10 +713,6 @@ edit_object (gchar* name, gint nc)
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (window), vbox);
-  
-  desc =
-    pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
-  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   scroll = gtk_scrolled_window_new (NULL, NULL);
 
@@ -786,7 +781,7 @@ edit_object (gchar* name, gint nc)
   g_signal_connect_after (this_buffer->buffer, "mark-set",
 		    G_CALLBACK (edit_mark_set_event), this_window);
 
-  if (desc) gtk_widget_override_font (view, desc);
+  set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
@@ -807,7 +802,6 @@ edit_file (gchar *path)
   GtkWidget *vbox;
   GtkWidget *scroll;
   GtkWidget *view;
-  PangoFontDescription *desc = NULL;
   window_s *this_window = NULL;
   buffer_s *this_buffer = NULL;
   GtkWidget *window;
@@ -830,10 +824,6 @@ edit_file (gchar *path)
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (window), vbox);
-  
-  desc =
-    pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
-  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
 
   scroll = gtk_scrolled_window_new (NULL, NULL);
 
@@ -867,7 +857,6 @@ edit_file (gchar *path)
         g_free (lname);
         g_free (this_window);
         gtk_widget_destroy (window);
-        pango_font_description_free (desc);
         gtk_widget_destroy (scroll);
         return;
       }
@@ -910,7 +899,7 @@ edit_file (gchar *path)
   g_signal_connect_after (this_buffer->buffer, "mark-set",
 		    G_CALLBACK (edit_mark_set_event), this_window);
 
-  if (desc) gtk_widget_override_font (view, desc);
+  set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   

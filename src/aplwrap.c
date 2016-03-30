@@ -25,9 +25,33 @@
 static GtkWidget *window;
 static GtkWidget *scroll;
 static GtkWidget *view;
-static PangoFontDescription *desc = NULL;
+
+GtkWindow *
+get_top_window ()
+{
+  return GTK_WINDOW (window);
+}
 
 static gint rows_old = 0, rows_new;
+
+void
+set_font (GtkTextBuffer *buffer)
+{
+  GtkTextTag *font_tag =
+    gtk_text_buffer_create_tag (buffer, NULL,
+				"font", vwidth ? "UnifontMedium" : "FreeMono",
+				"size-points",  (gdouble)ft_size,
+				NULL);
+  GtkTextIter start_iter;
+  GtkTextIter end_iter;
+  gtk_text_buffer_get_start_iter (buffer, &start_iter);
+  gtk_text_buffer_get_end_iter (buffer, &end_iter);
+
+  gtk_text_buffer_apply_tag (buffer,
+			     font_tag,
+			     &start_iter,
+			     &end_iter);
+}
 
 gchar *
 get_rows_assign ()
@@ -433,17 +457,20 @@ main (int   argc,
 
   build_menubar (vbox);
 
-  desc =
-    pango_font_description_from_string (vwidth ? "UnifontMedium" : "FreeMono");
-  pango_font_description_set_size (desc, ft_size * PANGO_SCALE);
+  /***
+			"[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
+ https://developer.gnome.org/gtk3/stable/GtkTextTag.html
 
+      
+   ***/
+  
   scroll = gtk_scrolled_window_new (NULL, NULL);
   view = gtk_text_view_new ();
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+  set_font (buffer);
   g_signal_connect (view, "button-press-event",
 		    G_CALLBACK (button_press_event), NULL);
-  if (desc) gtk_widget_override_font (view, desc);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   
 #if ENABLE_SEARCH

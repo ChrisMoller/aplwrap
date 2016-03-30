@@ -50,6 +50,7 @@ pstat_destroy (GtkWidget *widget,
 void
 set_pstat_value (gint idx, const gchar *val)
 {
+  if (!pstat_grid) return;
   if (idx >= 0 && idx < PSTAT_MAX && pstat_etys[idx].value) 
     gtk_label_set_text (GTK_LABEL (pstat_etys[idx].value), val);
 }
@@ -60,7 +61,9 @@ show_pstat (GtkWidget *widget,
 {
   GtkWidget *window;
   GtkWidget *vbox;
+#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
   GdkRGBA    color;
+#endif
 
   if (pstat_grid) return;
 
@@ -68,13 +71,17 @@ show_pstat (GtkWidget *widget,
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
   gtk_window_set_title (GTK_WINDOW (window), _ ("Pstat"));
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
   gdk_rgba_parse (&color, "white");
   gtk_widget_override_background_color (window, GTK_STATE_FLAG_NORMAL, &color);
+#endif
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (window), vbox);
   pstat_grid = gtk_grid_new ();
+#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
   gdk_rgba_parse (&color, "black");
   gtk_widget_override_color (window, GTK_STATE_FLAG_NORMAL, &color);
+#endif
   gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 12);
 
   for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
