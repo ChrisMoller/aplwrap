@@ -62,9 +62,6 @@ show_pstat (GtkWidget *widget,
   GtkWidget *window;
   GtkWidget *vbox;
   static GtkCssProvider *provider = NULL;
-#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
-  GdkRGBA    color;
-#endif
 
   if (pstat_grid) return;
 
@@ -72,12 +69,6 @@ show_pstat (GtkWidget *widget,
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
   gtk_window_set_title (GTK_WINDOW (window), _ ("Pstat"));
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
-#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
-  gdk_rgba_parse (&color, "white");
-  gtk_widget_override_background_color (window, GTK_STATE_FLAG_NORMAL, &color);
-  gdk_rgba_parse (&color, "black");
-  gtk_widget_override_color (window, GTK_STATE_FLAG_NORMAL, &color);
-#else
   if (!provider) {
     provider = gtk_css_provider_new ();
 #define CSS_STRING "* { background-color: white; color: black; }"
@@ -86,7 +77,6 @@ show_pstat (GtkWidget *widget,
   gtk_style_context_add_provider (gtk_widget_get_style_context (window),
                                       GTK_STYLE_PROVIDER (provider),
                                       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-#endif
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (window), vbox);
   pstat_grid = gtk_grid_new ();
