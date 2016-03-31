@@ -61,6 +61,7 @@ show_pstat (GtkWidget *widget,
 {
   GtkWidget *window;
   GtkWidget *vbox;
+  static GtkCssProvider *provider = NULL;
 #if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
   GdkRGBA    color;
 #endif
@@ -74,14 +75,21 @@ show_pstat (GtkWidget *widget,
 #if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
   gdk_rgba_parse (&color, "white");
   gtk_widget_override_background_color (window, GTK_STATE_FLAG_NORMAL, &color);
+  gdk_rgba_parse (&color, "black");
+  gtk_widget_override_color (window, GTK_STATE_FLAG_NORMAL, &color);
+#else
+  if (!provider) {
+    provider = gtk_css_provider_new ();
+#define CSS_STRING "* { background-color: white; color: black; }"
+    gtk_css_provider_load_from_data (provider, CSS_STRING, -1, NULL);
+  }
+  gtk_style_context_add_provider (gtk_widget_get_style_context (window),
+                                      GTK_STYLE_PROVIDER (provider),
+                                      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 #endif
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
   gtk_container_add (GTK_CONTAINER (window), vbox);
   pstat_grid = gtk_grid_new ();
-#if (GTK_MAJOR_VERSION == 3) && (GTK_MINOR_VERSION < 16)
-  gdk_rgba_parse (&color, "black");
-  gtk_widget_override_color (window, GTK_STATE_FLAG_NORMAL, &color);
-#endif
   gtk_grid_set_column_spacing (GTK_GRID (pstat_grid), 12);
 
   for (int i = 0; i < sizeof(pstat_etys) / sizeof(pstat_ety_s); i++) {
