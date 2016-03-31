@@ -443,8 +443,6 @@ main (int   argc,
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
-  // chlm -- insert font stuff here
-
   GtkCssProvider *provider = gtk_css_provider_new ();
 #define CSS_STRING "* { font: %s; font-size: %dpx; }"
   gchar *css = g_strdup_printf (CSS_STRING,
