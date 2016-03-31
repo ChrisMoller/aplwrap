@@ -706,6 +706,16 @@ edit_object (gchar* name, gint nc)
   this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  GtkCssProvider *provider = gtk_css_provider_new ();
+#define CSS_STRING "* { font: %s; font-size: %dpx; }"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+  gtk_style_context_add_provider (gtk_widget_get_style_context (window),
+				  GTK_STYLE_PROVIDER (provider),
+				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   window (this_window) = window;
   gtk_window_set_title (GTK_WINDOW (window), lname);
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
@@ -815,6 +825,17 @@ edit_file (gchar *path)
   this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  GtkCssProvider *provider = gtk_css_provider_new ();
+#define CSS_STRING "* { font: %s; font-size: %dpx; }"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+  gtk_style_context_add_provider (gtk_widget_get_style_context (window),
+				  GTK_STYLE_PROVIDER (provider),
+				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  
   window (this_window) = window;
   path (this_window) = path ? path : NEW_FILE;
   gtk_window_set_title (GTK_WINDOW (window), lname);
