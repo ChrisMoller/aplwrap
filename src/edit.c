@@ -429,7 +429,6 @@ clear_buffer (GtkTextBuffer *buffer)
   gtk_text_buffer_get_start_iter (buffer, &start);
   gtk_text_buffer_get_end_iter (buffer, &end);
   gtk_text_buffer_delete (buffer, &start, &end);
-  set_font (buffer);
 }
 
 static gint
@@ -782,7 +781,6 @@ edit_object (gchar* name, gint nc)
   g_signal_connect_after (this_buffer->buffer, "mark-set",
 		    G_CALLBACK (edit_mark_set_event), this_window);
 
-  set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   
@@ -900,7 +898,6 @@ edit_file (gchar *path)
   g_signal_connect_after (this_buffer->buffer, "mark-set",
 		    G_CALLBACK (edit_mark_set_event), this_window);
 
-  set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (scroll), TRUE, TRUE, 2);
   

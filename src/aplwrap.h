@@ -20,8 +20,6 @@ gchar *handle_apl_characters (gsize *bw_p, GdkEventKey *key_event);
 
 void set_status_visibility (gboolean show);
 
-void set_font (GtkTextBuffer *buffer);
-
 GtkWindow *get_top_window (void);
 
 #endif

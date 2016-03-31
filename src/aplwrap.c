@@ -34,33 +34,6 @@ get_top_window ()
 
 static gint rows_old = 0, rows_new;
 
-void
-set_font (GtkTextBuffer *buffer)
-{
-
-  /***
-			"[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
- https://developer.gnome.org/gtk3/stable/GtkTextTag.html
-
-      
-   ***/
-
-  GtkTextTag *font_tag =
-    gtk_text_buffer_create_tag (buffer, NULL,
-				"font", vwidth ? "UnifontMedium" : "FreeMono",
-				"size-points",  (gdouble)ft_size,
-				NULL);
-  GtkTextIter start_iter;
-  GtkTextIter end_iter;
-  gtk_text_buffer_get_start_iter (buffer, &start_iter);
-  gtk_text_buffer_get_end_iter (buffer, &end_iter);
-
-  gtk_text_buffer_apply_tag (buffer,
-			     font_tag,
-			     &start_iter,
-			     &end_iter);
-}
-
 gchar *
 get_rows_assign ()
 {
@@ -228,7 +201,6 @@ delete_uncommitted_input ()
     gtk_text_buffer_place_cursor (buffer, &start_iter);
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
-    set_font (buffer);
   }
 }
 
@@ -470,7 +442,20 @@ main (int   argc,
   view = gtk_text_view_new ();
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-  set_font (buffer);
+
+  // chlm -- insert font stuff here
+
+  GtkCssProvider *provider = gtk_css_provider_new ();
+#define CSS_STRING "* { font: %s; font-size: %dpx; }"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+  gtk_style_context_add_provider (gtk_widget_get_style_context (view),
+				  GTK_STYLE_PROVIDER (provider),
+				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    
   g_signal_connect (view, "button-press-event",
 		    G_CALLBACK (button_press_event), NULL);
   gtk_container_add (GTK_CONTAINER (scroll), view);

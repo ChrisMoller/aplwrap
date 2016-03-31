@@ -142,7 +142,6 @@ handle_history_replacement (gchar *text)
 
     // delete
     gtk_text_buffer_delete (buffer, &start_iter, &end_iter);
-    set_font (buffer);
 
     // insert
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
@@ -206,8 +205,10 @@ handle_copy_down ()
       }
       return 1;
     }
-    else if (gtk_text_iter_has_tag (&insert_iter, get_tag(TAG_LCK)))
-      return 1;
+    else {
+      if (gtk_text_iter_has_tag (&insert_iter, get_tag(TAG_LCK))) 
+	return 1;
+    }
     return 0;
   }
 }
@@ -240,7 +241,6 @@ get_input_text (gint *sz)
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_iter_set_line_offset (&input_iter, 6);
     gtk_text_buffer_delete (buffer, &input_iter, &end_iter);
-    set_font (buffer);
     gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
     beep ();
   }

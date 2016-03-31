@@ -95,7 +95,6 @@ show_manuals (GtkWidget *widget,
       gtk_container_set_border_width (GTK_CONTAINER (view), 4);
       gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
       gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
-      set_font (gtk_text_view_get_buffer (GTK_TEXT_VIEW (view)));
       GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
       GtkWidget *label = gtk_label_new (g_path_get_basename (path));
       gtk_container_add (GTK_CONTAINER (scroll), view);
