@@ -135,13 +135,15 @@ edit_close (GtkWidget *widget,
 }
 
 gint
-message_dialog (GtkMessageType type,
+message_dialog (GtkWidget     *parent,
+		GtkMessageType type,
                 GtkButtonsType buttons,
                 gchar         *message,
                 gchar         *secondary)
 {
   GtkWidget *dialog =
-    gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, type, buttons,
+    gtk_message_dialog_new (GTK_WINDOW (parent), GTK_DIALOG_MODAL,
+			    type, buttons,
                             "%s", message);
   if (secondary)
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
@@ -200,7 +202,7 @@ edit_save_object_cb (gchar *text, void *data)
   }
   g_strfreev (lines);
   if (error_text) {
-    message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+    message_dialog (tw->window, GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
                     _ ("APL error while defining function"),
                     error_text);
     g_free (error_text);
@@ -324,7 +326,7 @@ edit_delete_real (GtkWidget *widget,
   if (modified) {
     GtkWidget *e_dialog;
     gint response;
-    e_dialog = gtk_message_dialog_new (NULL,
+    e_dialog = gtk_message_dialog_new (GTK_WINDOW (tw->window),
 				       GTK_DIALOG_DESTROY_WITH_PARENT,
 				       GTK_MESSAGE_QUESTION,
 				       GTK_BUTTONS_NONE,
@@ -501,14 +503,14 @@ edit_revert (GtkWidget *widget,
   gint   nc   = tb->nc;
   gchar *path = path (tw);
 
-  if (message_dialog (GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+  if (message_dialog (tw->window, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                       _ ("Revert buffer?"), name) == GTK_RESPONSE_YES) {
     if (path) {
       /* Revert file */
       gchar *text;
       GError *error = NULL;
       if (!g_file_get_contents (path, &text, NULL, &error)) {
-        message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+        message_dialog (tw->window, GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
                         _ ("File error"), error->message);
         g_error_free (error);
         return;
@@ -706,16 +708,6 @@ edit_object (gchar* name, gint nc)
   this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  GtkCssProvider *provider = gtk_css_provider_new ();
-#define CSS_STRING "* { font: %s; font-size: %dpx; }"
-  gchar *css = g_strdup_printf (CSS_STRING,
-				vwidth ? "UnifontMedium" : "FreeMono",
-				ft_size);
-  gtk_css_provider_load_from_data (provider, css, -1, NULL);
-  g_free (css);
-  gtk_style_context_add_provider (gtk_widget_get_style_context (window),
-				  GTK_STYLE_PROVIDER (provider),
-				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   window (this_window) = window;
   gtk_window_set_title (GTK_WINDOW (window), lname);
   gtk_window_set_default_size (GTK_WINDOW (window), width, height);
@@ -767,6 +759,16 @@ edit_object (gchar* name, gint nc)
 		    G_CALLBACK (edit_close), this_window);
   
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
+  GtkCssProvider *provider = gtk_css_provider_new ();
+#define CSS_STRING "* { font: %s; font-size: %dpx; }"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+  gtk_style_context_add_provider (gtk_widget_get_style_context (view),
+				  GTK_STYLE_PROVIDER (provider),
+				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   view (this_window) = view;
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 
@@ -825,17 +827,6 @@ edit_file (gchar *path)
   this_window = g_malloc0 (sizeof(window_s));
   
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  GtkCssProvider *provider = gtk_css_provider_new ();
-#define CSS_STRING "* { font: %s; font-size: %dpx; }"
-  gchar *css = g_strdup_printf (CSS_STRING,
-				vwidth ? "UnifontMedium" : "FreeMono",
-				ft_size);
-  gtk_css_provider_load_from_data (provider, css, -1, NULL);
-  g_free (css);
-  gtk_style_context_add_provider (gtk_widget_get_style_context (window),
-				  GTK_STYLE_PROVIDER (provider),
-				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-  
   window (this_window) = window;
   path (this_window) = path ? path : NEW_FILE;
   gtk_window_set_title (GTK_WINDOW (window), lname);
@@ -871,7 +862,7 @@ edit_file (gchar *path)
         gtk_text_buffer_place_cursor (this_buffer->buffer, &start_iter);
       }
       else {
-        message_dialog (GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+        message_dialog (window, GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
                         _ ("File error"), error->message);
         g_error_free (error);
         g_free (lname);
@@ -895,6 +886,16 @@ edit_file (gchar *path)
 		    G_CALLBACK (edit_close), this_window);
   
   view = gtk_text_view_new_with_buffer (this_buffer->buffer);
+  GtkCssProvider *provider = gtk_css_provider_new ();
+#define CSS_STRING "* { font: %s; font-size: %dpx; }"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+  gtk_style_context_add_provider (gtk_widget_get_style_context (view),
+				  GTK_STYLE_PROVIDER (provider),
+				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   view (this_window) = view;
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 8);
 

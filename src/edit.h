@@ -48,7 +48,8 @@ void edit_file (gchar *path);
 
 gboolean dirty_edit_buffers ();
 
-gint message_dialog (GtkMessageType type,
+gint message_dialog (GtkWidget     *parent,
+		     GtkMessageType type,
                      GtkButtonsType buttons,
                      gchar         *message,
                      gchar         *secondary);
