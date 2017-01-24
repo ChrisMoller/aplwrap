@@ -236,8 +236,12 @@ get_input_text (gint *sz)
   gtk_text_buffer_get_iter_at_mark (buffer, &start_iter, mark);
   gtk_text_iter_set_line_offset (&start_iter, 0);
   gtk_text_buffer_get_iter_at_offset (buffer, &input_iter, input_offset);
-  if (!gtk_text_iter_begins_tag (&start_iter, get_tag (TAG_PRM)) &&
-      !gtk_text_iter_equal (&input_iter, &start_iter)) {
+#if (GTK_MAJOR_VERSION >= 3) && (GTK_MINOR_VERSION >= 20)
+  gboolean txttag = gtk_text_iter_starts_tag (&start_iter, get_tag (TAG_PRM));
+#else
+  gboolean txttag = gtk_text_iter_begins_tag (&start_iter, get_tag (TAG_PRM));
+#endif
+  if (!txttag && !gtk_text_iter_equal (&input_iter, &start_iter)) {
     gtk_text_buffer_get_end_iter (buffer, &end_iter);
     gtk_text_iter_set_line_offset (&input_iter, 6);
     gtk_text_buffer_delete (buffer, &input_iter, &end_iter);
