@@ -3465,8 +3465,7 @@ fi
 
 
 
-#APL_SOURCES=`apl --show_src_dir`
-APL_SOURCES=
+APL_SOURCES=`apl --show_src_dir`
 
 
 as_ac_File=`$as_echo "ac_cv_file_$APL_SOURCES" | $as_tr_sh`

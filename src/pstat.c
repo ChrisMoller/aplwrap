@@ -189,7 +189,6 @@ get_pstat (GPid   pid,
   rc = asprintf(&path, "/proc/%d/stat", pid);
   if (rc == -1) return;
 
-  asprintf(&path, "/proc/%d/stat", pid);
   fp = fopen(path, "r");
   free (path);
   if (fp == NULL) return;
