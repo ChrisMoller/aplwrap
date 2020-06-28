@@ -4,8 +4,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
-#APL_SOURCES=`apl --show_src_dir`
-APL_SOURCES=
+APL_SOURCES=`apl --show_src_dir`
 
 
 AC_CHECK_FILE($APL_SOURCES, [foundit=yes], [foundit=no])
