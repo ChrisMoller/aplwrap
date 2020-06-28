@@ -20,6 +20,8 @@ Application Options:
   --shortcuts              file chooser directory shortcuts file [path]
   -f, --file               APL script file [path]
   --version                Print version and exit
+  --background		   background colour to use, defaults to "bisque"
+  --foreground		   foreground colour to use, defaults to "black"
   --display=DISPLAY        X display to use
 
 
