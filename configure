@@ -685,6 +685,7 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
+with_apl_source_dir
 enable_maintainer_mode
 '
       ac_precious_vars='build_alias
@@ -1323,6 +1324,11 @@ Optional Features:
   --disable-maintainer-mode
                           disable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --apl-source-dir=arg    Location of the GNU APL source code.
 
 Some influential environment variables:
   CC          C compiler command
@@ -3459,7 +3465,43 @@ fi
 
 
 
-APL_SOURCES=`apl --show_src_dir`
+#APL_SOURCES=`apl --show_src_dir`
+APL_SOURCES=
+
+
+as_ac_File=`$as_echo "ac_cv_file_$APL_SOURCES" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $APL_SOURCES" >&5
+$as_echo_n "checking for $APL_SOURCES... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$APL_SOURCES"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  foundit=yes
+else
+  foundit=no
+fi
+
+if test x$foundit = xno; then
+
+# Check whether --with-apl-source-dir was given.
+if test "${with_apl_source_dir+set}" = set; then :
+  withval=$with_apl_source_dir;
+fi
+
+  APL_SOURCES=$with_apl_source_dir
+fi
+
 
 
 GETTEXT_PACKAGE=gtk30
@@ -3468,6 +3510,8 @@ GETTEXT_PACKAGE=gtk30
 cat >>confdefs.h <<_ACEOF
 #define GETTEXT_PACKAGE "$GETTEXT_PACKAGE"
 _ACEOF
+
+
 
 
 ac_config_headers="$ac_config_headers config.h"

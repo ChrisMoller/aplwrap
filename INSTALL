@@ -16,7 +16,7 @@ aplwrap requires GTK+ version 3.16 or newer, including the development
 package (like gtk3-devel) if your distribution separates that from the GTK+
 library package.
 
-The ./configure file used by aplwrap was created with automake version 1.13.4.
+The ./configure file used by aplwrap was created with automake version 1.16.1.
 This doesn't work with some newer Linux distributions.  If that's the case, you
 can rebuild the configuration by running:
 

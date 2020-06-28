@@ -174,7 +174,8 @@ get_pstat (GPid   pid,
   int conv;
   unsigned long rchar, wchar, syscr, syscw, read_bytes, write_bytes;
   unsigned long cancelled_write_bytes;
-
+  int rc;
+  
   memset(stats, 0, sizeof(struct _pstat));
   if (pid < 0) return;
   gettimeofday(&wall_time, NULL);
@@ -184,6 +185,10 @@ get_pstat (GPid   pid,
   conv = fscanf(fp, SCANF_BTIME, &btime);
   fclose(fp);
   if (conv != 1) return;
+
+  rc = asprintf(&path, "/proc/%d/stat", pid);
+  if (rc == -1) return;
+
   asprintf(&path, "/proc/%d/stat", pid);
   fp = fopen(path, "r");
   free (path);
@@ -201,11 +206,10 @@ get_pstat (GPid   pid,
   stats->minflt     = minflt + cminflt;
   stats->majflt     = majflt + cmajflt;
   stats->biowait    = biowait;
-#if 1
-  asprintf(&path, "/proc/%d/stat", pid);
-#else
-  snprintf(path, sizeof(path), "/proc/%d/io", pid);
-#endif
+
+  rc = asprintf(&path, "/proc/%d/stat", pid);
+  if (rc == -1) return;
+
   fp = fopen(path, "r");
   free (path);
   if (fp == NULL) return;
