@@ -19,6 +19,7 @@ gboolean nocolour     = FALSE;
 gboolean printversion = FALSE;
 gchar *new_fn = NULL;
 gchar *opt_lx = NULL;
+gchar *opt_load = NULL;
 gchar *rows_v = NULL;
 gchar *script = NULL;
 gchar *shortcuts_file = NULL;
@@ -50,6 +51,10 @@ GOptionEntry entries[] = {
     NULL },
   { "LX", 0, 0, G_OPTION_ARG_STRING,
     &opt_lx,
+    "APL startup command or expression [string]",
+    NULL },
+  { "load", 'L', 0, G_OPTION_ARG_STRING,
+    &opt_load,
     "APL startup command or expression [string]",
     NULL },
   { "rows-var", 0, 0, G_OPTION_ARG_STRING,

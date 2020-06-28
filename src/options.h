@@ -14,6 +14,7 @@ extern gboolean     vwidth;
 extern gboolean     nocolour;
 extern gchar       *new_fn;
 extern gchar       *opt_lx;
+extern gchar       *opt_load;
 extern gchar       *shortcuts_file;
 extern gchar       *script;
 extern gchar       *rows_v;

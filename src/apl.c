@@ -150,6 +150,10 @@ int apl_spawn (int   argc,
       append_argv ("--LX");
       append_argv (opt_lx);
     }
+    if (opt_load) {
+      append_argv ("-L");
+      append_argv (opt_load);
+    }
     if (script) {
       append_argv ("-f");
       append_argv (script);
