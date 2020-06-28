@@ -20,6 +20,7 @@
 #include <signal.h>
 
 static GPid apl_pid = -1;
+gboolean apl_expect_network =  TRUE;
 
 GPid
 get_apl_pid ()
@@ -193,7 +194,6 @@ int apl_spawn (int   argc,
 
   g_child_watch_add (apl_pid, apl_exit, NULL);
 
-  apl_expect_network =  TRUE;
   
   if (apl_in != -1 && apl_out != -1 && apl_err != -1) {
     g_unix_set_fd_nonblocking (apl_out, TRUE, NULL);

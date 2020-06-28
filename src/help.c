@@ -83,6 +83,7 @@ show_manuals (GtkWidget *widget,
   gtk_container_add (GTK_CONTAINER (window), notebook);
 
   GDir *dir = g_dir_open (MANUALS_PATH, 0, NULL);
+  g_print ("dir = %s\n", MANUALS_PATH);
   const gchar *fname;
   while ((fname = g_dir_read_name (dir))) {
     gchar *path = g_build_filename (MANUALS_PATH, fname, NULL);

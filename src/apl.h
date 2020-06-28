@@ -1,7 +1,7 @@
 #ifndef APL_H
 #define APL_H
 
-gboolean apl_expect_network;
+extern gboolean apl_expect_network;
 
 int apl_spawn (int   argc,
                char *argv[]);

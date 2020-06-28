@@ -5,8 +5,8 @@
 
 #define PGM_TITLE "APLwrap"
 
-gchar *plot_pipe_name;
-gint   plot_pipe_fd;
+extern gchar *plot_pipe_name;
+extern gint   plot_pipe_fd;
 
 gchar *get_rows_assign ();
 

@@ -1,5 +1,6 @@
 #include "../config.h"
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -163,7 +164,7 @@ get_pstat (GPid   pid,
            pstat *stats)
 {
   struct timeval wall_time;
-  char path[20];
+  char * path = NULL;
   FILE *fp;
   unsigned long btime;
   unsigned long minflt, cminflt, majflt, cmajflt, utime, stime, vsize;
@@ -183,8 +184,9 @@ get_pstat (GPid   pid,
   conv = fscanf(fp, SCANF_BTIME, &btime);
   fclose(fp);
   if (conv != 1) return;
-  snprintf(path, sizeof(path), "/proc/%d/stat", pid);
+  asprintf(&path, "/proc/%d/stat", pid);
   fp = fopen(path, "r");
+  free (path);
   if (fp == NULL) return;
   conv = fscanf(fp, SCANFMT_STAT, &minflt, &cminflt, &majflt, &cmajflt,
                 &utime, &stime, &cutime, &cstime, &start_time,
@@ -199,8 +201,13 @@ get_pstat (GPid   pid,
   stats->minflt     = minflt + cminflt;
   stats->majflt     = majflt + cmajflt;
   stats->biowait    = biowait;
+#if 1
+  asprintf(&path, "/proc/%d/stat", pid);
+#else
   snprintf(path, sizeof(path), "/proc/%d/io", pid);
+#endif
   fp = fopen(path, "r");
+  free (path);
   if (fp == NULL) return;
   conv = fscanf(fp, SCANFMT_IO, &rchar, &wchar, &syscr, &syscw,
                 &read_bytes, &write_bytes, &cancelled_write_bytes);

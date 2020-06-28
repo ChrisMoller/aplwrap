@@ -55,7 +55,8 @@ tagged_insert (char   *text,
       if (g_unichar_iscntrl (c) && *op != '\n' && *op != '\r') {
 	gint cl = ptr - op;
 	if (*op == '\a') {
-          gdk_beep ();
+	  GdkDisplay *display = gdk_display_get_default ();
+          gdk_display_beep (display);
           memmove (op, op+1, text_idx-(ptr-text)+1);
           --text_idx;
           --ptr;

@@ -11,6 +11,9 @@ gint width = WIDTH_FALLBACK;
 #define HEIGHT_FALLBACK	440
 gint height = HEIGHT_FALLBACK;
 
+gchar *bg_colour = NULL;
+gchar *fg_colour = NULL;
+
 gboolean vwidth       = FALSE;
 gboolean nocolour     = FALSE;
 gboolean printversion = FALSE;
@@ -64,6 +67,14 @@ GOptionEntry entries[] = {
   { "version", 0, 0, G_OPTION_ARG_NONE,
     &printversion,
     "Print version and exit",
+    NULL },
+  { "background", 0, 0, G_OPTION_ARG_STRING,
+    &bg_colour,
+    "background colour",
+    NULL },
+  { "foreground", 0, 0, G_OPTION_ARG_STRING,
+    &fg_colour,
+    "foreground colour",
     NULL },
   { NULL }
 };
