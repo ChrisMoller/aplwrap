@@ -1,4 +1,4 @@
-2020-06-29    <moller@mollerware.com>
+2020-06-29  Chris Moller  <moller@mollerware.com>
 
 	* resources.c (restore_resources): Added save/restore for font
 	size and fg/bg colours.
@@ -10,7 +10,7 @@
 	* menu.c (settings_cb): Added foreground/background settings.
 	Added font size spinn button.
 
-2020-06-2    <moller@mollerware.com>
+2020-06-2  Chris Moller  <moller@mollerware.com>
 
 	* txtbuf.c (tagged_insert): Replaced deprecated ...beep()
 	
