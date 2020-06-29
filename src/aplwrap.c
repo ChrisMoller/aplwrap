@@ -280,9 +280,6 @@ key_press_event (GtkWidget *widget,
       return maybe_copy_selected_text_without_tags ();
   }
 
-  /* All remaining processing is for keys having Alt modifier */
-  if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
-
   /* Command history */
   if (key_event->keyval == GDK_KEY_Up) {
     handle_history_replacement(history_prev());
@@ -293,6 +290,9 @@ key_press_event (GtkWidget *widget,
     handle_history_replacement(history_next());
     return TRUE;
   }
+
+  /* All remaining processing is for keys having Alt modifier */
+  if (!(key_event->state & GDK_MOD1_MASK)) return FALSE; 
 
   /* Advance by prompt through transcript */
   if (key_event->keyval == GDK_KEY_Page_Up) {
