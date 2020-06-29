@@ -1,0 +1,7 @@
+2020-06-28    <moller@mollerware.com>
+
+	* configure.ac: Added --apl-source-dir ./configure option in case
+	the automatic find files.  Also incremented the minor release
+	number and tinkered a bit with the README file
+	
+
