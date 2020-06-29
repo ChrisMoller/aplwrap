@@ -25,9 +25,21 @@
 static GtkWidget *window;
 static GtkWidget *scroll;
 static GtkWidget *view;
+static GtkCssProvider *provider;
 
 gchar *plot_pipe_name = NULL;
 gint   plot_pipe_fd   = -1;
+
+void
+load_css_provider ()
+{
+#define CSS_STRING "* { font: %s; font-size: %dpx; background-color: %s; color: %s;}"
+  gchar *css = g_strdup_printf (CSS_STRING,
+				vwidth ? "UnifontMedium" : "FreeMono",
+				ft_size, bg_colour, fg_colour);
+  gtk_css_provider_load_from_data (provider, css, -1, NULL);
+  g_free (css);
+}
 
 GtkWindow *
 get_top_window ()
@@ -446,15 +458,11 @@ main (int   argc,
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
-  GtkCssProvider *provider = gtk_css_provider_new ();
+  provider = gtk_css_provider_new ();
   if (!bg_colour) bg_colour = g_strdup (BG_COLOUR_FALLBACK);
   if (!fg_colour) fg_colour = g_strdup (FG_COLOUR_FALLBACK);
-#define CSS_STRING "* { font: %s; font-size: %dpx; background-color: %s; color: %s;}"
-  gchar *css = g_strdup_printf (CSS_STRING,
-				vwidth ? "UnifontMedium" : "FreeMono",
-				ft_size, bg_colour, fg_colour);
-  gtk_css_provider_load_from_data (provider, css, -1, NULL);
-  g_free (css);
+
+  load_css_provider ();
   gtk_style_context_add_provider (gtk_widget_get_style_context (view),
 				  GTK_STYLE_PROVIDER (provider),
 				  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);

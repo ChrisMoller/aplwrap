@@ -43,8 +43,55 @@ settings_cb (GtkWidget *widget,
 		    G_CALLBACK (ps_toggle_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
 
+  GdkRGBA fg_rgba;
+  GdkRGBA bg_rgba;
+  GtkWidget *fg_button;
+  GtkWidget *bg_button;
+  
+  {
+    GtkWidget *grid =  gtk_grid_new ();
+    gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 2);
+
+
+    gdk_rgba_parse (&fg_rgba, fg_colour);
+    gdk_rgba_parse (&bg_rgba, bg_colour);
+    
+    GtkWidget *fg_label = gtk_label_new (_("Foreground"));
+    fg_button = gtk_color_button_new ();
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (fg_button), &fg_rgba);
+
+    GtkWidget *bg_label = gtk_label_new (_("Background"));
+    bg_button = gtk_color_button_new ();
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (bg_button), &bg_rgba);
+
+    gtk_grid_attach (GTK_GRID (grid), fg_label,  0,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_button, 1,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_label,  0,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_button, 1,1, 1, 1);
+  }
+
   gtk_widget_show_all (dialog);
   gtk_dialog_run (GTK_DIALOG (dialog));
+
+  {
+    GdkRGBA fg_rgba_new;
+    GdkRGBA bg_rgba_new;
+    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (fg_button), &fg_rgba_new);
+    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (bg_button), &bg_rgba_new);
+    gboolean do_reload = FALSE;
+    if (!gdk_rgba_equal (&fg_rgba_new, &fg_rgba)) {
+      if (fg_colour) g_free (fg_colour);
+      fg_colour = gdk_rgba_to_string (&fg_rgba_new);
+      do_reload = TRUE;
+    }
+    if (!gdk_rgba_equal (&bg_rgba_new, &bg_rgba)) {
+      if (bg_colour) g_free (bg_colour);
+      bg_colour = gdk_rgba_to_string (&bg_rgba_new);
+      do_reload = TRUE;
+    }
+    if (do_reload) load_css_provider ();
+  }
+
   gtk_widget_destroy (dialog);
 }
 

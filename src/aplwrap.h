@@ -22,4 +22,6 @@ void set_status_visibility (gboolean show);
 
 GtkWindow *get_top_window (void);
 
+void load_css_provider ();
+
 #endif
