@@ -55,7 +55,7 @@ GOptionEntry entries[] = {
     NULL },
   { "load", 'L', 0, G_OPTION_ARG_STRING,
     &opt_load,
-    "APL startup command or expression [string]",
+    "Preload the specified workspace [string]",
     NULL },
   { "rows-var", 0, 0, G_OPTION_ARG_STRING,
     &rows_v,

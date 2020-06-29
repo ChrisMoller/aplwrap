@@ -16,6 +16,7 @@ Application Options:
   -n, --nocolour           Turn off coloured error text
   -x, --xeq                Path to the GNU APL executable [string]
   --LX                     APL startup command or expression [string]
+  -L, --load               Preload the specified workspace [string]
   --rows-var               APL variable name for display row count [string]
   --shortcuts              file chooser directory shortcuts file [path]
   -f, --file               APL script file [path]
@@ -41,7 +42,7 @@ options. These additional options are ignored by aplwrap. The entire
 GNU APL command line is accessible to the APL program via the ⎕ARG
 system function.
 
-aplwrap is tested using GNU APL 1.4 and later.
+aplwrap is tested using GNU APL 1.8 and later.
 
 
 Contact me if I've screwed anything up or if there's a feature you
