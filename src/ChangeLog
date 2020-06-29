@@ -1,3 +1,15 @@
+2020-06-29    <moller@mollerware.com>
+
+	* aplwrap.c (key_press_event): Fixed Up/Down key command history.
+	
+2020-06-2    <moller@mollerware.com>
+
+	* txtbuf.c (tagged_insert): Replaced deprecated ...beep()
+	* pstat.c (get_pstat): Replace sprintf() to too-small fixed buffer
+	with asprintf().
+	* options.[ch]: Added options to set foreground/background
+	colours.  Also added an option to pass a -L workspace load to apl.
+
 2014-10-19  David B. Lamkins  <david@lamkins.net>
 
 	* aplio.c (apl_read_err): Add 100us sleep to reduce the likelihood
