@@ -1,5 +1,7 @@
 2020-06-29  Chris Moller  <moller@mollerware.com>
 
+	* help.c (show_manuals): Removed an old diagnostic g_print().
+
 	* resources.c (restore_resources): Added save/restore for font
 	size and fg/bg colours.
 
