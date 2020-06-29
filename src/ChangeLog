@@ -5,6 +5,7 @@
 	css provider.
 	
 	* menu.c (settings_cb): Added foreground/background settings.
+	Added font size spinn button.
 
 2020-06-2    <moller@mollerware.com>
 

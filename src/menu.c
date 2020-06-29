@@ -47,11 +47,11 @@ settings_cb (GtkWidget *widget,
   GdkRGBA bg_rgba;
   GtkWidget *fg_button;
   GtkWidget *bg_button;
+  GtkWidget *ft_sz_spin;
   
   {
     GtkWidget *grid =  gtk_grid_new ();
     gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 2);
-
 
     gdk_rgba_parse (&fg_rgba, fg_colour);
     gdk_rgba_parse (&bg_rgba, bg_colour);
@@ -63,12 +63,22 @@ settings_cb (GtkWidget *widget,
     GtkWidget *bg_label = gtk_label_new (_("Background"));
     bg_button = gtk_color_button_new ();
     gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (bg_button), &bg_rgba);
+    
+    GtkWidget *ft_sz_label = gtk_label_new (_("Font size"));
+    ft_sz_spin =
+      gtk_spin_button_new_with_range (4.0, 56.0, 1.0);
+    gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (ft_sz_spin), TRUE);
+    gtk_spin_button_set_digits  (GTK_SPIN_BUTTON (ft_sz_spin), 0);
+    gtk_spin_button_set_value   (GTK_SPIN_BUTTON (ft_sz_spin), (double)ft_size);
 
-    gtk_grid_attach (GTK_GRID (grid), fg_label,  0,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), fg_button, 1,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_label,  0,1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_button, 1,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_label,     0,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_button,    1,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_label,     0,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_button,    1,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_label,  0,2, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_spin,   1,2, 1, 1);
   }
+
 
   gtk_widget_show_all (dialog);
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -76,9 +86,18 @@ settings_cb (GtkWidget *widget,
   {
     GdkRGBA fg_rgba_new;
     GdkRGBA bg_rgba_new;
+    gint    ft_size_new;
     gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (fg_button), &fg_rgba_new);
     gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (bg_button), &bg_rgba_new);
+
+    ft_size_new =
+      gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (ft_sz_spin));
     gboolean do_reload = FALSE;
+
+    if (ft_size != ft_size_new) {
+      ft_size = ft_size_new;
+      do_reload = TRUE;
+    }
     if (!gdk_rgba_equal (&fg_rgba_new, &fg_rgba)) {
       if (fg_colour) g_free (fg_colour);
       fg_colour = gdk_rgba_to_string (&fg_rgba_new);
