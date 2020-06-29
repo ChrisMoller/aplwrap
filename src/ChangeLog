@@ -1,5 +1,8 @@
 2020-06-29    <moller@mollerware.com>
 
+	* resources.c (restore_resources): Added save/restore for font
+	size and fg/bg colours.
+
 	* aplwrap.c (key_press_event): Fixed Up/Down key command history.
 	(load_css_provider): New fcn to allow fg/bg settings to change the
 	css provider.
