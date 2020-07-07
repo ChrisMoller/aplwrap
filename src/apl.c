@@ -7,6 +7,8 @@
 #include <glib-unix.h>
 #include <string.h>
 #include <strings.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "apl.h"
 #include "aplwrap.h"
@@ -44,6 +46,17 @@ aplwrap_quit (GtkWidget *widget,
 	      gpointer  data)
 {
   quitting = TRUE;
+
+  if (flag_file) {
+    unlink (flag_file);
+    free (flag_file);
+  }
+  if (flag_dir) {
+    rmdir (flag_dir);
+    free (flag_dir);
+  }
+
+  if (flag_file) unlink (flag_file);
 
   save_dirty_edit_buffers ();
 

@@ -6,7 +6,6 @@ AM_PROG_CC_C_O
 
 APL_SOURCES=`apl --show_src_dir`
 
-
 AC_CHECK_FILE($APL_SOURCES, [foundit=yes], [foundit=no])
 if test x$foundit = xno; then
 AC_ARG_WITH([apl-source-dir],

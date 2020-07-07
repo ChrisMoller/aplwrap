@@ -3467,7 +3467,6 @@ fi
 
 APL_SOURCES=`apl --show_src_dir`
 
-
 as_ac_File=`$as_echo "ac_cv_file_$APL_SOURCES" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $APL_SOURCES" >&5
 $as_echo_n "checking for $APL_SOURCES... " >&6; }

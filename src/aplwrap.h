@@ -24,4 +24,7 @@ GtkWindow *get_top_window (void);
 
 void load_css_provider ();
 
+extern char *flag_dir;
+extern char *flag_file;
+
 #endif

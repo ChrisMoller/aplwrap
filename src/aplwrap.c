@@ -2,10 +2,12 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n-lib.h>
+#define _GNU_SOURCE
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 
 #include "Avec.h"
@@ -29,6 +31,9 @@ static GtkCssProvider *provider;
 
 gchar *plot_pipe_name = NULL;
 gint   plot_pipe_fd   = -1;
+
+char *flag_file = NULL;
+char *flag_dir = NULL;
 
 void
 load_css_provider ()
@@ -400,6 +405,8 @@ update_status_line (gchar *text)
   while (gtk_events_pending ()) gtk_main_iteration ();
 }
 
+int asprintf(char **strp, const char *fmt, ...);
+
 int
 main (int   argc,
       char *argv[])
@@ -408,6 +415,12 @@ main (int   argc,
   GOptionContext *context;
   GtkWidget *vbox;
   int override_name;
+
+  asprintf (&flag_dir, "/var/run/user/%d/%d",
+	    (int)getuid (), (int)getpid ());
+  mkdir (flag_dir, 0777);
+  asprintf (&flag_file, "%s/aplwrap", flag_dir);
+  creat (flag_file, 0666);
 
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
