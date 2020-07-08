@@ -11,6 +11,9 @@ gint width = WIDTH_FALLBACK;
 #define HEIGHT_FALLBACK	440
 gint height = HEIGHT_FALLBACK;
 
+#define EDIF_FALLBACK	FALSE
+gboolean enable_edif = EDIF_FALLBACK;
+
 gchar *bg_colour = NULL;
 gchar *fg_colour = NULL;
 
@@ -23,6 +26,17 @@ gchar *opt_load = NULL;
 gchar *rows_v = NULL;
 gchar *script = NULL;
 gchar *shortcuts_file = NULL;
+
+static gboolean
+disable_edif (const gchar *option_name,
+	      const gchar *value,
+	      gpointer data,
+	      GError **error)
+{
+  g_print ("in noedif\n");
+  enable_edif = FALSE;
+  return TRUE;
+}
 
 GOptionEntry entries[] = {
   { "ftsize", 's', 0, G_OPTION_ARG_INT,
@@ -44,6 +58,14 @@ GOptionEntry entries[] = {
   { "nocolour", 'n', 0, G_OPTION_ARG_NONE,
     &nocolour,
     "Turn off coloured error text",
+    NULL },
+  { "edif", 'e', 0, G_OPTION_ARG_NONE,
+    &enable_edif,
+    "Turn on the edif2 editor",
+    NULL },
+  { "noedif", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+    &disable_edif,
+    "Turn off the edif2 editor",
     NULL },
   { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
     &new_fn,

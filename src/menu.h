@@ -37,5 +37,6 @@ void add_menu_item (gchar         *name,
                     gpointer       data,
                     GtkWidget     *menu);
 void init_shortcuts ();
+void set_edif (gboolean startup, gboolean state);
 
 #endif

@@ -16,6 +16,24 @@
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
 
+#define START_EDIF	"'libedif2.so' ⎕FX 'ed2'"
+#define CLOSE_EDIF	")erase ed2"
+
+void
+set_edif (gboolean startup, gboolean state)
+{
+  char * ss = state ? START_EDIF : CLOSE_EDIF;
+  if (!startup || state) apl_eval (ss, -1, NULL, NULL);
+}
+
+static void
+edif_toggle_cb (GtkToggleButton *togglebutton,
+		gpointer         user_data)
+{
+  enable_edif = gtk_toggle_button_get_active (togglebutton);
+  if (enable_edif) set_edif (FALSE, enable_edif);
+}
+
 static void
 settings_cb (GtkWidget *widget,
 	     gpointer   data)
@@ -42,6 +60,13 @@ settings_cb (GtkWidget *widget,
   g_signal_connect (ps_toggle, "toggled",
 		    G_CALLBACK (ps_toggle_cb), NULL);
   gtk_box_pack_start (GTK_BOX (vbox), ps_toggle, FALSE, FALSE, 2);
+  
+  GtkWidget *edif_toggle = gtk_check_button_new_with_label (_("Enable Edif"));
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (edif_toggle),
+				enable_edif);
+  g_signal_connect (edif_toggle, "toggled",
+		    G_CALLBACK (edif_toggle_cb), NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), edif_toggle, FALSE, FALSE, 2);
 
   GdkRGBA fg_rgba;
   GdkRGBA bg_rgba;
@@ -51,7 +76,7 @@ settings_cb (GtkWidget *widget,
   
   {
     GtkWidget *grid =  gtk_grid_new ();
-    gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 8);
 
     gdk_rgba_parse (&fg_rgba, fg_colour);
     gdk_rgba_parse (&bg_rgba, bg_colour);
@@ -71,12 +96,12 @@ settings_cb (GtkWidget *widget,
     gtk_spin_button_set_digits  (GTK_SPIN_BUTTON (ft_sz_spin), 0);
     gtk_spin_button_set_value   (GTK_SPIN_BUTTON (ft_sz_spin), (double)ft_size);
 
-    gtk_grid_attach (GTK_GRID (grid), fg_label,     0,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), fg_button,    1,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_label,     0,1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_button,    1,1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), ft_sz_label,  0,2, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), ft_sz_spin,   1,2, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_label,		0,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_button,	1,0, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_label,		0,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_button,	1,1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_label,	0,2, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_spin,	1,2, 1, 1);
   }
 
 

@@ -12,10 +12,11 @@
 
 #define GROUP_APLWRAP  "AplwrapResources"
 
-#define KEY_SHOW_PSTAT "ShowPstat"
-#define KEY_FONT_SIZE  "FontSize"
-#define KEY_FOREGROUND_COLOUR  "FgColour"
-#define KEY_BACKGROUND_COLOUR  "BgColour"
+#define KEY_SHOW_PSTAT		"ShowPstat"
+#define KEY_FONT_SIZE		"FontSize"
+#define KEY_FOREGROUND_COLOUR	"FgColour"
+#define KEY_BACKGROUND_COLOUR	"BgColour"
+#define KEY_ENABLE_EDIF		"EnableEdif"
 
 static gchar *resource_path = NULL;
 
@@ -86,6 +87,13 @@ restore_resources ()
       if (bg_colour) g_free (bg_colour);
       bg_colour = sv;
     }
+
+    bv = g_key_file_get_boolean (key_file,
+				 GROUP_APLWRAP,
+				 KEY_ENABLE_EDIF,
+				 &error);
+    if (error) g_clear_error (&error);
+    else enable_edif = bv;
   }
 
   g_key_file_free (key_file); 
@@ -123,6 +131,11 @@ save_resources ()
 			  GROUP_APLWRAP,
 			  KEY_FONT_SIZE,
 			  ft_size);
+
+  g_key_file_set_boolean (key_file,
+                          GROUP_APLWRAP,
+                          KEY_ENABLE_EDIF,
+                          enable_edif);
 
   {
     gchar *data = NULL;

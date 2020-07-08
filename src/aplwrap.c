@@ -440,6 +440,7 @@ main (int   argc,
     g_print ("aplwrap version %s\n", VERSION);
     exit (0);
   }
+  set_edif (TRUE, enable_edif);
 
   plot_pipe_name = g_strdup_printf ("/tmp/aplwrap-%d", (int)getpid ());
   plot_pipe_fd = (0 == mkfifo (plot_pipe_name, 0600)) ?
@@ -514,6 +515,7 @@ main (int   argc,
 
   define_tags ();
   init_shortcuts ();
+  set_edif (TRUE, enable_edif);
 
   gtk_widget_show_all (window);
   set_status_visibility (show_status);

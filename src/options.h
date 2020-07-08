@@ -3,8 +3,8 @@
 
 #include <gtk/gtk.h>
 
-#define BG_COLOUR_FALLBACK  "bisque"
-#define FG_COLOUR_FALLBACK  "black"
+#define BG_COLOUR_FALLBACK	"bisque"
+#define FG_COLOUR_FALLBACK	"black"
 
 extern gint         ft_size;
 extern gint         width;
@@ -12,6 +12,7 @@ extern gint         height;
 extern gboolean     printversion;
 extern gboolean     vwidth;
 extern gboolean     nocolour;
+extern gboolean     enable_edif;
 extern gchar       *new_fn;
 extern gchar       *opt_lx;
 extern gchar       *opt_load;
