@@ -1,22 +1,12 @@
 #include "options.h"
 
-#define XEQ_FALLBACK	"apl"
-
-#define FT_SIZE_FALLBACK	12
 gint ft_size = FT_SIZE_FALLBACK;
-
-#define WIDTH_FALLBACK	680
 gint width = WIDTH_FALLBACK;
-
-#define HEIGHT_FALLBACK	440
 gint height = HEIGHT_FALLBACK;
-
-#define EDIF_FALLBACK	FALSE
 gboolean enable_edif = EDIF_FALLBACK;
-
+gchar *edif_name = NULL;
 gchar *bg_colour = NULL;
 gchar *fg_colour = NULL;
-
 gboolean vwidth       = FALSE;
 gboolean nocolour     = FALSE;
 gboolean printversion = FALSE;
@@ -33,7 +23,6 @@ disable_edif (const gchar *option_name,
 	      gpointer data,
 	      GError **error)
 {
-  g_print ("in noedif\n");
   enable_edif = FALSE;
   return TRUE;
 }
@@ -66,6 +55,10 @@ GOptionEntry entries[] = {
   { "noedif", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     &disable_edif,
     "Turn off the edif2 editor",
+    NULL },
+  { "edif-name", 'E', 0, G_OPTION_ARG_STRING,
+    &edif_name,
+    "Set the edif2 function name [string] [default ed2]",
     NULL },
   { "xeq", 'x', 0, G_OPTION_ARG_FILENAME,
     &new_fn,

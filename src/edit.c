@@ -473,7 +473,6 @@ static void
 edit_revert_variable_cb (gchar *text, void *data)
 {
   set_send_cb (NULL, NULL);
-  g_print ("vbl: %s\n", text);
 #if 0
   window_s *tw = data;
   gchar **lines = g_strsplit (text, "\n", 0);
@@ -677,7 +676,6 @@ static void
 edit_variable_cb (gchar *text, void *data)
 {
   set_send_cb (NULL, NULL);
-  g_print ("vbl: %s\n", text);
 #if 0
   window_s *tw = data;
   gchar **lines = g_strsplit (text, "\n", 0);

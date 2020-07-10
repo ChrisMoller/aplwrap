@@ -16,14 +16,42 @@
 static gchar *filename = NULL;
 gboolean show_status = TRUE;
 
-#define START_EDIF	"'libedif2.so' ⎕FX 'ed2'"
-#define CLOSE_EDIF	")erase ed2"
+#define START_EDIF	"'libedif2.so' ⎕FX '%s'"
+#define CLOSE_EDIF	")erase %s"
+
+#if 0
+static void
+aplfx_callback_2 (gchar *result, size_t idx, void *state)
+{
+  gchar * cmd = g_strdup_printf ("⍞←'%s'", result);
+  if (state != (void *)(-1)) apl_send_inp (cmd, strlen (cmd));
+  g_free (cmd);
+}
+#endif
+
+static void
+unset_edif ()
+{
+  if (edif_name) {
+    gchar *cmd = g_strdup_printf (CLOSE_EDIF, edif_name);
+    apl_eval (cmd, -1, NULL, NULL);
+    g_free (cmd);
+  }
+}
 
 void
 set_edif (gboolean startup, gboolean state)
 {
-  char * ss = state ? START_EDIF : CLOSE_EDIF;
-  if (!startup || state) apl_eval (ss, -1, NULL, NULL);
+  if (edif_name && (!startup || state)) {
+    char * ss = state ? START_EDIF : CLOSE_EDIF;
+    gchar *cmd = g_strdup_printf (ss, edif_name);
+#if 0
+    apl_eval (cmd, -1, aplfx_callback_2, GINT_TO_POINTER (-1));
+#else
+    apl_eval (cmd, -1, NULL, NULL);
+#endif
+    g_free (cmd);
+  }
 }
 
 static void
@@ -46,8 +74,10 @@ settings_cb (GtkWidget *widget,
   dialog =  gtk_dialog_new_with_buttons (_ ("Settings"),
                                          get_top_window (),
                                          GTK_DIALOG_DESTROY_WITH_PARENT,
+					 _ ("Cancel"), GTK_RESPONSE_CANCEL,
                                          _ ("_OK"), GTK_RESPONSE_ACCEPT,
                                          NULL);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
   gtk_window_set_keep_above (GTK_WINDOW (dialog), TRUE);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -73,10 +103,24 @@ settings_cb (GtkWidget *widget,
   GtkWidget *fg_button;
   GtkWidget *bg_button;
   GtkWidget *ft_sz_spin;
+  GtkWidget *ename_ety;
   
   {
+    enum {
+	  ROW_ENAME,
+	  ROW_FG,
+	  ROW_BG,
+	  ROW_FS
+    };
+    
     GtkWidget *grid =  gtk_grid_new ();
     gtk_box_pack_start (GTK_BOX (vbox), grid, FALSE, FALSE, 8);
+
+    GtkWidget *ename_lbl= gtk_label_new (_ ("Editor command"));
+    ename_ety = gtk_entry_new ();
+    gtk_entry_set_text (GTK_ENTRY (ename_ety), edif_name);
+    gtk_entry_set_input_purpose (GTK_ENTRY (ename_ety),
+				 GTK_INPUT_PURPOSE_ALPHA);
 
     gdk_rgba_parse (&fg_rgba, fg_colour);
     gdk_rgba_parse (&bg_rgba, bg_colour);
@@ -96,24 +140,34 @@ settings_cb (GtkWidget *widget,
     gtk_spin_button_set_digits  (GTK_SPIN_BUTTON (ft_sz_spin), 0);
     gtk_spin_button_set_value   (GTK_SPIN_BUTTON (ft_sz_spin), (double)ft_size);
 
-    gtk_grid_attach (GTK_GRID (grid), fg_label,		0,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), fg_button,	1,0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_label,		0,1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), bg_button,	1,1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), ft_sz_label,	0,2, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid), ft_sz_spin,	1,2, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ename_lbl,	0, ROW_ENAME, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ename_ety,	1, ROW_ENAME, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_label,		0, ROW_FG, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), fg_button,	1, ROW_FG, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_label,		0, ROW_BG, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), bg_button,	1, ROW_BG, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_label,	0, ROW_FS, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), ft_sz_spin,	1, ROW_FS, 1, 1);
   }
 
 
   gtk_widget_show_all (dialog);
-  gtk_dialog_run (GTK_DIALOG (dialog));
+  gint response = gtk_dialog_run (GTK_DIALOG (dialog));
 
-  {
+  if (response == GTK_RESPONSE_ACCEPT) {
     GdkRGBA fg_rgba_new;
     GdkRGBA bg_rgba_new;
     gint    ft_size_new;
     gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (fg_button), &fg_rgba_new);
     gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (bg_button), &bg_rgba_new);
+
+    const gchar *new_ename = gtk_entry_get_text (GTK_ENTRY (ename_ety));
+    if (g_strcmp0 (new_ename, edif_name)) {
+      unset_edif ();
+      if (edif_name) g_free (edif_name);
+      edif_name = g_strdup (new_ename);
+      set_edif (FALSE, enable_edif);
+    }
 
     ft_size_new =
       gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (ft_sz_spin));

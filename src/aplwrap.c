@@ -440,7 +440,7 @@ main (int   argc,
     g_print ("aplwrap version %s\n", VERSION);
     exit (0);
   }
-  set_edif (TRUE, enable_edif);
+  //  set_edif (TRUE, enable_edif);
 
   plot_pipe_name = g_strdup_printf ("/tmp/aplwrap-%d", (int)getpid ());
   plot_pipe_fd = (0 == mkfifo (plot_pipe_name, 0600)) ?
@@ -475,6 +475,7 @@ main (int   argc,
   provider = gtk_css_provider_new ();
   if (!bg_colour) bg_colour = g_strdup (BG_COLOUR_FALLBACK);
   if (!fg_colour) fg_colour = g_strdup (FG_COLOUR_FALLBACK);
+  if (!edif_name) fg_colour = g_strdup (EDIF_NAME_FALLBACK);
 
   load_css_provider ();
   gtk_style_context_add_provider (gtk_widget_get_style_context (view),

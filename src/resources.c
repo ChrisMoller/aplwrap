@@ -17,6 +17,7 @@
 #define KEY_FOREGROUND_COLOUR	"FgColour"
 #define KEY_BACKGROUND_COLOUR	"BgColour"
 #define KEY_ENABLE_EDIF		"EnableEdif"
+#define KEY_EDIF_NAME		"EdifName"
 
 static gchar *resource_path = NULL;
 
@@ -88,6 +89,16 @@ restore_resources ()
       bg_colour = sv;
     }
 
+    sv = g_key_file_get_string (key_file,
+				GROUP_APLWRAP,
+				KEY_EDIF_NAME,
+				&error);
+    if (error) g_clear_error (&error);
+    else {
+      if (edif_name) g_free (edif_name);
+      edif_name = sv;
+    }
+
     bv = g_key_file_get_boolean (key_file,
 				 GROUP_APLWRAP,
 				 KEY_ENABLE_EDIF,
@@ -136,6 +147,11 @@ save_resources ()
                           GROUP_APLWRAP,
                           KEY_ENABLE_EDIF,
                           enable_edif);
+
+  g_key_file_set_string (key_file,
+			 GROUP_APLWRAP,
+			 KEY_EDIF_NAME,
+			 edif_name);
 
   {
     gchar *data = NULL;
