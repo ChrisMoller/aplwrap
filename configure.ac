@@ -9,7 +9,7 @@ APL_SOURCES=`apl --show_src_dir`
 AC_CHECK_FILE($APL_SOURCES, [foundit=yes], [foundit=no])
 if test x$foundit = xno; then
 AC_ARG_WITH([apl-source-dir],
-  AS_HELP_STRING([--apl-source-dir=arg],
+  AS_HELP_STRING([--with-apl-source-dir=arg],
   [Location of the GNU APL source code.]))
   APL_SOURCES=$with_apl_source_dir
 fi
